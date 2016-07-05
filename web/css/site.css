@@ -90,6 +90,20 @@ a.desc:after {
     margin: 0 0 15px 0;
 }
 
-.table td.bottom-column {
+.table th.bottom-column {
     vertical-align: bottom;
 }
+
+.navbar-inverse {
+    background-color: #171d7d;
+    border-color: #26153f;
+}
+
+.navbar-inverse .navbar-brand, .navbar-inverse .navbar-nav > li > a {
+    color: #f3d215;
+}
+
+.navbar-inverse .navbar-brand {
+    padding: 0 15px;
+}
+

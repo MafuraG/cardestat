@@ -1,12 +1,27 @@
+{{ use('yii/widgets/LinkPager') }}
+
 <h1>{{ table_title }}</h1>
 <table class="table table-bordered text-center">
   {% for level, row in table %}
-    <tr tclass="table level{{ level }}">
+    <tr>
       {% for parent_id, item in row %}
-        <td colspan="{{ item['no_leaves'] }}" rowspan="{{ item['span_levels'] }}" class="bottom-column">
+        <th colspan="{{ item['no_leaves'] }}" rowspan="{{ item['span_levels'] }}" class="bottom-column">
           {{ item['name'] }}
-        </td>
+        </th>
+      {% endfor %}
+    </tr>
+  {% endfor %}
+  {% for group in groups %}
+    <tr>
+      {% for reading in group['itemReadingsExtended'] %}
+        {% if reading['count'] is defined %}
+          <td>
+            {{ reading['count'] }}
+          </td>
+        {% endif %}
       {% endfor %}
     </tr>
   {% endfor %}
 </table>
+
+{{ link_pager_widget({'pagination': pagination}) }}

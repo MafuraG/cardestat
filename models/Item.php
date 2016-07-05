@@ -9,6 +9,9 @@ class Item extends ActiveRecord {
     public function getChildren() {
         return $this->hasMany(Item::className(), ['parent_id' => 'id']);
     }
+    public function getReadings() {
+        return $this->hasMany(ItemReading::className());
+    }
     public function getDescendants() {
         $res = $this->getChildren()->all();
         foreach ($res as &$ch) {

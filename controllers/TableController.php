@@ -5,6 +5,8 @@ namespace app\controllers;
 use yii\web\Controller;
 use yii\data\Pagination;
 use app\models\ItemExtended;
+use app\models\ItemReading;
+use app\models\ItemReadingGroup;
 use yii\helpers\ArrayHelper;
 
 class TableController extends Controller
@@ -27,18 +29,32 @@ class TableController extends Controller
     }
     public function actionView($id)
     {
-        $query = ItemExtended::find(['root_id' => $id]);
-        $table = $this->addLeafCountInfo(ArrayHelper::toArray($query->orderBy('level,path')->all()));
+        $query = ItemExtended::find(['root_id' => $id])->asArray();
+        $table = $this->addLeafCountInfo(ArrayHelper::index($query->orderBy('level,path')->all(), 'id'));
+        //
+        $query = ItemReadingGroup::find()->asArray() // Yii2 bug forces to do this!?
+            ->with(['itemReadingsExtended' => function($q) use ($id) {
+                $q->where(['root_id' => $id]);
+            }]);
+        $pagination = new Pagination([
+            'defaultPageSize' => 1,
+            'totalCount' => $query->count()
+        ]);
+        $groups = $query->offset($pagination->offset)
+            ->limit($pagination->limit)
+            ->all();
         $table = ArrayHelper::index($table, 'id', 'level');
-        /*
-        echo '<br/><br/><br/><br/><br/>';
-        \yii\helpers\VarDumper::dump($table, 5, true);
-        */
         $root = array_shift($table);
         $table_title = array_values($root)[0]['name'];
+        /*
+        echo '<br><br><br><br><br><br>';
+        \yii\helpers\VarDumper::dump($groups, 5, true);
+        */
 
         return $this->render('view.twig', [
             'table_title' => $table_title,
+            'groups' => $groups,
+            'pagination' => $pagination,
             'table' => $table,
         ]);
     }
