@@ -1,0 +1,12 @@
+<h1>{{ table_title }}</h1>
+<table class="table table-bordered text-center">
+  {% for level, row in table %}
+    <tr tclass="table level{{ level }}">
+      {% for parent_id, item in row %}
+        <td colspan="{{ item['no_leaves'] }}" rowspan="{{ item['span_levels'] }}" class="bottom-column">
+          {{ item['name'] }}
+        </td>
+      {% endfor %}
+    </tr>
+  {% endfor %}
+</table>

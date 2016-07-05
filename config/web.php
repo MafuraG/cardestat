@@ -38,6 +38,23 @@ $config = [
             ],
         ],
         'db' => require(__DIR__ . '/db.php'),
+        'view' => [
+            'renderers' => [
+                 'twig' => [
+                    'class' => 'yii\twig\ViewRenderer',
+                    'cachePath' => '@runtime/Twig/cache',
+                    // Array of twig options:
+                    'options' => [
+                        'auto_reload' => true,
+                    ],
+                    'globals' => ['html' => '\yii\helpers\Html'],
+                    'functions' => array(
+                        't' => 'Yii::t',
+                    ),
+                    'uses' => ['yii\bootstrap'],
+                ],
+            ]
+        ]
         /*
         'urlManager' => [
             'enablePrettyUrl' => true,
