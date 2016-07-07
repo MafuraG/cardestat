@@ -1,10 +1,9 @@
 {{ use('yii/widgets/LinkPager') }}
-{{ use('yii/helpers/BaseUrl') }}
 <h1>{{ t('app', 'Tables') }}</h1>
 <ul>
 {% for item in items %}
   <li>
-    {{ html.a(html.encode(item.name), {0: 'table/view', 'id': item.id}) | raw }}
+    {{ html.a(html.encode(item.name), url('table/view', {'id': item.id})) | raw }}
   </li>
 {% endfor %}
 </ul>

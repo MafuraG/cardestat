@@ -6,6 +6,9 @@ use yii\db\ActiveRecord;
 
 class Item extends ActiveRecord {
     private $descendants;
+    public static function primaryKey() {
+        return ['id'];
+    }
     public function getChildren() {
         return $this->hasMany(Item::className(), ['parent_id' => 'id']);
     }
@@ -20,8 +23,9 @@ class Item extends ActiveRecord {
         return $res;
     }
     public static function findLeaves() {
+        $t = self::tableName();
         return static::find()
-            ->leftJoin('item child', 'child.parent_id = item.id')
+            ->leftJoin('item child', "child.parent_id = $t.id")
             ->where('child.id is null');
     }
 }

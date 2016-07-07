@@ -1,27 +1,104 @@
 {{ use('yii/widgets/LinkPager') }}
+{{ use('kartik/daterange/DateRangePicker') }}
+{{ use('kartik/daterange/MomentAsset') }}
+{{ use('yii/web/JqueryAsset') }}
+{{ register_jquery_asset() }}
+{{ register_moment_asset() }}
 
 <h1>{{ table_title }}</h1>
-<table class="table table-bordered text-center">
-  {% for level, row in table %}
-    <tr>
-      {% for parent_id, item in row %}
-        <th colspan="{{ item['no_leaves'] }}" rowspan="{{ item['span_levels'] }}" class="bottom-column">
-          {{ item['name'] }}
-        </th>
-      {% endfor %}
-    </tr>
-  {% endfor %}
-  {% for group in groups %}
-    <tr>
-      {% for reading in group['itemReadingsExtended'] %}
-        {% if reading['count'] is defined %}
+<p>
+  <button type="button" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#new-group">{{ t('app', 'New group') }}</button>
+  <button type="button" class="btn btn-lg btn-success" data-toggle="modal" data-target="#new-group"><span class="glyphicon glyphicon-export" aria-hidden="true"></span> CSV</button>
+</p>
+<h2>{{ t('app', 'Groups') }}</h2>
+<div class="scrollable-x">
+  <table class="table table-bordered text-center" style="max-width: 100%">
+    {% for level, row in table %}
+      <tr>
+        {% if first_iteration is not defined %}
+          <th rowspan="{{ n_levels }}" class="bottom-column col-xs-1">{{ t('app', 'From') }}</th>
+          <th rowspan="{{ n_levels }}" class="bottom-column col-xs-1">{{ t('app', 'To') }}</th>
+          {% set first_iteration = false %}
+        {% endif %}
+        {% for parent_id, item in row %}
+          <th colspan="{{ item['no_leaves'] }}" rowspan="{{ item['span_levels'] }}" class="bottom-column col-xs-1">
+            {{ item['name'] }}
+          </th>
+        {% endfor %}
+      </tr>
+    {% endfor %}
+    {% for group in groups %}
+      <tr>
+        <td nowrap><small>{{ group['from'] }}</small></td>
+        <td nowrap><small>{{ group['to'] }}</small></td>
+        {% for reading in group['itemReadingsExtended'] %}
           <td>
             {{ reading['count'] }}
           </td>
-        {% endif %}
-      {% endfor %}
-    </tr>
-  {% endfor %}
-</table>
+        {% endfor %}
+      </tr>
+    {% endfor %}
+  </table>
+</div>
 
 {{ link_pager_widget({'pagination': pagination}) }}
+
+<div id="new-group" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog scrollable-x modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">{{ t('app', 'New group') }}</h4>
+      </div>
+      <form class="modal-body">
+        <div class="row">
+          <div class="form-group col-md-4 col-sm-6">
+            <label class="control-label">{{ t('app', 'Date range') }}</label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+              {{ date_range_picker_widget({
+                     'model': group_model,
+                     'name': 'date_range'
+                 }) }}
+            </div>
+          </div>
+        </div>
+        <label class="control-label">{{ t('app', 'New group readings') }}</label>
+        <table class="table table-bordered table-editable text-center">
+          {% for level, row in table %}
+            <tr>
+              {% for parent_id, item in row %}
+                <th colspan="{{ item['no_leaves'] }}" rowspan="{{ item['span_levels'] }}" class="bottom-column">
+                  {{ item['name'] }}
+                </th>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+          <tr>
+            {% for item in items %}
+              <td class="editable">
+                <input name="ItemReading[{{ item['id'] }}]" />
+              </td>
+            {% endfor %}
+          </tr>
+        </table>
+      </form>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">{{ t('app', 'Add group') }}</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+{{ void(this.beginBlock('table_view_js')) }}
+$('#new-group [type="submit"]').on('click', function() {
+    console.log('wtf', $('#new-group').find('form'), $('#new-group').find('form').serialize());
+    $.ajax({
+        method: 'post',
+        url: '{{ url('table/ajax-create') | raw }}',
+        data: $('#new-group').find('form').serialize()
+    });
+});
+{{ void(this.endBlock()) }}
+
+{{ this.registerJs(this.blocks['table_view_js'], constant('POS_END', this)) }}
