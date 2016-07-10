@@ -46,7 +46,11 @@ $config = [
                     // Array of twig options:
                     'options' => [
                         'auto_reload' => true,
+                        'debug' => YII_DEBUG
                     ],
+                    'extensions' => YII_DEBUG ? [
+                        '\Twig_Extension_Debug',
+                    ] : [],
                     'globals' => ['html' => '\yii\helpers\Html'],
                     'functions' => array(
                         't' => 'Yii::t',

@@ -5,7 +5,7 @@ namespace app\models;
 use yii\db\ActiveRecord;
 
 class Item extends ActiveRecord {
-    private $descendants;
+    protected $children;
     public static function primaryKey() {
         return ['id'];
     }
@@ -18,7 +18,7 @@ class Item extends ActiveRecord {
     public function getDescendants() {
         $res = $this->getChildren()->all();
         foreach ($res as &$ch) {
-            $ch->descendants = $ch->getDescendants();
+            $ch->children = $ch->getDescendants();
         }
         return $res;
     }

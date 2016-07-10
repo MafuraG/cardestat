@@ -141,3 +141,13 @@ h1 {
     margin-bottom: 32px;
     border-bottom: 1px solid #ddd;
 }
+
+ul.jqtree-tree li.jqtree-selected > .jqtree-element, ul.jqtree-tree li.jqtree-selected > .jqtree-element:hover {
+    background: inherit;
+}
+
+ul.jqtree-tree li.jqtree-selected > .jqtree-element .jqtree-title {
+    font-weight: bolder;
+    background: gold;
+    padding: 2px;
+}

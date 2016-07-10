@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use yii\data\Pagination;
+use app\models\Item;
 use app\models\ItemExtended;
 use app\models\ItemReading;
 use app\models\ItemReadingGroup;
@@ -60,8 +61,23 @@ class TableController extends Controller {
             $transaction->rollback();
         }
     }
-    public function actionView($id)
-    {
+    public function actionUpdate($id) {
+        $item = Item::findOne($id);
+        //$item_tree = 'que fueeeeeeee';
+        //echo \yii\helpers\Json::encode($item_tree); die;
+        $item_tree = ArrayHelper::toArray($item->children, [
+            'app\models\Item' => [
+                'id',
+                'name',
+                'parent_id',
+                'children'
+            ]
+        ]);
+        return $this->render('edit.twig', [
+            'item_tree' => $item_tree
+        ]);
+    }
+    public function actionView($id) {
         $query = ItemExtended::find(['root_id' => $id])->asArray();
         $table = $this->addTreeInfo(ArrayHelper::index($query->orderBy('level,path')->all(), 'id'));
         //

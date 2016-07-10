@@ -1,0 +1,12 @@
+{{ use('app/assets/JqtreeAsset') }}
+{{ register_jqtree_asset() }}
+
+<div id="item-tree"></div>
+
+{{ void(this.beginBlock('table_edit_js')) }}
+    var treeData = {{ item_tree | json_encode() | raw }};
+    console.log(treeData);
+    $('#item-tree').tree({data: treeData});
+{{ void(this.endBlock()) }}
+
+{{ this.registerJs(this.blocks['table_edit_js'], constant('POS_END', this)) }}

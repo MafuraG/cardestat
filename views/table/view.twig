@@ -4,6 +4,11 @@
 {{ use('yii/web/JqueryAsset') }}
 {{ register_jquery_asset() }}
 {{ register_moment_asset() }}
+{{ set(this, 'params', {'breadcrumbs': [{
+       'label': t('app', 'Tables'),
+       'url': url('table')
+   }, table_title]})
+}}
 
 <h1>{{ table_title }}</h1>
 <p>
