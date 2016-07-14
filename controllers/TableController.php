@@ -15,7 +15,8 @@ class TableController extends Controller {
             'verbs' => [
                 'class' => \yii\filters\VerbFilter::className(),
                 'actions' => [
-                    'ajax-create'  => ['post'],
+                    'ajax-create-reading'  => ['post'],
+                    'ajax-create-item'  => ['post'],
                 ],
             ],
         ], parent::behaviors());
@@ -36,7 +37,34 @@ class TableController extends Controller {
             'pagination' => $pagination,
         ]);
     }
-    public function actionAjaxCreate() {
+    public function actionAjaxCreateItem() {
+        $request = \Yii::$app->request;
+        $item = new Item();
+        $sibling = Item::findOne(['parent_id' => $request->post('parent_id', null)]);
+        $item->name = $request->post('name', null);
+        $item->parent_id = $request->post('parent_id', null);
+        $connection = \Yii::$app->db;
+        $transaction = $connection->beginTransaction();
+        try {
+            if (!$item->save())
+                throw new \yii\web\HttpException(422, \yii\helpers\Json::encode($item->errors));
+            if ($sibling) foreach ($sibling->readings as $reading) {
+                $itemReading = new ItemReading();
+                $itemReading->item_id = $item->id;
+                $itemReading->item_reading_group_id = $reading->item_reading_group_id;
+                $itemReading->save(false);
+            } else if ($item->parent) foreach ($item->parent->readings as $reading) {
+                $reading->item_id = $item->id;
+                $reading->save(false);
+            }
+            $transaction->commit();
+        } catch (Exception $e) {
+            $transaction->rollback();
+            throw $e;
+        }
+        return \yii\helpers\Json::encode($item);
+    }
+    public function actionAjaxCreateReading() {
         $request = \Yii::$app->request;
         $group = new ItemReadingGroup();
         $group->date_range = $request->post('date_range', null);
@@ -59,17 +87,17 @@ class TableController extends Controller {
             $transaction->commit();
         } catch (Exception $e) {
             $transaction->rollback();
+            throw $e;
         }
     }
     public function actionUpdate($id) {
-        $item = Item::findOne($id);
-        //$item_tree = 'que fueeeeeeee';
-        //echo \yii\helpers\Json::encode($item_tree); die;
-        $item_tree = ArrayHelper::toArray($item->children, [
-            'app\models\Item' => [
+        $item = ItemExtended::findOne($id);
+        $item_tree = ArrayHelper::toArray($item, [
+            'app\models\ItemExtended' => [
                 'id',
                 'name',
                 'parent_id',
+                'path',
                 'children'
             ]
         ]);

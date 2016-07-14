@@ -97,10 +97,9 @@
 </div><!-- /.modal -->
 {{ void(this.beginBlock('table_view_js')) }}
 $('#new-group [type="submit"]').on('click', function() {
-    console.log('wtf', $('#new-group').find('form'), $('#new-group').find('form').serialize());
     $.ajax({
         method: 'post',
-        url: '{{ url('table/ajax-create') | raw }}',
+        url: '{{ url('table/ajax-create-reading') | raw }}',
         data: $('#new-group').find('form').serialize()
     });
 });

@@ -17,7 +17,7 @@ body {
 .footer {
     height: 60px;
     background-color: #171d7d;
-    color: #f5cc1a;
+    color: #fbd11a;
     border-top: 1px solid #ddd;
     padding-top: 20px;
 }
@@ -101,7 +101,7 @@ a.desc:after {
 }
 
 .navbar-inverse .navbar-brand, .navbar-inverse .navbar-nav > li > a {
-    color: #f3d215;
+    color: #fbd11a;
 }
 
 .navbar .navbar-header a:hover {
@@ -129,6 +129,7 @@ td.editable input {
     padding: 0;
     margin: 0;
     border: 0;
+    border-bottom: solid 1px #ddd;
     width: 100%;
 }
 
@@ -146,8 +147,15 @@ ul.jqtree-tree li.jqtree-selected > .jqtree-element, ul.jqtree-tree li.jqtree-se
     background: inherit;
 }
 
+ul.jqtree-tree li > .jqtree-element .jqtree-title {
+    padding: 2px;
+}
+
 ul.jqtree-tree li.jqtree-selected > .jqtree-element .jqtree-title {
     font-weight: bolder;
-    background: gold;
-    padding: 2px;
+    background: #fbd11a;
+}
+
+fieldset {
+   margin-bottom: 22px;
 }

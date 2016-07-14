@@ -1,12 +1,84 @@
 {{ use('app/assets/JqtreeAsset') }}
 {{ register_jqtree_asset() }}
+{{ set(this, 'params', {'breadcrumbs': [{
+       'label': t('app', 'Tables'),
+       'url': url('table')
+   }, t('app', 'Update'), item_tree['id']]})
+}}
 
-<div id="item-tree"></div>
+<h1>{{ t('app', 'Update') }} {{ item_tree['name'] }}</h1>
+
+<div class="row">
+  <div class="col-md-4">
+    <div class="well">
+      <form>
+        <legend>{{ t('app', 'Properties') }}</legend>
+        <fieldset class="current">
+          <div class="form-group">
+            <label for="Item_path">{{ t('app', 'Path') }}</label>
+            <input class="form-control" id="Item_path" readonly>
+          </div>
+          <div class="form-group">
+            <label for="Item_name">{{ t('app', 'Name') }}</label>
+            <input type="hidden" id="Item_id" name="Item[id]">
+            <input class="form-control" id="Item_name" name="Item[name]">
+          </div>
+          <button type="button" class="btn btn-primary">{{ t('app', 'Save') }}</button>
+          <button type="button" class="btn btn-danger">{{ t('app', 'Delete') }}</button>
+        </fieldset>
+        <legend>{{ t('app', 'Create child node') }}</legend>
+        <fieldset class="new-child">
+          <div class="form-group">
+            <label for="Item_name">{{ t('app', 'Name') }}</label>
+            <input class="form-control" id="Item_name" name="Item[name]">
+          </div>
+          <button type="button" data-loading-text="{{ t('app', 'Creating...') }}" class="btn btn-primary">{{ t('app', 'Create') }}</button>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+  
+  <div class="col-md-8" id="item-tree"></div>
+
+</div>
 
 {{ void(this.beginBlock('table_edit_js')) }}
+    var $currentItemPath = $('#Item_path');
+    var $currentItemName = $('fieldset.current #Item_name');
+    var $currentItemId = $('fieldset.current #Item_id');
+    var $newChildName = $('fieldset.new-child #Item_name');
     var treeData = {{ item_tree | json_encode() | raw }};
-    console.log(treeData);
-    $('#item-tree').tree({data: treeData});
+    $itemTree = $('#item-tree');
+    $itemTree.tree({data: treeData['children']});
+    $itemTree.on('tree.click', function(event) {
+        // The clicked node is 'event.node'
+        var node = event.node;
+        $currentItemName.val(node.name);
+        $currentItemPath.val(node.path.substring(node.path.indexOf('\\') + 1));
+        $currentItemId.val(node.id);
+    });
+    $('fieldset.new-child .btn-primary').on('click', function() {
+       var $btn = $(this).button('loading');
+       $.ajax({
+           url: '{{ url('table/ajax-create-item') | raw }}',
+           method: 'post',
+           dataType: 'json',
+           data: 'name={name}&parent_id={parent_id}'
+               .replace('{name}', $newChildName.val())
+               .replace('{parent_id}', $currentItemId.val()),
+           success: function(data, textStatus, jqXHR) {
+               var parentNode = $itemTree.tree('getNodeById', $currentItemId.val());
+               $itemTree.tree('appendNode', {
+                   id: data.id,
+                   name: $newChildName.val()
+               }, parentNode);
+               $newChildName.val('');
+           },
+           complete: function() {
+               $btn.button('reset');
+           }
+       });
+    });
 {{ void(this.endBlock()) }}
 
-{{ this.registerJs(this.blocks['table_edit_js'], constant('POS_END', this)) }}
+{{ this.registerJs(this.blocks['table_edit_js'], constant('POS_LOAD', this)) }}

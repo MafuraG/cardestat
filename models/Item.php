@@ -9,11 +9,14 @@ class Item extends ActiveRecord {
     public static function primaryKey() {
         return ['id'];
     }
+    public function getParent() {
+        return $this->hasOne(Item::className(), ['id' => 'parent_id']);
+    }
     public function getChildren() {
         return $this->hasMany(Item::className(), ['parent_id' => 'id']);
     }
     public function getReadings() {
-        return $this->hasMany(ItemReading::className());
+        return $this->hasMany(ItemReading::className(), ['item_id' => 'id']);
     }
     public function getDescendants() {
         $res = $this->getChildren()->all();
