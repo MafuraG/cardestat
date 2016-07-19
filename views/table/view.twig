@@ -10,26 +10,35 @@
    }, table_title]})
 }}
 
+{% set glyph_pencil = '<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>' %}
+{% set glyph_trash = '<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>' %}
+{% set glyph_export = '<span class="glyphicon glyphicon-export" aria-hidden="true"></span>' %}
+
 <h1>{{ table_title }}</h1>
 <p>
-  <button type="button" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#new-group">{{ t('app', 'New group') }}</button>
-  <button type="button" class="btn btn-lg btn-success" data-toggle="modal" data-target="#new-group"><span class="glyphicon glyphicon-export" aria-hidden="true"></span> CSV</button>
+  <button type="button" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#new-group">
+    {{ t('app', 'New group') }}</button>
+  <button type="button" class="btn btn-lg btn-success" data-toggle="modal" data-target="#new-group">
+    {{ glyph_export | raw }}</span> CSV</button>
 </p>
 <h2>{{ t('app', 'Groups') }}</h2>
-<div class="scrollable-x">
+<div id="table-wrapper" class="scrollable-x">
   <table class="table table-bordered text-center" style="max-width: 100%">
     {% for level, row in table %}
       <tr>
         {% if first_iteration is not defined %}
-          <th rowspan="{{ n_levels }}" class="bottom-column col-xs-1">{{ t('app', 'From') }}</th>
-          <th rowspan="{{ n_levels }}" class="bottom-column col-xs-1">{{ t('app', 'To') }}</th>
-          {% set first_iteration = false %}
+          <th rowspan="{{ n_levels }}" class="bottom-column">{{ t('app', 'From') }}</th>
+          <th rowspan="{{ n_levels }}" class="bottom-column">{{ t('app', 'To') }}</th>
         {% endif %}
         {% for parent_id, item in row %}
           <th colspan="{{ item['no_leaves'] }}" rowspan="{{ item['span_levels'] }}" class="bottom-column col-xs-1">
             {{ item['name'] }}
           </th>
         {% endfor %}
+        {% if first_iteration is not defined %}
+          <th rowspan="{{ n_levels }}" class="bottom-column"></th>
+          {% set first_iteration = false %}
+        {% endif %}
       </tr>
     {% endfor %}
     {% for group in groups %}
@@ -41,6 +50,12 @@
             {{ reading['count'] }}
           </td>
         {% endfor %}
+        <td>
+          <button class="btn btn-xs btn-success">
+            {{ html.a(glyph_pencil, url('table/ajax-update-group', {'id': group['id']})) | raw }}</button>
+          <button class="btn btn-xs btn-danger">
+            {{ html.a(glyph_trash, url('table/ajax-delete-group', {'id': group['id']})) | raw }}</button>
+        </td>
       </tr>
     {% endfor %}
   </table>
@@ -52,7 +67,8 @@
   <div class="modal-dialog scrollable-x modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title">{{ t('app', 'New group') }}</h4>
       </div>
       <form class="modal-body">
@@ -66,6 +82,7 @@
                      'name': 'date_range'
                  }) }}
             </div>
+            <p class="help-block"></p>
           </div>
         </div>
         <label class="control-label">{{ t('app', 'New group readings') }}</label>
@@ -89,19 +106,51 @@
         </table>
       </form>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary">{{ t('app', 'Add group') }}</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal" >Close</button>
+        <button type="submit" class="btn btn-primary" data-loading-text="{{ t('app', 'Adding group') }}...">{{ t('app', 'Add group') }}</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
 {{ void(this.beginBlock('table_view_js')) }}
 $('#new-group [type="submit"]').on('click', function() {
+    $btn = $(this).button('loading');
+    $('.form-group').removeClass('has-error');
+    $('.help-block').html('');
     $.ajax({
         method: 'post',
         url: '{{ url('table/ajax-create-reading') | raw }}',
+        data: $('#new-group').find('form').serialize(),
+        dataType: 'json',
+        error: function(jqXHR, textStatus, errorThrown) {
+            msg = JSON.parse(jqXHR.responseJSON.message);
+            console.log(msg);
+            for (attr in msg) {
+                $input = $('input[name="{attr}"]'.replace('{attr}', attr));
+                console.log(attr, msg[attr]);
+                $input.closest('.form-group')
+                    .addClass('has-error')
+                    .find('.help-block')
+                    .html(msg[attr].join(','));
+            }
+        },
+        complete: function() {
+            $btn.button('reset');
+        },
+        success: function() {
+            location.reload();
+        }
+    });
+});
+$('#table-wrapper').on('click', '.table .btn-success', function() {
+    var url = $(this).find('a').attr('href');
+    $.ajax({
+        method: 'post',
+        url: url,
         data: $('#new-group').find('form').serialize()
     });
+    return false;
 });
 {{ void(this.endBlock()) }}
 

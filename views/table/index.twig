@@ -1,13 +1,75 @@
-{{ use('yii/widgets/LinkPager') }}
+{{ use('yii/grid/GridView') }}
 {{ set(this, 'params', {'breadcrumbs': [t('app', 'Tables')]}) }}
 
 <h1>{{ t('app', 'Tables') }}</h1>
-<ul>
-{% for item in items %}
-  <li>
-    {{ html.a(html.encode(item.name), url('table/view', {'id': item.id})) | raw }}
-  </li>
-{% endfor %}
-</ul>
 
-{{ link_pager_widget({'pagination': pagination}) }}
+<p>
+  <button type="button" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#new-table">
+    {{ t('app', 'New table') }}</button>
+</p>
+
+{% set buttons_tpl = '
+    <button class="btn btn-xs btn-success">{view}</button>
+    <button class="btn btn-xs btn-primary">{update}</button>
+    <button class="btn btn-xs btn-danger">{delete}</button>' %}
+{{ grid_view_widget({
+    'dataProvider': dataProvider,
+    'columns': [
+        {'attribute': 'id', 'contentOptions': {'class': 'id'}},
+        {'attribute': 'name'},
+        {
+            'class': 'yii\\grid\\ActionColumn',
+            'contentOptions': {'class': 'actions-3'},
+            'template': buttons_tpl
+        }
+    ],
+    'summaryOptions': {
+        'class': 'pull-right',
+        'tag': 'em'
+    }
+   })
+}}
+
+<div id="new-table" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">{{ t('app', 'New table') }}</h4>
+      </div>
+      <form class="modal-body">
+        <div class="form-group">
+          <label class="control-label">{{ t('app', 'Table name') }}</label>
+          <input maxlength="48" class="form-control" id="Item_name" name="Item[name]" type="text">
+        </div>
+      </form>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+          {{ t('app', 'Cancel') }}</button>
+        <button type="submit" class="btn btn-primary" data-loading-text="{{ t('app', 'Adding...') }}">
+          {{ t('app', 'Add table') }}</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+{{ void(this.beginBlock('table_index_js')) }}
+$('#new-table [type="submit"]').on('click', function() {
+    $btn = $(this);
+    $btn.button('loading');
+    $.ajax({
+        method: 'post',
+        url: '{{ url('table/ajax-create-table') | raw }}',
+        data: $('#new-table').find('form').serialize(),
+        success: function() {
+            location.reload();
+        },
+        complete: function() {
+            $btn.button('reset');
+        }
+    });
+});
+{{ void(this.endBlock()) }}
+
+{{ this.registerJs(this.blocks['table_index_js'], constant('POS_END', this)) }}

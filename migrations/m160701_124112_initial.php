@@ -49,6 +49,7 @@ class m160701_124112_initial extends Migration {
     }
 
     public function safeDown() {
+        $this->execute('drop view item_reading_extended');
         $this->execute('drop view item_extended');
         $this->dropTable('item_reading');
         $this->dropTable('item_reading_group');

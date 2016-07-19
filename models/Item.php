@@ -6,6 +6,12 @@ use yii\db\ActiveRecord;
 
 class Item extends ActiveRecord {
     protected $children;
+    public function rules() {
+        return [
+            ['name', 'required'],
+            ['name', 'string', 'max' => 48],
+        ];
+    }
     public static function primaryKey() {
         return ['id'];
     }
@@ -25,10 +31,5 @@ class Item extends ActiveRecord {
         }
         return $res;
     }
-    public static function findLeaves() {
-        $t = self::tableName();
-        return static::find()
-            ->leftJoin('item child', "child.parent_id = $t.id")
-            ->where('child.id is null');
-    }
+    
 }

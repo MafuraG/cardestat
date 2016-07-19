@@ -91,6 +91,10 @@ a.desc:after {
     margin: 0 0 15px 0;
 }
 
+.table.text-center th {
+    text-align: center;
+}
+
 .table th.bottom-column {
     vertical-align: bottom;
 }
@@ -158,4 +162,16 @@ ul.jqtree-tree li.jqtree-selected > .jqtree-element .jqtree-title {
 
 fieldset {
    margin-bottom: 22px;
+}
+
+td.id {
+   width: 50px;
+}
+
+td.actions-3 {
+   width: 99px;
+}
+
+td .btn .glyphicon {
+   color: black;
 }

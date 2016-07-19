@@ -3,9 +3,12 @@
 namespace app\controllers;
 
 use yii\data\Pagination;
+use yii\data\ActiveDataProvider;
+use yii\web\Response;
 use app\models\Item;
 use app\models\ItemExtended;
 use app\models\ItemReading;
+use app\models\ItemReadingExtended;
 use app\models\ItemReadingGroup;
 use yii\helpers\ArrayHelper;
 
@@ -17,25 +20,58 @@ class TableController extends Controller {
                 'actions' => [
                     'ajax-create-reading'  => ['post'],
                     'ajax-create-item'  => ['post'],
+                    'ajax-update-group'  => ['post'],
+                    'ajax-delete-item'  => ['post'],
+                    'ajax-create-table'  => ['post'],
                 ],
             ],
         ], parent::behaviors());
     }
     public function actionIndex() {
         $query = ItemExtended::find()->where(['parent_id' => null]);
-        $pagination = new Pagination([
-            'defaultPageSize' => 5,
-            'totalCount' => $query->count(),
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => [
+                'pageSize' => 20,
+            ],
         ]);
-        $items = $query->orderBy('name')
-            ->offset($pagination->offset)
-            ->limit($pagination->limit)
-            ->all();
 
         return $this->render('index.twig', [
-            'items' => $items,
-            'pagination' => $pagination,
+            'dataProvider' => $dataProvider,
         ]);
+    }
+    public function actionAjaxUpdateGroup($id) {
+        $request = \Yii::$app->request;
+        $readings = $request->post('ItemReading', []);
+        return \yii\helpers\Json::encode($readings);
+    }
+    public function actionAjaxCreateTable() {
+        $request = \Yii::$app->request;
+        $item = new Item();
+        $item->attributes = $request->post('Item', []);
+        if (!$item->save())
+            throw new \yii\web\HttpException(422, \yii\helpers\Json::encode($item->errors));
+        return \yii\helpers\Json::encode($item);
+    }
+    public function actionAjaxDeleteItem() {
+        $request = \Yii::$app->request;
+        $item = Item::findOne($request->post('id'));
+        $connection = \Yii::$app->db;
+        $transaction = $connection->beginTransaction();
+        try {
+            if ($item->parent and $item->parent->children and count($item->parent->children) == 1) {
+                foreach ($item->readings as $reading) {
+                    $reading->item_id = $item->parent_id;
+                    $reading->save(false);
+                }
+            } else foreach ($item->readings as $reading) $reading->delete();
+            $res = $item->delete();
+            $transaction->commit();
+            return \yii\helpers\Json::encode($res);
+        } catch (Exception $e) {
+            $transaction->rollback();
+            throw $e;
+        }
     }
     public function actionAjaxCreateItem() {
         $request = \Yii::$app->request;
@@ -48,7 +84,7 @@ class TableController extends Controller {
         try {
             if (!$item->save())
                 throw new \yii\web\HttpException(422, \yii\helpers\Json::encode($item->errors));
-            if ($sibling) foreach ($sibling->readings as $reading) {
+            if ($sibling) foreach (ItemExtended::findLeaves($sibling->id)->one()->readings as $reading) {
                 $itemReading = new ItemReading();
                 $itemReading->item_id = $item->id;
                 $itemReading->item_reading_group_id = $reading->item_reading_group_id;
@@ -57,6 +93,7 @@ class TableController extends Controller {
                 $reading->item_id = $item->id;
                 $reading->save(false);
             }
+            $item = ItemExtended::findOne(['id' => $item->id]);
             $transaction->commit();
         } catch (Exception $e) {
             $transaction->rollback();
@@ -65,6 +102,7 @@ class TableController extends Controller {
         return \yii\helpers\Json::encode($item);
     }
     public function actionAjaxCreateReading() {
+        \Yii::$app->response->format = Response::FORMAT_JSON;
         $request = \Yii::$app->request;
         $group = new ItemReadingGroup();
         $group->date_range = $request->post('date_range', null);
@@ -85,6 +123,7 @@ class TableController extends Controller {
                     throw new \yii\web\HttpException(500, \Yii::t('app', 'Could not save reading'));
             }
             $transaction->commit();
+            return \yii\helpers\Json::encode(null);
         } catch (Exception $e) {
             $transaction->rollback();
             throw $e;
@@ -110,6 +149,12 @@ class TableController extends Controller {
         $table = $this->addTreeInfo(ArrayHelper::index($query->orderBy('level,path')->all(), 'id'));
         //
         $query = ItemReadingGroup::find()->asArray() // Yii2 bug forces to do this!?
+            ->innerJoin(['ire' =>
+                ItemReadingExtended::find()
+                    ->select(['item_reading_group_id'])
+                    ->where(['root_id' => $id])
+                    ->groupBy('item_reading_group_id')
+            ], 'ire.item_reading_group_id = item_reading_group.id')
             ->with(['itemReadingsExtended' => function($q) use ($id) {
                 $q->where(['root_id' => $id]);
             }]);
@@ -131,7 +176,7 @@ class TableController extends Controller {
             'table_title' => $table_title,
             'groups' => $groups,
             'items' => $items,
-            'n_levels' => 4,//$root['n_levels'],
+            'n_levels' => reset($root)['n_levels'],
             'group_model' => $group_model,
             'pagination' => $pagination,
             'table' => $table,
@@ -140,6 +185,7 @@ class TableController extends Controller {
     protected function addTreeInfo($table) {
         $parents = [];
         $noLeaves = [];
+        $levelsBelow = [];
         $maxLevel = 0;
         foreach (array_reverse($table) as $v) {
             $parents[] = $v['parent_id'];
@@ -161,6 +207,9 @@ class TableController extends Controller {
             if (array_search($v['id'], $parents, true) === false)
                 $v['span_levels'] = $maxLevel - $levelsBelow[$v['id']] - $v['level'] + 1;
         }
+        reset($table);
+        $table[key($table)]['n_levels'] = $maxLevel;
+
         return $table;
     }
 }

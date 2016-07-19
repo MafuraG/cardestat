@@ -8,7 +8,7 @@
 
 <h1>{{ t('app', 'Update') }} {{ item_tree['name'] }}</h1>
 
-<div class="row">
+<div class="row" style="position: relative">
   <div class="col-md-4">
     <div class="well">
       <form>
@@ -24,7 +24,7 @@
             <input class="form-control" id="Item_name" name="Item[name]">
           </div>
           <button type="button" class="btn btn-primary">{{ t('app', 'Save') }}</button>
-          <button type="button" class="btn btn-danger">{{ t('app', 'Delete') }}</button>
+          <button type="button" class="btn btn-danger" data-loading-text="{{ t('app', 'Deleting') }}...">{{ t('app', 'Delete') }}</button>
         </fieldset>
         <legend>{{ t('app', 'Create child node') }}</legend>
         <fieldset class="new-child">
@@ -32,12 +32,13 @@
             <label for="Item_name">{{ t('app', 'Name') }}</label>
             <input class="form-control" id="Item_name" name="Item[name]">
           </div>
-          <button type="button" data-loading-text="{{ t('app', 'Creating...') }}" class="btn btn-primary">{{ t('app', 'Create') }}</button>
+          <button type="button" data-loading-text="{{ t('app', 'Creating') }}..." class="btn btn-primary">{{ t('app', 'Create') }}</button>
         </fieldset>
       </form>
     </div>
   </div>
   
+  <span class="glyphicon glyphicon-tree-conifer" style="position: absolute; top: 4px"></span>
   <div class="col-md-8" id="item-tree"></div>
 
 </div>
@@ -49,7 +50,7 @@
     var $newChildName = $('fieldset.new-child #Item_name');
     var treeData = {{ item_tree | json_encode() | raw }};
     $itemTree = $('#item-tree');
-    $itemTree.tree({data: treeData['children']});
+    $itemTree.tree({data: [treeData]});
     $itemTree.on('tree.click', function(event) {
         // The clicked node is 'event.node'
         var node = event.node;
@@ -57,8 +58,16 @@
         $currentItemPath.val(node.path.substring(node.path.indexOf('\\') + 1));
         $currentItemId.val(node.id);
     });
+    $newChildName.on('keyup', function (e) {
+        if (e.keyCode == 13) {
+            appendChild($('fieldset.new-child .btn-primary'));
+        }
+    });
     $('fieldset.new-child .btn-primary').on('click', function() {
-       var $btn = $(this).button('loading');
+        appendChild($(this));
+    });
+    function appendChild($btn) {
+       $btn.button('loading');
        $.ajax({
            url: '{{ url('table/ajax-create-item') | raw }}',
            method: 'post',
@@ -70,9 +79,28 @@
                var parentNode = $itemTree.tree('getNodeById', $currentItemId.val());
                $itemTree.tree('appendNode', {
                    id: data.id,
-                   name: $newChildName.val()
+                   name: $newChildName.val(),
+                   path: data.path,
+                   parent_id: parentNode.id
                }, parentNode);
                $newChildName.val('');
+           },
+           complete: function() {
+               $btn.button('reset');
+           }
+       });
+    }
+    $('fieldset.current .btn-danger').on('click', function() {
+       var $btn = $(this).button('loading');
+       $.ajax({
+           url: '{{ url('table/ajax-delete-item') | raw }}',
+           method: 'post',
+           dataType: 'json',
+           data: 'id={id}'
+               .replace('{id}', $currentItemId.val()),
+           success: function(data, textStatus, jqXHR) {
+               var node = $itemTree.tree('getNodeById', $currentItemId.val());
+               $itemTree.tree('removeNode', node);
            },
            complete: function() {
                $btn.button('reset');
