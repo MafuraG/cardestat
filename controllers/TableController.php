@@ -11,18 +11,26 @@ use app\models\ItemReading;
 use app\models\ItemReadingExtended;
 use app\models\ItemReadingGroup;
 use yii\helpers\ArrayHelper;
+use yii\web\HttpException;
+use yii\filters\AccessControl;
 
 class TableController extends Controller {
     public function behaviors() {
         return ArrayHelper::merge([
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [[
+                    'allow' => true,
+                    'roles' => ['@']
+                ]]
+            ],
             'verbs' => [
                 'class' => \yii\filters\VerbFilter::className(),
                 'actions' => [
-                    'ajax-create-reading'  => ['post'],
-                    'ajax-create-item'  => ['post'],
-                    'ajax-update-group'  => ['post'],
-                    'ajax-delete-item'  => ['post'],
                     'ajax-create-table'  => ['post'],
+                    'ajax-save-readings'  => ['post'],
+                    'ajax-create-item'  => ['post'],
+                    'ajax-delete-item'  => ['post'],
                 ],
             ],
         ], parent::behaviors());
@@ -40,20 +48,17 @@ class TableController extends Controller {
             'dataProvider' => $dataProvider,
         ]);
     }
-    public function actionAjaxUpdateGroup($id) {
-        $request = \Yii::$app->request;
-        $readings = $request->post('ItemReading', []);
-        return \yii\helpers\Json::encode($readings);
-    }
     public function actionAjaxCreateTable() {
+        \Yii::$app->response->format = Response::FORMAT_JSON;
         $request = \Yii::$app->request;
         $item = new Item();
         $item->attributes = $request->post('Item', []);
         if (!$item->save())
-            throw new \yii\web\HttpException(422, \yii\helpers\Json::encode($item->errors));
-        return \yii\helpers\Json::encode($item);
+            throw new HttpException(422, \yii\helpers\Json::encode($item->errors));
+        return $item;
     }
     public function actionAjaxDeleteItem() {
+        \Yii::$app->response->format = Response::FORMAT_JSON;
         $request = \Yii::$app->request;
         $item = Item::findOne($request->post('id'));
         $connection = \Yii::$app->db;
@@ -67,13 +72,14 @@ class TableController extends Controller {
             } else foreach ($item->readings as $reading) $reading->delete();
             $res = $item->delete();
             $transaction->commit();
-            return \yii\helpers\Json::encode($res);
+            return $res;
         } catch (Exception $e) {
             $transaction->rollback();
             throw $e;
         }
     }
     public function actionAjaxCreateItem() {
+        \Yii::$app->response->format = Response::FORMAT_JSON;
         $request = \Yii::$app->request;
         $item = new Item();
         $sibling = Item::findOne(['parent_id' => $request->post('parent_id', null)]);
@@ -83,12 +89,21 @@ class TableController extends Controller {
         $transaction = $connection->beginTransaction();
         try {
             if (!$item->save())
-                throw new \yii\web\HttpException(422, \yii\helpers\Json::encode($item->errors));
-            if ($sibling) foreach (ItemExtended::findLeaves($sibling->id)->one()->readings as $reading) {
-                $itemReading = new ItemReading();
-                $itemReading->item_id = $item->id;
-                $itemReading->item_reading_group_id = $reading->item_reading_group_id;
-                $itemReading->save(false);
+                throw new HttpException(422, \yii\helpers\Json::encode($item->errors));
+            if ($sibling) {
+                $sql = 'insert into item_reading (item_id, item_reading_group_id) values ';
+                $i = 0;
+                foreach (ItemExtended::findLeaves($sibling->id)->one()->readings as $reading) {
+                    $i++;
+                    $sql .= "($item->id, $reading->item_reading_group_id),";
+                }
+                if ($i > 0) {
+                    $sql = substr($sql, 0, strlen($sql) - 1);
+                    $command = $connection->createCommand($sql);
+                    $res = $command->execute();
+                    if ($res !== $i)
+                        throw new HttpException(500, \Yii::t('app', 'Could not save all items'));
+                }
             } else if ($item->parent) foreach ($item->parent->readings as $reading) {
                 $reading->item_id = $item->id;
                 $reading->save(false);
@@ -99,31 +114,40 @@ class TableController extends Controller {
             $transaction->rollback();
             throw $e;
         }
-        return \yii\helpers\Json::encode($item);
+        return $item;
     }
-    public function actionAjaxCreateReading() {
+    public function actionAjaxSaveReadings($id = null) {
         \Yii::$app->response->format = Response::FORMAT_JSON;
         $request = \Yii::$app->request;
-        $group = new ItemReadingGroup();
-        $group->date_range = $request->post('date_range', null);
+        if (!$id) $group = new ItemReadingGroup();
+        else $group = ItemReadingGroup::findOne(['id' => $id]);
+        if (!$group) throw new HttpException(404);
+        $group->date_range = $request->post('Group_date_range', null);
         if (!$group->validate())
-            throw new \yii\web\HttpException(422, \yii\helpers\Json::encode($group->errors));
+            throw new HttpException(422, \yii\helpers\Json::encode($group->errors));
         $connection = \Yii::$app->db;
         $transaction = $connection->beginTransaction();
         try {
+            $sql = 'insert into item_reading (item_reading_group_id, count, item_id) values ';
             if (!$group->save(false))
-                throw new \yii\web\HttpException(500, \Yii::t('app', 'Could not save group'));
+                throw new HttpException(500, \Yii::t('app', 'Could not save group'));
             $readings = $request->post('ItemReading', []);
+            if ($id) ItemReading::deleteAll("item_reading_group_id = $id");
+            $i = 0;
             foreach ($readings as $item_id => $item_count) {
-                $itemReading = new ItemReading();
-                $itemReading->item_id = $item_id;
-                $itemReading->count = $item_count;
-                $itemReading->item_reading_group_id = $group->id;
-                if (!$itemReading->save(false))
-                    throw new \yii\web\HttpException(500, \Yii::t('app', 'Could not save reading'));
+                $i++;
+                if (!is_numeric($item_count) or !is_int($item_count+0)) $item_count = null;
+                $sql .= "($group->id, $item_count, $item_id),";
+            }
+            if ($i > 0) {
+                $sql = substr($sql, 0, strlen($sql) - 1);
+                $command = $connection->createCommand($sql);
+                $res = $command->execute();
+                if ($res !== $i)
+                    throw new HttpException(500, \Yii::t('app', 'Could not save all readings'));
             }
             $transaction->commit();
-            return \yii\helpers\Json::encode(null);
+            return $res;
         } catch (Exception $e) {
             $transaction->rollback();
             throw $e;
@@ -145,7 +169,7 @@ class TableController extends Controller {
         ]);
     }
     public function actionView($id) {
-        $query = ItemExtended::find(['root_id' => $id])->asArray();
+        $query = ItemExtended::find()->where(['root_id' => $id])->asArray();
         $table = $this->addTreeInfo(ArrayHelper::index($query->orderBy('level,path')->all(), 'id'));
         //
         $query = ItemReadingGroup::find()->asArray() // Yii2 bug forces to do this!?

@@ -6,7 +6,7 @@
 {{ register_moment_asset() }}
 {{ set(this, 'params', {'breadcrumbs': [{
        'label': t('app', 'Tables'),
-       'url': url('table')
+       'url': url(['table/index'])
    }, table_title]})
 }}
 
@@ -15,23 +15,22 @@
 {% set glyph_export = '<span class="glyphicon glyphicon-export" aria-hidden="true"></span>' %}
 
 <h1>{{ table_title }}</h1>
-<p>
-  <button type="button" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#new-group">
+<p class="actions">
+  <button type="button" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#group-data">
     {{ t('app', 'New group') }}</button>
-  <button type="button" class="btn btn-lg btn-success" data-toggle="modal" data-target="#new-group">
+  <button type="button" class="btn btn-lg btn-success" data-toggle="modal" data-target="#group-data">
     {{ glyph_export | raw }}</span> CSV</button>
 </p>
 <h2>{{ t('app', 'Groups') }}</h2>
 <div id="table-wrapper" class="scrollable-x">
-  <table class="table table-bordered text-center" style="max-width: 100%">
+  <table class="table table-bordered table-condensed table-stripped text-center" style="max-width: 100%">
     {% for level, row in table %}
       <tr>
         {% if first_iteration is not defined %}
-          <th rowspan="{{ n_levels }}" class="bottom-column">{{ t('app', 'From') }}</th>
-          <th rowspan="{{ n_levels }}" class="bottom-column">{{ t('app', 'To') }}</th>
+          <th rowspan="{{ n_levels }}" class="bottom-column">{{ t('app', 'Date range') }}</th>
         {% endif %}
         {% for parent_id, item in row %}
-          <th colspan="{{ item['no_leaves'] }}" rowspan="{{ item['span_levels'] }}" class="bottom-column col-xs-1">
+          <th colspan="{{ item['no_leaves'] }}" rowspan="{{ item['span_levels'] }}" class="break-all bottom-column col-xs-1">
             {{ item['name'] }}
           </th>
         {% endfor %}
@@ -43,18 +42,17 @@
     {% endfor %}
     {% for group in groups %}
       <tr>
-        <td nowrap><small>{{ group['from'] }}</small></td>
-        <td nowrap><small>{{ group['to'] }}</small></td>
+        <td nowrap><small class="date-range">{{ group['from'] }} - {{ group['to'] }}</small></td>
         {% for reading in group['itemReadingsExtended'] %}
-          <td>
+          <td class="count">
             {{ reading['count'] }}
           </td>
         {% endfor %}
-        <td>
-          <button class="btn btn-xs btn-success">
-            {{ html.a(glyph_pencil, url('table/ajax-update-group', {'id': group['id']})) | raw }}</button>
-          <button class="btn btn-xs btn-danger">
-            {{ html.a(glyph_trash, url('table/ajax-delete-group', {'id': group['id']})) | raw }}</button>
+        <td class="actions">
+          {{ html.a(glyph_pencil, url({0: 'table/ajax-save-readings', 
+              'id': group['id']}), {'class': 'btn btn-update btn-xs btn-default'}) | raw }}</button>
+          {{ html.a(glyph_trash, url({0: 'table/ajax-delete-group',
+              'id': group['id']}), {'class': 'btn btn-add btn-xs btn-default'}) | raw }}</button>
         </td>
       </tr>
     {% endfor %}
@@ -63,13 +61,14 @@
 
 {{ link_pager_widget({'pagination': pagination}) }}
 
-<div id="new-group" class="modal fade" tabindex="-1" role="dialog">
-  <div class="modal-dialog scrollable-x modal-lg">
+<div id="group-data" class="modal modal-add fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">{{ t('app', 'New group') }}</h4>
+        <h4 class="modal-title modal-add-only">{{ t('app', 'New group') }}</h4>
+        <h4 class="modal-title modal-edit-only">{{ t('app', 'Edit group') }}</h4>
       </div>
       <form class="modal-body">
         <div class="row">
@@ -77,57 +76,69 @@
             <label class="control-label">{{ t('app', 'Date range') }}</label>
             <div class="input-group">
               <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-              {{ date_range_picker_widget({
+                {{ date_range_picker_widget({
                      'model': group_model,
-                     'name': 'date_range'
-                 }) }}
+                     'name': 'Group_date_range'
+                }) }}
             </div>
             <p class="help-block"></p>
           </div>
         </div>
-        <label class="control-label">{{ t('app', 'New group readings') }}</label>
-        <table class="table table-bordered table-editable text-center">
-          {% for level, row in table %}
+        <label class="control-label modal-add-only">{{ t('app', 'New group readings') }}</label>
+        <label class="control-label modal-edit-only">{{ t('app', 'Edit group readings') }}</label>
+        <div class="scrollable-x">
+          <table class="table table-bordered table-editable text-center">
+            {% for level, row in table %}
+              <tr>
+                {% for parent_id, item in row %}
+                  <th colspan="{{ item['no_leaves'] }}" rowspan="{{ item['span_levels'] }}" class="break-all bottom-column">
+                    {{ item['name'] }}
+                  </th>
+                {% endfor %}
+              </tr>
+            {% endfor %}
             <tr>
-              {% for parent_id, item in row %}
-                <th colspan="{{ item['no_leaves'] }}" rowspan="{{ item['span_levels'] }}" class="bottom-column">
-                  {{ item['name'] }}
-                </th>
+              {% for item in items %}
+                <td class="editable">
+                  <input name="ItemReading[{{ item['id'] }}]" />
+                </td>
               {% endfor %}
             </tr>
-          {% endfor %}
-          <tr>
-            {% for item in items %}
-              <td class="editable">
-                <input name="ItemReading[{{ item['id'] }}]" />
-              </td>
-            {% endfor %}
-          </tr>
-        </table>
+          </table>
+        </div>
       </form>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal" >Close</button>
-        <button type="submit" class="btn btn-primary" data-loading-text="{{ t('app', 'Adding group') }}...">{{ t('app', 'Add group') }}</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal" >{{ t('app', 'Close') }}</button>
+        <button type="submit" class="btn btn-primary modal-add-only" data-loading-text="{{ t('app', 'Adding group') }}...">{{ t('app', 'Add group') }}</button>
+        <button type="submit" class="btn btn-primary modal-edit-only" data-loading-text="{{ t('app', 'Saving group') }}...">{{ t('app', 'Save group') }}</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
 {{ void(this.beginBlock('table_view_js')) }}
-$('#new-group [type="submit"]').on('click', function() {
-    $btn = $(this).button('loading');
+$groupData = $('#group-data');
+$countInputs = $groupData.find('table :input');
+
+$('[type="submit"]', $groupData).on('click', function() {
+    if ($groupData.hasClass('modal-add')) createReadings($(this));
+    else updateReadings($(this));
+});
+
+function createReadings($btn) {
+    $btn.button('loading');
     $('.form-group').removeClass('has-error');
     $('.help-block').html('');
     $.ajax({
         method: 'post',
-        url: '{{ url('table/ajax-create-reading') | raw }}',
-        data: $('#new-group').find('form').serialize(),
+        url: '{{ url(['table/ajax-save-readings']) | raw }}',
+        data: $('#group-data').find('form').serialize(),
         dataType: 'json',
         error: function(jqXHR, textStatus, errorThrown) {
             msg = JSON.parse(jqXHR.responseJSON.message);
             console.log(msg);
             for (attr in msg) {
-                $input = $('input[name="{attr}"]'.replace('{attr}', attr));
+                $input = $('input[name="Group_{attr}"]'.replace('{attr}', attr));
                 console.log(attr, msg[attr]);
                 $input.closest('.form-group')
                     .addClass('has-error')
@@ -142,14 +153,42 @@ $('#new-group [type="submit"]').on('click', function() {
             location.reload();
         }
     });
-});
-$('#table-wrapper').on('click', '.table .btn-success', function() {
-    var url = $(this).find('a').attr('href');
+}
+
+function updateReadings($btn) {
+    $btn.button('loading');
+    var url = $('#group-data').find('form').attr('action');
+    console.log($btn, url);
     $.ajax({
         method: 'post',
         url: url,
-        data: $('#new-group').find('form').serialize()
+        data: $('#group-data').find('form').serialize(),
+        dataType: 'json',
+        complete: function() {
+            $btn.button('reset');
+        },
+        success: function() {
+            location.reload();
+        }
     });
+}
+
+$('.actions .btn-primary').on('click', function() {
+    $groupData.removeClass('modal-edit').addClass('modal-add');
+    $groupData.modal('show');
+    $('#group-data').find('form :input').val('');
+    return false;
+});
+
+$('#table-wrapper').on('click', '.table .btn-update', function() {
+    $groupData.removeClass('modal-add').addClass('modal-edit');
+    $groupData.modal('show');
+    $('input[name="Group_date_range"]', $groupData)
+        .val($(this).closest('tr').find('.date-range').html().trim());
+    $(this).closest('tr').find('.count').each(function(i, e) {
+        $countInputs.eq(i).val($(e).html().trim());
+    });
+    $('#group-data').find('form').attr('action', $(this).attr('href'));
     return false;
 });
 {{ void(this.endBlock()) }}

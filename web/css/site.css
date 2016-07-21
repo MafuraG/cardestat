@@ -15,11 +15,11 @@ body {
 }
 
 .footer {
-    height: 60px;
     background-color: #171d7d;
     color: #fbd11a;
     border-top: 1px solid #ddd;
-    padding-top: 20px;
+    padding: 50px 0;
+    margin-top: 60px;
 }
 
 .jumbotron {
@@ -99,6 +99,10 @@ a.desc:after {
     vertical-align: bottom;
 }
 
+.table th.break-all {
+    word-wrap: break-word;
+}
+
 .navbar-inverse {
     background-color: #171d7d;
     border-color: #26153f;
@@ -168,10 +172,31 @@ td.id {
    width: 50px;
 }
 
-td.actions-3 {
+td.actions {
    width: 99px;
+   min-width: 99px;
+}
+
+td.actions .btn .glyphicon-trash {
+   color: red;
+}
+
+td.actions .btn .glyphicon-pencil {
+   color: blue;
+}
+
+td.actions .btn .glyphicon-eye-open {
+   color: green;
 }
 
 td .btn .glyphicon {
    color: black;
+}
+
+.modal-add .modal-edit-only {
+   display: none;
+}
+
+.modal-edit .modal-add-only {
+   display: none;
 }

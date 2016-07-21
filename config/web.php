@@ -66,7 +66,7 @@ $config = [
                 '<controller:\w+>/<id:\d+>' => '<controller>/view',
                 '<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',
                 '<controller:\w+>/<action:\w+>' => '<controller>/<action>',
-                'table/ajax-update-group/<id:\d+>' => 'table/ajax-update-group',
+                'table/ajax-save-readings/<id:\d+>' => 'table/ajax-save-readings',
             ],
         ],
     ],

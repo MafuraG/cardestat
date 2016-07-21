@@ -25,6 +25,6 @@ class ItemReadingGroup extends ActiveRecord {
         parent::afterValidate();
         $this->from = substr($this->date_range, 0, 10);
         $this->to = substr($this->date_range, 12, 22);
-        $this->created_at = date('Y-m-d H:m:i');
+        if (!$this->created_at) $this->created_at = date('Y-m-d H:m:i');
     }
 }

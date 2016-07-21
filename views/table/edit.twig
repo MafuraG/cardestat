@@ -2,7 +2,7 @@
 {{ register_jqtree_asset() }}
 {{ set(this, 'params', {'breadcrumbs': [{
        'label': t('app', 'Tables'),
-       'url': url('table')
+       'url': url(['table/index'])
    }, t('app', 'Update'), item_tree['id']]})
 }}
 
@@ -38,7 +38,6 @@
     </div>
   </div>
   
-  <span class="glyphicon glyphicon-tree-conifer" style="position: absolute; top: 4px"></span>
   <div class="col-md-8" id="item-tree"></div>
 
 </div>
@@ -69,7 +68,7 @@
     function appendChild($btn) {
        $btn.button('loading');
        $.ajax({
-           url: '{{ url('table/ajax-create-item') | raw }}',
+           url: '{{ url(['table/ajax-create-item']) | raw }}',
            method: 'post',
            dataType: 'json',
            data: 'name={name}&parent_id={parent_id}'
@@ -92,14 +91,15 @@
     }
     $('fieldset.current .btn-danger').on('click', function() {
        var $btn = $(this).button('loading');
+       var toDelete = $currentItemId.val();
        $.ajax({
-           url: '{{ url('table/ajax-delete-item') | raw }}',
+           url: '{{ url(['table/ajax-delete-item']) | raw }}',
            method: 'post',
            dataType: 'json',
            data: 'id={id}'
                .replace('{id}', $currentItemId.val()),
            success: function(data, textStatus, jqXHR) {
-               var node = $itemTree.tree('getNodeById', $currentItemId.val());
+               var node = $itemTree.tree('getNodeById', toDelete);
                $itemTree.tree('removeNode', node);
            },
            complete: function() {

@@ -5,10 +5,17 @@ use yii\db\Schema;
 
 class m160701_124112_initial extends Migration {
     public function safeUp() {
+        $this->createTable('user', [
+            'id' => Schema::TYPE_PK,
+            'username' => 'varchar(32) not null unique',
+            'authKey' => 'varchar(32)',
+            'accessToken' => 'varchar(32)',
+            'hash' => 'varchar(60) not null',
+        ]);
         $this->createTable('item', [
             'id' => Schema::TYPE_PK,
             'name' => 'varchar(48) not null',
-            'parent_id' => 'integer references item (id)',
+            'parent_id' => 'integer references item (id) on delete cascade',
             'unique (name, parent_id)'
         ]);
         $this->createTable('item_reading_group', [
@@ -54,5 +61,6 @@ class m160701_124112_initial extends Migration {
         $this->dropTable('item_reading');
         $this->dropTable('item_reading_group');
         $this->dropTable('item');
+        $this->dropTable('user');
     }
 }

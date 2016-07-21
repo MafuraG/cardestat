@@ -19,8 +19,8 @@
         {'attribute': 'name'},
         {
             'class': 'yii\\grid\\ActionColumn',
-            'contentOptions': {'class': 'actions-3'},
-            'template': buttons_tpl
+            'contentOptions': {'class': 'actions'},
+            'buttonOptions': {'class': 'btn btn-default btn-xs'}
         }
     ],
     'summaryOptions': {
@@ -60,7 +60,7 @@ $('#new-table [type="submit"]').on('click', function() {
     $btn.button('loading');
     $.ajax({
         method: 'post',
-        url: '{{ url('table/ajax-create-table') | raw }}',
+        url: '{{ url(['table/ajax-create-table']) | raw }}',
         data: $('#new-table').find('form').serialize(),
         success: function() {
             location.reload();
