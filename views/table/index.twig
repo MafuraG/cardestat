@@ -1,17 +1,19 @@
 {{ use('yii/grid/GridView') }}
+
 {{ set(this, 'params', {'breadcrumbs': [t('app', 'Tables')]}) }}
 
 <h1>{{ t('app', 'Tables') }}</h1>
 
-<p>
-  <button type="button" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#new-table">
-    {{ t('app', 'New table') }}</button>
-</p>
 
-{% set buttons_tpl = '
-    <button class="btn btn-xs btn-success">{view}</button>
-    <button class="btn btn-xs btn-primary">{update}</button>
-    <button class="btn btn-xs btn-danger">{delete}</button>' %}
+{% set buttons_tpl = '{view}' %}
+{% if app.user().can('admin') %}
+  <p>
+    <button type="button" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#new-table">
+      {{ t('app', 'New table') }}</button>
+  </p>
+  {% set buttons_tpl = buttons_tpl ~ '{update}{delete}' %}
+{% endif %}
+
 {{ grid_view_widget({
     'dataProvider': dataProvider,
     'columns': [
@@ -19,8 +21,9 @@
         {'attribute': 'name'},
         {
             'class': 'yii\\grid\\ActionColumn',
-            'contentOptions': {'class': 'actions'},
-            'buttonOptions': {'class': 'btn btn-default btn-xs'}
+            'contentOptions': {'class': 'actions text-center'},
+            'buttonOptions': {'class': 'btn btn-default btn-xs'},
+            'template': buttons_tpl 
         }
     ],
     'summaryOptions': {
@@ -55,8 +58,14 @@
 </div><!-- /.modal -->
 
 {{ void(this.beginBlock('table_index_js')) }}
-$('#new-table [type="submit"]').on('click', function() {
-    $btn = $(this);
+$('input[name="Item[name]"]').on('keyup', function(e) {
+    if (e.keyCode == 13) {
+        createTable($('#new-table [type="submit"]'));
+    }
+});
+$('#new-table [type="submit"]').on('click', createTable($(this)));
+
+function createTable($btn) {
     $btn.button('loading');
     $.ajax({
         method: 'post',
@@ -69,7 +78,7 @@ $('#new-table [type="submit"]').on('click', function() {
             $btn.button('reset');
         }
     });
-});
+}
 {{ void(this.endBlock()) }}
 
-{{ this.registerJs(this.blocks['table_index_js'], constant('POS_END', this)) }}
+{{ this.registerJs(this.blocks['table_index_js'], constant('POS_READY', this)) }}

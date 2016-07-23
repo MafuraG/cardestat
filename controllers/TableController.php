@@ -21,6 +21,14 @@ class TableController extends Controller {
                 'class' => AccessControl::className(),
                 'rules' => [[
                     'allow' => true,
+                    'actions' => ['ajax-delete-group', 'ajax-delete-item', 'action-create-table'],
+                    'roles' => ['admin']
+                ], [
+                    'allow' => false,
+                    'actions' => ['ajax-delete-group', 'ajax-delete-item', 'action-create-table'],
+                    'roles' => ['@']
+                ], [
+                    'allow' => true,
                     'roles' => ['@']
                 ]]
             ],
@@ -31,6 +39,7 @@ class TableController extends Controller {
                     'ajax-save-readings'  => ['post'],
                     'ajax-create-item'  => ['post'],
                     'ajax-delete-item'  => ['post'],
+                    'ajax-delete-group'  => ['post'],
                 ],
             ],
         ], parent::behaviors());
@@ -56,6 +65,23 @@ class TableController extends Controller {
         if (!$item->save())
             throw new HttpException(422, \yii\helpers\Json::encode($item->errors));
         return $item;
+    }
+    public function actionAjaxDeleteGroup($id) {
+        \Yii::$app->response->format = Response::FORMAT_JSON;
+        $group = ItemReadingGroup::findOne($id);
+        $connection = \Yii::$app->db;
+        $transaction = $connection->beginTransaction();
+        try {
+            foreach ($group->readings as $reading) {
+                $reading->delete();
+            }
+            $res = $group->delete();
+            $transaction->commit();
+            return $res;
+        } catch (Exception $e) {
+            $transaction->rollback();
+            throw $e;
+        }
     }
     public function actionAjaxDeleteItem() {
         \Yii::$app->response->format = Response::FORMAT_JSON;

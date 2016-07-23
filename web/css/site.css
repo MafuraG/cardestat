@@ -200,3 +200,12 @@ td .btn .glyphicon {
 .modal-edit .modal-add-only {
    display: none;
 }
+
+.wobble-fix {
+   -webkit-filter: blur(0);
+}
+
+.btn-xs .fa {
+   font-size: 14px;
+   color: black;
+}

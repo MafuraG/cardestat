@@ -17,6 +17,9 @@ class ItemReadingGroup extends ActiveRecord {
             ]
         ];
     }
+    public function getReadings() {
+        return $this->hasMany(ItemReading::className(), ['item_reading_group_id' => 'id']);
+    }
     public function getItemReadingsExtended() {
         return $this->hasMany(ItemReadingExtended::className(), ['item_reading_group_id' => 'id'])
             ->orderBy(['path' => SORT_ASC]);

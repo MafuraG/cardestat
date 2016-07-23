@@ -12,6 +12,14 @@ class m160701_124112_initial extends Migration {
             'accessToken' => 'varchar(32)',
             'hash' => 'varchar(60) not null',
         ]);
+        $this->insert('user', [
+            'username' => 'admin',
+            'hash' => '$2y$13$yQ0zD/9LKz76Jlifsus8jeMXLXWtQG5AuFyF.cwzjNGFv1Ajeewiq' // password 'secret'
+        ]);
+        $this->insert('user', [
+            'username' => 'pepe',
+            'hash' => '$2y$13$yQ0zD/9LKz76Jlifsus8jeMXLXWtQG5AuFyF.cwzjNGFv1Ajeewiq' // password 'secret'
+        ]);
         $this->createTable('item', [
             'id' => Schema::TYPE_PK,
             'name' => 'varchar(48) not null',
@@ -53,6 +61,10 @@ class m160701_124112_initial extends Migration {
                 from item_reading ir 
                      inner join item_extended i on (i.id = ir.item_id)
         ');
+        $auth = Yii::$app->authManager;
+        $admin = $auth->createRole('admin');
+        $auth->add($admin);
+        $auth->assign($admin, 1);
     }
 
     public function safeDown() {

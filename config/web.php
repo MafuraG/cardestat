@@ -6,6 +6,7 @@ $config = [
     'id' => 'basic',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
+    'defaultRoute' => 'table',
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
@@ -68,6 +69,9 @@ $config = [
                 '<controller:\w+>/<action:\w+>' => '<controller>/<action>',
                 'table/ajax-save-readings/<id:\d+>' => 'table/ajax-save-readings',
             ],
+        ],
+        'authManager' => [
+            'class' => 'yii\rbac\DbManager',
         ],
     ],
     'params' => $params,

@@ -1,0 +1,132 @@
+{{ use('yii/grid/GridView') }}
+{{ use('yii/widgets/Pjax') }}
+{{ use('yii/widgets/ActiveForm') }}
+
+{{ set(this, 'params', {'breadcrumbs': [t('app', 'Users')]}) }}
+
+<h1>{{ t('app', 'Users') }}</h1>
+
+
+{% set buttons_tpl = '{view}' %}
+{% if app.user().can('admin') %}
+  <p class="actions">
+    <button type="button" class="btn btn-add btn-lg btn-primary" data-toggle="modal" data-target="#new-user">
+      {{ t('app', 'New user') }}</button>
+  </p>
+  {% set buttons_tpl = buttons_tpl ~ '{update}{delete}' %}
+{% endif %}
+
+{{ pjax_begin({timeout: 20000, id: 'users'}) }}
+{{ grid_view_widget({
+    'dataProvider': dataProvider,
+    'columns': [
+        {'attribute': 'id', 'contentOptions': {'class': 'id'}},
+        {'attribute': 'username'},
+        {
+            'class': 'yii\\grid\\ActionColumn',
+            'contentOptions': {'class': 'actions text-center'},
+            'buttonOptions': {'class': 'btn btn-default btn-xs'},
+            'template': buttons_tpl 
+        }
+    ],
+    'summaryOptions': {
+        'class': 'pull-right',
+        'tag': 'em'
+    }
+   })
+}}
+{{ pjax_end() }}
+
+<div id="wtf">Ola ke ase</div>
+<div id="user-modal" class="modal fade modal-add" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title modal-add-only">{{ t('app', 'New user') }}</h4>
+        <h4 class="modal-title modal-edit-only">{{ t('app', 'Edit user') }}</h4>
+      </div>
+        {{ use('yii/widgets/ActiveForm') }}
+        {{ pjax_begin({
+               timeout: 20000,
+               enableReplaceState: false,
+               enablePushState: false,
+               options: {'data-pjax-container': 'users'}
+        }) }}
+        {% set form = active_form_begin({
+               'id': 'user-form',
+               'action': url(['user/create']),
+               'enableAjaxValidation': true,
+               'validationUrl': url(['user/validate']),
+               'options': {
+                   'data-pjax': true,
+                   'class': 'modal-body',
+                   'autocomplete': 'off'
+               }
+        }) %}
+          {{ html.activeHiddenInput(model, 'id') | raw }}
+          {{ form.field(model, 'username') | raw }}
+          {{ form.field(model, 'password').passwordInput() | raw }}
+          {{ form.field(model, 'password_repeat').passwordInput() | raw }}
+          {{ form.field(model, 'is_admin').checkbox() | raw }}
+          {{ html.submitButton('dale!') | raw }}
+        {{ active_form_end() }}
+        {{ pjax_end() }}
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+          {{ t('app', 'Cancel') }}</button>
+        <button type="submit" class="btn btn-primary modal-add-only" data-loading-text="{{ t('app', 'Adding user...') }}">
+          {{ t('app', 'Add user') }}</button>
+        <button type="submit" class="btn btn-primary modal-edit-only" data-loading-text="{{ t('app', 'Updating user...') }}">
+          {{ t('app', 'Update user') }}</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+{{ void(this.beginBlock('user_index_js')) }}
+$userModal = $('#user-modal');
+$('.actions .btn-add').on('click', function() {
+    $userModal.removeClass('modal-edit').addClass('modal-add');
+    $userModal.find('form :input').val('');
+    $userModal.modal('show');
+    return false;
+});
+
+$('#table-wrapper').on('click', '.table .btn-update', function() {
+    $userModal.removeClass('modal-add').addClass('modal-edit');
+    $userModal.modal('show');
+    $('input[name="Group_date_range"]', $groupData)
+        .val($(this).closest('tr').find('.date-range').html().trim());
+    $(this).closest('tr').find('.count').each(function(i, e) {
+        $countInputs.eq(i).val($(e).html().trim());
+    });
+    $userModal.find('form').attr('action', $(this).attr('href'));
+    return false;
+});
+
+$userForm = $('#user-form');
+$userModal.find('button[type="submit"]').on('click', function() {
+    $userForm.submit();
+    return false;
+});
+/*
+$("#user-form-pjax").on("pjax:end", function() {
+    $.pjax.reload({container:"#users"});  //Reload GridView
+});
+*/
+/*
+$userForm.on('beforeSubmit', function() {
+    $.ajax({
+        url: $userForm.attr('action'),
+        data: $userForm.serialize(),
+        method: 'POST'
+    });
+    return false;
+});
+*/
+
+{{ void(this.endBlock()) }}
+
+{{ this.registerJs(this.blocks['user_index_js'], constant('POS_END', this)) }}

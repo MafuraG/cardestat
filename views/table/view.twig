@@ -2,8 +2,10 @@
 {{ use('kartik/daterange/DateRangePicker') }}
 {{ use('kartik/daterange/MomentAsset') }}
 {{ use('yii/web/JqueryAsset') }}
+{{ use({'FontawesomeAsset': 'rmrevin/yii/fontawesome/AssetBundle'}) }}
 {{ register_jquery_asset() }}
 {{ register_moment_asset() }}
+{{ register_fontawesome_asset() }}
 {{ set(this, 'params', {'breadcrumbs': [{
        'label': t('app', 'Tables'),
        'url': url(['table/index'])
@@ -16,12 +18,18 @@
 
 <h1>{{ table_title }}</h1>
 <p class="actions">
-  <button type="button" class="btn btn-lg btn-primary" data-toggle="modal" data-target="#group-data">
+  <button type="button" class="btn btn-add btn-lg btn-primary" data-toggle="modal" data-target="#group-data">
     {{ t('app', 'New group') }}</button>
-  <button type="button" class="btn btn-lg btn-success" data-toggle="modal" data-target="#group-data">
+  <button type="button" class="btn btn-lg btn-export btn-success" data-toggle="modal" data-target="#group-data">
     {{ glyph_export | raw }}</span> CSV</button>
 </p>
 <h2>{{ t('app', 'Groups') }}</h2>
+
+{% if not groups|length is same as(0) %}
+  {% set found_class = 'hidden' %}
+{% endif %}
+<p class="text-info not-found {{ found_class }}"><em>{{ t('app', 'No groups found') }}</em></p>
+
 <div id="table-wrapper" class="scrollable-x">
   <table class="table table-bordered table-condensed table-stripped text-center" style="max-width: 100%">
     {% for level, row in table %}
@@ -51,8 +59,10 @@
         <td class="actions">
           {{ html.a(glyph_pencil, url({0: 'table/ajax-save-readings', 
               'id': group['id']}), {'class': 'btn btn-update btn-xs btn-default'}) | raw }}</button>
-          {{ html.a(glyph_trash, url({0: 'table/ajax-delete-group',
-              'id': group['id']}), {'class': 'btn btn-add btn-xs btn-default'}) | raw }}</button>
+          {% if app.user().can('admin') %}
+            {{ html.a(glyph_trash, url({0: 'table/ajax-delete-group',
+                'id': group['id']}), {'class': 'btn btn-delete btn-xs btn-default', 'data-loading-text': t('app', '<i class="fa fa-spinner fa-pulse wobble-fix"></i>')}) | raw }}</button>
+          {% endif %}
         </td>
       </tr>
     {% endfor %}
@@ -110,7 +120,7 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal" >{{ t('app', 'Close') }}</button>
         <button type="submit" class="btn btn-primary modal-add-only" data-loading-text="{{ t('app', 'Adding group') }}...">{{ t('app', 'Add group') }}</button>
-        <button type="submit" class="btn btn-primary modal-edit-only" data-loading-text="{{ t('app', 'Saving group') }}...">{{ t('app', 'Save group') }}</button>
+        <button type="submit" class="btn btn-primary modal-edit-only" data-loading-text="{{ t('app', 'Updating group') }}...">{{ t('app', 'Update group') }}</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -136,10 +146,8 @@ function createReadings($btn) {
         dataType: 'json',
         error: function(jqXHR, textStatus, errorThrown) {
             msg = JSON.parse(jqXHR.responseJSON.message);
-            console.log(msg);
             for (attr in msg) {
                 $input = $('input[name="Group_{attr}"]'.replace('{attr}', attr));
-                console.log(attr, msg[attr]);
                 $input.closest('.form-group')
                     .addClass('has-error')
                     .find('.help-block')
@@ -158,7 +166,6 @@ function createReadings($btn) {
 function updateReadings($btn) {
     $btn.button('loading');
     var url = $('#group-data').find('form').attr('action');
-    console.log($btn, url);
     $.ajax({
         method: 'post',
         url: url,
@@ -173,10 +180,31 @@ function updateReadings($btn) {
     });
 }
 
-$('.actions .btn-primary').on('click', function() {
+$('.actions .btn-add').on('click', function() {
     $groupData.removeClass('modal-edit').addClass('modal-add');
     $groupData.modal('show');
-    $('#group-data').find('form :input').val('');
+    $groupData.find('form :input').val('');
+    return false;
+});
+
+$('#table-wrapper').on('click', '.table .btn-delete', function() {
+    if (!confirm('{{ t('app', 'Are you sure you want to delete this group?') }}')) return false;
+    var $btn = $(this);
+    $btn.button('loading');
+    $.ajax({
+        method: 'post',
+        url: $btn.attr('href'),
+        complete: function() {
+            $btn.button('reset');
+        },
+        success: function() {
+            $btn.closest('tr').remove();
+            if ($btn.closest('table').find('tr').length == 0) $('.not-found').removeClass('hidden');
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert(textStatus + ': ' + errorThrown);
+        }
+    });
     return false;
 });
 
@@ -188,7 +216,7 @@ $('#table-wrapper').on('click', '.table .btn-update', function() {
     $(this).closest('tr').find('.count').each(function(i, e) {
         $countInputs.eq(i).val($(e).html().trim());
     });
-    $('#group-data').find('form').attr('action', $(this).attr('href'));
+    $groupData.find('form').attr('action', $(this).attr('href'));
     return false;
 });
 {{ void(this.endBlock()) }}

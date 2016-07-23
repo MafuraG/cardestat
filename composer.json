@@ -21,7 +21,8 @@
         "fxp/composer-asset-plugin": "*",
         "bower-asset/jqtree": "*",
         "yiisoft/yii2-twig": "^2.0",
-        "kartik-v/yii2-date-range": "~1.6"
+        "kartik-v/yii2-date-range": "~1.6",
+        "rmrevin/yii2-fontawesome": "*"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",
