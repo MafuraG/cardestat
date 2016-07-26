@@ -3,6 +3,7 @@
 {{ use('kartik/daterange/MomentAsset') }}
 {{ use('yii/web/JqueryAsset') }}
 {{ use({'FontawesomeAsset': 'rmrevin/yii/fontawesome/AssetBundle'}) }}
+{{ use('kartik/export/ExportMenu') }}
 {{ register_jquery_asset() }}
 {{ register_moment_asset() }}
 {{ register_fontawesome_asset() }}
@@ -23,6 +24,10 @@
   <button type="button" class="btn btn-lg btn-export btn-success" data-toggle="modal" data-target="#group-data">
     {{ glyph_export | raw }}</span> CSV</button>
 </p>
+{{ export_menu_widget({
+    dataProvider: dataProvider
+}) }}
+
 <h2>{{ t('app', 'Groups') }}</h2>
 
 {% if not groups|length is same as(0) %}

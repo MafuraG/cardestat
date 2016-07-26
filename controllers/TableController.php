@@ -13,6 +13,7 @@ use app\models\ItemReadingGroup;
 use yii\helpers\ArrayHelper;
 use yii\web\HttpException;
 use yii\filters\AccessControl;
+use yii\data\ArrayDataProvider;
 
 class TableController extends Controller {
     public function behaviors() {
@@ -35,6 +36,7 @@ class TableController extends Controller {
             'verbs' => [
                 'class' => \yii\filters\VerbFilter::className(),
                 'actions' => [
+                    'view'   => ['get', 'post'],
                     'ajax-create-table'  => ['post'],
                     'ajax-save-readings'  => ['post'],
                     'ajax-create-item'  => ['post'],
@@ -197,7 +199,6 @@ class TableController extends Controller {
     public function actionView($id) {
         $query = ItemExtended::find()->where(['root_id' => $id])->asArray();
         $table = $this->addTreeInfo(ArrayHelper::index($query->orderBy('level,path')->all(), 'id'));
-        //
         $query = ItemReadingGroup::find()->asArray() // Yii2 bug forces to do this!?
             ->innerJoin(['ire' =>
                 ItemReadingExtended::find()
@@ -215,6 +216,16 @@ class TableController extends Controller {
         $groups = $query->offset($pagination->offset)
             ->limit($pagination->limit)
             ->all();
+        //
+        $rawGroups = [];
+        foreach ($groups as $group) {
+            $rawGroups[$group['id']] = ArrayHelper::map($group['itemReadingsExtended'], 'path', 'count');
+            $rawGroups[$group['id']]['from'] = $group['from'];
+            $rawGroups[$group['id']]['to'] = $group['to'];
+        }
+        $dataProvider = new ArrayDataProvider([
+            'allModels' => $rawGroups
+        ]);
         $table = ArrayHelper::index($table, 'id', 'level');
         $root = array_shift($table);
         $table_title = array_values($root)[0]['name'];
@@ -224,6 +235,7 @@ class TableController extends Controller {
 
         return $this->render('view.twig', [
             'table_title' => $table_title,
+            'dataProvider' => $dataProvider,
             'groups' => $groups,
             'items' => $items,
             'n_levels' => reset($root)['n_levels'],
