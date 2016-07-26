@@ -61,6 +61,14 @@ class m160701_124112_initial extends Migration {
                 from item_reading ir 
                      inner join item_extended i on (i.id = ir.item_id)
         ');
+        $this->execute('
+            create view user_extended as 
+            select u.*, array_agg(ai.name) as roles
+            from "user" u 
+                 left join auth_assignment aa on (u.id = aa.user_id::integer)
+                 left join auth_item ai on (ai.name = aa.item_name and ai.type = 1)
+            group by u.id, u.username, u."authKey", u."accessToken", u.hash;
+        ');
         $auth = Yii::$app->authManager;
         $admin = $auth->createRole('admin');
         $auth->add($admin);

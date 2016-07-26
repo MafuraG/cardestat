@@ -18,26 +18,26 @@
 
 {{ pjax_begin({timeout: 20000, id: 'users'}) }}
 {{ grid_view_widget({
-    'dataProvider': dataProvider,
-    'columns': [
-        {'attribute': 'id', 'contentOptions': {'class': 'id'}},
-        {'attribute': 'username'},
+    dataProvider: dataProvider,
+    columns: [
+        {attribute: 'id', 'contentOptions': {class: 'id'}},
+        {attribute: 'username'},
+        {attribute: 'roles', content: [this.context, 'renderRoles']},
         {
-            'class': 'yii\\grid\\ActionColumn',
-            'contentOptions': {'class': 'actions text-center'},
-            'buttonOptions': {'class': 'btn btn-default btn-xs'},
-            'template': buttons_tpl 
+            class: 'yii\\grid\\ActionColumn',
+            contentOptions: {class: 'actions text-center'},
+            buttonOptions: {class: 'btn btn-default btn-xs'},
+            template: buttons_tpl 
         }
     ],
-    'summaryOptions': {
-        'class': 'pull-right',
-        'tag': 'em'
+    summaryOptions: {
+        class: 'pull-right',
+        tag: 'em'
     }
    })
 }}
 {{ pjax_end() }}
 
-<div id="wtf">Ola ke ase</div>
 <div id="user-modal" class="modal fade modal-add" tabindex="-1" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -48,31 +48,23 @@
         <h4 class="modal-title modal-edit-only">{{ t('app', 'Edit user') }}</h4>
       </div>
         {{ use('yii/widgets/ActiveForm') }}
-        {{ pjax_begin({
-               timeout: 20000,
-               enableReplaceState: false,
-               enablePushState: false,
-               options: {'data-pjax-container': 'users'}
-        }) }}
         {% set form = active_form_begin({
-               'id': 'user-form',
-               'action': url(['user/create']),
-               'enableAjaxValidation': true,
-               'validationUrl': url(['user/validate']),
-               'options': {
+               id: 'user-form',
+               action: url(['user/ajax-create']),
+               enableAjaxValidation: false,
+               validationUrl: url(['user/validate']),
+               options: {
                    'data-pjax': true,
-                   'class': 'modal-body',
-                   'autocomplete': 'off'
+                   class: 'modal-body',
+                   autocomplete: 'off'
                }
         }) %}
           {{ html.activeHiddenInput(model, 'id') | raw }}
-          {{ form.field(model, 'username') | raw }}
+          {{ form.field(model, 'username', {enableAjaxValidation: false}) | raw }}
           {{ form.field(model, 'password').passwordInput() | raw }}
           {{ form.field(model, 'password_repeat').passwordInput() | raw }}
-          {{ form.field(model, 'is_admin').checkbox() | raw }}
-          {{ html.submitButton('dale!') | raw }}
+          {{ form.field(model, 'is_admin').checkbox({value: 1}) | raw }}
         {{ active_form_end() }}
-        {{ pjax_end() }}
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">
           {{ t('app', 'Cancel') }}</button>
@@ -86,7 +78,7 @@
 </div><!-- /.modal -->
 
 {{ void(this.beginBlock('user_index_js')) }}
-$userModal = $('#user-modal');
+var $userModal = $('#user-modal');
 $('.actions .btn-add').on('click', function() {
     $userModal.removeClass('modal-edit').addClass('modal-add');
     $userModal.find('form :input').val('');
@@ -106,27 +98,33 @@ $('#table-wrapper').on('click', '.table .btn-update', function() {
     return false;
 });
 
-$userForm = $('#user-form');
-$userModal.find('button[type="submit"]').on('click', function() {
-    $userForm.submit();
+var $userForm = $('#user-form');
+var $submitBtn;
+$('#user-form').on('beforeSubmit', function(e) {
+    var $form = $(this);
+    // return false if form still have some validation errors
+    if ($form.find('.has-error').length) {
+        return false;
+    }
+    $('input[type="checkbox"]', $userForm).attr('value', 1);
+    $.pjax.submit(e, '#users', {
+        push: false,
+        replace: false,
+        timeout: 20000,
+        scrollTo: 0,
+        maxCacheLength: 0
+    })
     return false;
 });
-/*
-$("#user-form-pjax").on("pjax:end", function() {
-    $.pjax.reload({container:"#users"});  //Reload GridView
+$('#users').on('pjax:end', function(xhr, options) {
+    if ($submitBtn) $submitBtn.button('reset');
+    $userModal.modal('hide');
 });
-*/
-/*
-$userForm.on('beforeSubmit', function() {
-    $.ajax({
-        url: $userForm.attr('action'),
-        data: $userForm.serialize(),
-        method: 'POST'
-    });
-    return false;
+$('button[type="submit"]', $userModal).on('click', function() {
+    $submitBtn = $(this).button('loading');
+    $userForm.data('yiiActiveForm').submitting = true;
+    $userForm.yiiActiveForm('validate');
 });
-*/
-
 {{ void(this.endBlock()) }}
 
-{{ this.registerJs(this.blocks['user_index_js'], constant('POS_END', this)) }}
+{{ this.registerJs(this.blocks['user_index_js'], constant('POS_LOAD', this)) }}
