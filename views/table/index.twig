@@ -1,4 +1,5 @@
 {{ use('yii/grid/GridView') }}
+{{ use('yii/widgets/Pjax') }}
 
 {{ set(this, 'params', {'breadcrumbs': [t('app', 'Tables')]}) }}
 
@@ -14,6 +15,7 @@
   {% set buttons_tpl = buttons_tpl ~ '{update}{delete}' %}
 {% endif %}
 
+{{ pjax_begin({timeout: 20000, id: 'tables'}) }}
 {{ grid_view_widget({
     'dataProvider': dataProvider,
     'columns': [
@@ -32,6 +34,7 @@
     }
    })
 }}
+{{ pjax_end() }}
 
 <div id="new-table" class="modal fade" tabindex="-1" role="dialog">
   <div class="modal-dialog">
@@ -58,27 +61,47 @@
 </div><!-- /.modal -->
 
 {{ void(this.beginBlock('table_index_js')) }}
+function createTable($btn) {
+    $btn.button('loading');
+    $.pjax({
+        type: 'post',
+        url: '{{ url(['table/ajax-create-table']) | raw }}',
+        data: $('#new-table').find('form').serialize(),
+        container: '#tables', 
+        push: false,
+        replace: false,
+        timeout: 20000,
+    });
+}
+$('#tables').on('pjax:end', function(xhr, options) {
+   $newTableBtn.button('reset');
+   $('#new-table').modal('hide');
+});
 $('input[name="Item[name]"]').on('keyup', function(e) {
     if (e.keyCode == 13) {
         createTable($('#new-table [type="submit"]'));
     }
 });
-$('#new-table [type="submit"]').on('click', createTable($(this)));
-
-function createTable($btn) {
-    $btn.button('loading');
-    $.ajax({
-        method: 'post',
-        url: '{{ url(['table/ajax-create-table']) | raw }}',
-        data: $('#new-table').find('form').serialize(),
-        success: function() {
-            location.reload();
-        },
-        complete: function() {
-            $btn.button('reset');
-        }
+var $newTableBtn = $('#new-table [type="submit"]');
+$newTableBtn.on('click', function() {
+    createTable($newTableBtn)
+});
+$('#tables').on('click', '.table .actions a[href*="table/delete"]', function(e) {
+    $btn = $(this);
+    var href = $btn.attr('href');
+    var id = href.substring(href.lastIndexOf('/') + 1);
+    $.pjax({
+        url: '{{ url(['table/ajax-delete-item']) }}',
+        type: 'POST',
+        data: 'id={id}'.replace('{id}', id),
+        container: '#tables', 
+        push: false,
+        replace: false,
+        timeout: 20000,
+        maxCacheLength: 0,
     });
-}
+    return false;
+});
 {{ void(this.endBlock()) }}
 
 {{ this.registerJs(this.blocks['table_index_js'], constant('POS_READY', this)) }}

@@ -83,14 +83,18 @@
 var $userModal = $('#user-modal');
 var $userForm = $('#user-form');
 $('.actions .btn-add').on('click', function() {
+    $userModal.find('form :input').val('');
+    $userModal.find('.has-success').removeClass('.has-success');
+    $userForm.find('input[name="UserForm[is_admin]"]').prop('checked', false);
     $userModal.removeClass('modal-edit').addClass('modal-add');
     $userForm.find('input[name="UserForm[username]"]').attr('readonly', false);
-    $userModal.find('form :input').val('');
     $userModal.modal('show');
     return false;
 });
 
 $('#users').on('click', '.table .actions a[href$="user/update"]', function() {
+    $userModal.find('form :input').val('');
+    $userModal.find('.has-success').removeClass('.has-success');
     $userModal.removeClass('modal-add').addClass('modal-edit');
     $userModal.modal('show');
     var roles = $.map($(this).closest('tr').find('[data-role]'), function(e) { return $(e).html().trim()});
@@ -114,15 +118,13 @@ $userForm.on('beforeSubmit', function(e) {
     }
     $('input[type="checkbox"]', $userForm).attr('value', 1);
     $.pjax.submit(e, '#users', {
-        url: function() {
-            return $userForm.attr('action') + window.location.search;
-        },
+        url: $userForm.attr('action') + window.location.search,
         push: false,
         replace: false,
         timeout: 20000,
         scrollTo: 0,
         maxCacheLength: 0
-    })
+    });
     return false;
 });
 $('#users').on('pjax:end', function(xhr, options) {

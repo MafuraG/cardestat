@@ -66,7 +66,7 @@
               'id': group['id']}), {'class': 'btn btn-update btn-xs btn-default'}) | raw }}</button>
           {% if app.user().can('admin') %}
             {{ html.a(glyph_trash, url({0: 'table/ajax-delete-group',
-                'id': group['id']}), {'class': 'btn btn-delete btn-xs btn-default', 'data-loading-text': t('app', '<i class="fa fa-spinner fa-pulse wobble-fix"></i>')}) | raw }}</button>
+                'id': group['id']}), {'class': 'btn btn-delete btn-xs btn-default', 'data-loading-text': '<i class="fa fa-spinner fa-pulse wobble-fix"></i>'}) | raw }}</button>
           {% endif %}
         </td>
       </tr>

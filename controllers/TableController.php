@@ -22,11 +22,11 @@ class TableController extends Controller {
                 'class' => AccessControl::className(),
                 'rules' => [[
                     'allow' => true,
-                    'actions' => ['ajax-delete-group', 'ajax-delete-item', 'action-create-table'],
+                    'actions' => ['ajax-delete-group', 'ajax-delete-item', 'action-create-table', 'ajax-update-item'],
                     'roles' => ['admin']
                 ], [
                     'allow' => false,
-                    'actions' => ['ajax-delete-group', 'ajax-delete-item', 'action-create-table'],
+                    'actions' => ['ajax-delete-group', 'ajax-delete-item', 'action-create-table', 'ajax-update-item'],
                     'roles' => ['@']
                 ], [
                     'allow' => true,
@@ -40,6 +40,7 @@ class TableController extends Controller {
                     'ajax-create-table'  => ['post'],
                     'ajax-save-readings'  => ['post'],
                     'ajax-create-item'  => ['post'],
+                    'ajax-update-item'  => ['post'],
                     'ajax-delete-item'  => ['post'],
                     'ajax-delete-group'  => ['post'],
                 ],
@@ -60,23 +61,23 @@ class TableController extends Controller {
         ]);
     }
     public function actionAjaxCreateTable() {
+        if (!\Yii::$app->user->can('admin')) throw new HttpException(403);
         \Yii::$app->response->format = Response::FORMAT_JSON;
         $request = \Yii::$app->request;
         $item = new Item();
         $item->attributes = $request->post('Item', []);
         if (!$item->save())
             throw new HttpException(422, \yii\helpers\Json::encode($item->errors));
-        return $item;
+        $this->layout = false;
+        return $this->actionIndex();;
     }
     public function actionAjaxDeleteGroup($id) {
+        if (!\Yii::$app->user->can('admin')) throw new HttpException(403);
         \Yii::$app->response->format = Response::FORMAT_JSON;
         $group = ItemReadingGroup::findOne($id);
         $connection = \Yii::$app->db;
         $transaction = $connection->beginTransaction();
         try {
-            foreach ($group->readings as $reading) {
-                $reading->delete();
-            }
             $res = $group->delete();
             $transaction->commit();
             return $res;
@@ -86,6 +87,7 @@ class TableController extends Controller {
         }
     }
     public function actionAjaxDeleteItem() {
+        if (!\Yii::$app->user->can('admin')) throw new HttpException(403);
         \Yii::$app->response->format = Response::FORMAT_JSON;
         $request = \Yii::$app->request;
         $item = Item::findOne($request->post('id'));
@@ -93,20 +95,35 @@ class TableController extends Controller {
         $transaction = $connection->beginTransaction();
         try {
             if ($item->parent and $item->parent->children and count($item->parent->children) == 1) {
-                foreach ($item->readings as $reading) {
+                $aLeaf = ItemExtended::findLeaves($item->id)->one();
+                foreach ($aLeaf->readings as $reading) {
                     $reading->item_id = $item->parent_id;
                     $reading->save(false);
                 }
-            } else foreach ($item->readings as $reading) $reading->delete();
-            $res = $item->delete();
+            }// else foreach ($item->readings as $reading) $reading->delete();
+            $item->delete();
             $transaction->commit();
-            return $res;
+            
+            $this->layout = false;
+            return $this->actionIndex();
         } catch (Exception $e) {
             $transaction->rollback();
             throw $e;
         }
     }
+    public function actionAjaxUpdateItem($id) {
+        if (!\Yii::$app->user->can('admin')) throw new HttpException(403);
+        \Yii::$app->response->format = Response::FORMAT_JSON;
+        $request = \Yii::$app->request;
+        $item = Item::findOne($id);
+        $item->name = $request->post('name');
+        if (!$item->save())
+            throw new HttpException(422, \yii\helpers\Json::encode($item->errors));
+        $itemX = ItemExtended::findOne($id);
+        return $itemX;
+    }
     public function actionAjaxCreateItem() {
+        if (!\Yii::$app->user->can('admin')) throw new HttpException(403);
         \Yii::$app->response->format = Response::FORMAT_JSON;
         $request = \Yii::$app->request;
         $item = new Item();
@@ -182,6 +199,7 @@ class TableController extends Controller {
         }
     }
     public function actionUpdate($id) {
+        if (!\Yii::$app->user->can('admin')) throw new HttpException(403);
         $item = ItemExtended::findOne($id);
         $item_tree = ArrayHelper::toArray($item, [
             'app\models\ItemExtended' => [

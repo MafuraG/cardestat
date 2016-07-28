@@ -23,7 +23,7 @@
             <input type="hidden" id="Item_id" name="Item[id]">
             <input class="form-control" id="Item_name" name="Item[name]">
           </div>
-          <button type="button" class="btn btn-primary">{{ t('app', 'Save') }}</button>
+          <button type="button" class="btn btn-primary"data-loading-text="{{ t('app', 'Saving') }}...">{{ t('app', 'Save') }}</button>
           <button type="button" class="btn btn-danger" data-loading-text="{{ t('app', 'Deleting') }}...">{{ t('app', 'Delete') }}</button>
         </fieldset>
         <legend>{{ t('app', 'Create child node') }}</legend>
@@ -66,6 +66,7 @@
         appendChild($(this));
     });
     function appendChild($btn) {
+       if (!$currentItemId.val()) return;
        $btn.button('loading');
        $.ajax({
            url: '{{ url(['table/ajax-create-item']) | raw }}',
@@ -89,18 +90,45 @@
            }
        });
     }
-    $('fieldset.current .btn-danger').on('click', function() {
+    $('fieldset.current .btn-primary').on('click', function() {
+       var toUpdateName = $currentItemName.val();
+       var toUpdateId = $currentItemId.val();
+       if (!toUpdateId || !toUpdateName) return;
        var $btn = $(this).button('loading');
+       $.ajax({
+           url: '{{ url(['table/ajax-update-item']) | raw }}?id=' + toUpdateId,
+           method: 'post',
+           data: 'name=' + toUpdateName,
+           dataType: 'json',
+           success: function(data, textStatus, jqXHR) {
+               var node = $itemTree.tree('getNodeById', toUpdateId);
+               $itemTree.tree('updateNode', node, {
+                   name: toUpdateName,
+                   path: data.path
+               });
+               $currentItemPath.val(node.path.substring(node.path.indexOf('\\') + 1));
+           },
+           complete: function() {
+               $btn.button('reset');
+           }
+       });
+    });
+    $('fieldset.current .btn-danger').on('click', function() {
        var toDelete = $currentItemId.val();
+       if (!toDelete) return;
+       var $btn = $(this).button('loading');
        $.ajax({
            url: '{{ url(['table/ajax-delete-item']) | raw }}',
            method: 'post',
            dataType: 'json',
            data: 'id={id}'
-               .replace('{id}', $currentItemId.val()),
+               .replace('{id}', toDelete),
            success: function(data, textStatus, jqXHR) {
                var node = $itemTree.tree('getNodeById', toDelete);
                $itemTree.tree('removeNode', node);
+               $currentItemPath.val('');
+               $currentItemName.val('');
+               $currentItemId.val('');
            },
            complete: function() {
                $btn.button('reset');

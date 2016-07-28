@@ -35,9 +35,9 @@ class m160701_124112_initial extends Migration {
         ]);
         $this->createTable('item_reading', [
             'id' => Schema::TYPE_PK,
-            'item_reading_group_id' => 'integer not null references item_reading_group (id)',
+            'item_reading_group_id' => 'integer not null references item_reading_group (id) on delete cascade',
             'count' => 'integer check (count >= 0)',
-            'item_id' => 'integer not null references item (id)',
+            'item_id' => 'integer not null references item (id) on delete cascade',
         ]);
         $this->execute('
             create view item_extended as 
