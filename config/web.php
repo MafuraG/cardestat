@@ -7,6 +7,13 @@ $config = [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'defaultRoute' => 'table',
+    'modules' => [
+        'gridview' => [
+            'class' => '\kartik\grid\Module',
+            //'downloadAction' => 'export',
+            'downloadAction' => 'gridview/export/download',
+        ]
+    ],
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation

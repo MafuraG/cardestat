@@ -27,6 +27,7 @@ class UserController extends Controller {
                 'class' => \yii\filters\VerbFilter::className(),
                 'actions' => [
                     'ajax-create-table'  => ['post'],
+                    'validate' => ['post', 'get']
                 ]
             ]
         ], parent::behaviors());
@@ -46,7 +47,7 @@ class UserController extends Controller {
                 'pageSize' => 20,
             ],
         ]);
-
+        $dataProvider->sort->route = 'user/index';
         return $this->render('index.twig', [
             'model' => $model,
             'dataProvider' => $dataProvider,
@@ -77,6 +78,7 @@ class UserController extends Controller {
                 $admin = $auth->getRole('admin');
                 $auth->assign($admin, $user->id);
             }
+            $this->layout = false;
             return $this->actionIndex();
         }
     }

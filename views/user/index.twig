@@ -52,6 +52,8 @@
                id: 'user-form',
                action: url(['user/ajax-create']),
                enableAjaxValidation: false,
+               validateOnChange: false,
+               validateOnBlur: false,
                validationUrl: url(['user/validate']),
                options: {
                    'data-pjax': true,
@@ -60,7 +62,7 @@
                }
         }) %}
           {{ html.activeHiddenInput(model, 'id') | raw }}
-          {{ form.field(model, 'username', {enableAjaxValidation: false}) | raw }}
+          {{ form.field(model, 'username', {enableAjaxValidation: true}) | raw }}
           {{ form.field(model, 'password').passwordInput() | raw }}
           {{ form.field(model, 'password_repeat').passwordInput() | raw }}
           {{ form.field(model, 'is_admin').checkbox({value: 1}) | raw }}
@@ -100,7 +102,7 @@ $('#table-wrapper').on('click', '.table .btn-update', function() {
 
 var $userForm = $('#user-form');
 var $submitBtn;
-$('#user-form').on('beforeSubmit', function(e) {
+$userForm.on('beforeSubmit', function(e) {
     var $form = $(this);
     // return false if form still have some validation errors
     if ($form.find('.has-error').length) {
@@ -108,6 +110,9 @@ $('#user-form').on('beforeSubmit', function(e) {
     }
     $('input[type="checkbox"]', $userForm).attr('value', 1);
     $.pjax.submit(e, '#users', {
+        url: function() {
+            return $userForm.attr('action') + window.location.search;
+        },
         push: false,
         replace: false,
         timeout: 20000,
@@ -122,8 +127,9 @@ $('#users').on('pjax:end', function(xhr, options) {
 });
 $('button[type="submit"]', $userModal).on('click', function() {
     $submitBtn = $(this).button('loading');
-    $userForm.data('yiiActiveForm').submitting = true;
-    $userForm.yiiActiveForm('validate');
+    //$userForm.data('yiiActiveForm').submitting = true;
+    //$userForm.yiiActiveForm('validate');
+    $userForm.submit();
 });
 {{ void(this.endBlock()) }}
 
