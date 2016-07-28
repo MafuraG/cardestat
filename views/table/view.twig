@@ -15,18 +15,25 @@
 
 {% set glyph_pencil = '<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>' %}
 {% set glyph_trash = '<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>' %}
-{% set glyph_export = '<span class="glyphicon glyphicon-export" aria-hidden="true"></span>' %}
 
 <h1>{{ table_title }}</h1>
-<p class="actions">
+<div class="actions">
   <button type="button" class="btn btn-add btn-lg btn-primary" data-toggle="modal" data-target="#group-data">
-    {{ t('app', 'New group') }}</button>
-  <button type="button" class="btn btn-lg btn-export btn-success" data-toggle="modal" data-target="#group-data">
-    {{ glyph_export | raw }}</span> CSV</button>
-</p>
-{{ export_menu_widget({
-    dataProvider: dataProvider
-}) }}
+    {{ t('app', 'New group') }}
+  </button>
+  {{ export_menu_widget({
+         dataProvider: dataProvider,
+         target: '_blank',
+         columnSelectorOptions: {
+             class: 'btn btn-lg btn-default',
+         },
+         dropdownOptions: {
+             label: t('app', 'Export'),
+             class: 'btn btn-lg btn-success',
+         },
+         filename: table_title
+  }) }}
+</div>
 
 <h2>{{ t('app', 'Groups') }}</h2>
 
@@ -66,7 +73,7 @@
               'id': group['id']}), {'class': 'btn btn-update btn-xs btn-default'}) | raw }}</button>
           {% if app.user().can('admin') %}
             {{ html.a(glyph_trash, url({0: 'table/ajax-delete-group',
-                'id': group['id']}), {'class': 'btn btn-delete btn-xs btn-default', 'data-loading-text': '<i class="fa fa-spinner fa-pulse wobble-fix"></i>'}) | raw }}</button>
+                'id': group['id']}), {'class': 'btn btn-delete btn-xs btn-default', 'data-loading-text': '<i class="fa fa-trash-o fa-spin wobble-fix"></i>'}) | raw }}</button>
           {% endif %}
         </td>
       </tr>
@@ -199,12 +206,9 @@ $('#table-wrapper').on('click', '.table .btn-delete', function() {
     $.ajax({
         method: 'post',
         url: $btn.attr('href'),
-        complete: function() {
-            $btn.button('reset');
-        },
         success: function() {
-            $btn.closest('tr').remove();
             if ($btn.closest('table').find('tr').length == 0) $('.not-found').removeClass('hidden');
+            $btn.closest('tr').remove();
         },
         error: function(jqXHR, textStatus, errorThrown) {
             alert(textStatus + ': ' + errorThrown);
