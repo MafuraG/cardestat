@@ -29,11 +29,13 @@ class UserForm extends Model
         return [
             // username and password are both required
             ['id', 'integer', 'min' => 1],
-            ['username', 'unique', 'targetClass' => 'app\models\User'],
+            ['id', 'required', 'on' => 'update'],
+            ['id', 'exist', 'targetAttribute' => 'id', 'targetClass' => User::className(), 'on' => 'update'],
+            ['username', 'unique', 'targetClass' => 'app\models\User', 'on' => 'create'],
             [['username', 'password', 'password_repeat'], 'string', 'max' => 32],
             ['password', 'string', 'min' => 6],
             ['username', 'string', 'min' => 5],
-            [['username', 'password', 'password_repeat'], 'required'],
+            [['username', 'password', 'password_repeat'], 'required', 'on' => 'create'],
             ['password_repeat', 'compare', 'compareAttribute' => 'password', 'message' => \Yii::t('app', 'Passwords don\'t match')],
             // rememberMe must be a boolean value
             ['is_admin', 'boolean'],

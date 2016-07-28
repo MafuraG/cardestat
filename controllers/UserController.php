@@ -26,7 +26,7 @@ class UserController extends Controller {
             'verbs' => [
                 'class' => \yii\filters\VerbFilter::className(),
                 'actions' => [
-                    'ajax-create-table'  => ['post'],
+                    'ajax-save'  => ['post'],
                     'validate' => ['post', 'get']
                 ]
             ]
@@ -35,7 +35,7 @@ class UserController extends Controller {
     public function renderRoles($model, $key, $index, $column) {
         $res = '';
         foreach (explode(',', substr($model->roles, 1, strlen($model->roles) - 2)) as $role)
-            if ($role !== 'NULL') $res .= "<span class=\"badge\">$role</span>";
+            if ($role !== 'NULL') $res .= "<span data-role class=\"badge\">$role</span>";
         return $res;
     }
     public function actionIndex() {
@@ -55,29 +55,38 @@ class UserController extends Controller {
     }
     public function actionValidate() {
         $model = new UserForm();
-        if (\Yii::$app->request->isAjax && $model->load(\Yii::$app->request->post())) {
+        $request = \Yii::$app->request;
+        if ($request->isAjax && $model->load($request->post())) {
+            if ($model->id) $model->scenario = 'update';
+            else $model->scenario = 'create';
             \Yii::$app->response->format = Response::FORMAT_JSON;
             return ActiveForm::validate($model);
         }
     }
-    public function actionAjaxCreate() {
+    public function actionAjaxSave() {
         $model = new UserForm();
         if (\Yii::$app->request->isAjax && $model->load(\Yii::$app->request->post())) {
+            if ($model->id) $model->scenario = 'update';
+            else $model->scenario = 'create';
             $val = ActiveForm::validate($model);
             if ($val) {
                 \Yii::$app->response->format = Response::FORMAT_JSON;
                 throw new HttpException(422, \yii\helpers\Json::encode($val));
             }
-            $user = new User();
-            $user->username = $model->username;
-            $user->hash = \Yii::$app->getSecurity()->generatePasswordHash($model->password);
+            if (!$model->id) {
+                $user = new User();
+                $user->username = $model->username;
+            } else $user = User::findOne($model->id);
+            if ($model->password)
+                $user->hash = \Yii::$app->getSecurity()->generatePasswordHash($model->password);
             if (!$user->save(false)) 
                 throw new HttpException(500, \Yii::t('app', 'Could not save the user'));
-            if ($model->is_admin) {
-                $auth = \Yii::$app->authManager;
-                $admin = $auth->getRole('admin');
-                $auth->assign($admin, $user->id);
-            }
+
+            $auth = \Yii::$app->authManager;
+            $admin = $auth->getRole('admin');
+            if ($model->is_admin) $auth->assign($admin, $user->id);
+            else $auth->revoke($admin, $user->id);
+
             $this->layout = false;
             return $this->actionIndex();
         }

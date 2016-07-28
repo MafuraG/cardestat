@@ -20,8 +20,8 @@
 {{ grid_view_widget({
     dataProvider: dataProvider,
     columns: [
-        {attribute: 'id', 'contentOptions': {class: 'id'}},
-        {attribute: 'username'},
+        {attribute: 'id', contentOptions: {class: 'id', 'data-id': true}},
+        {attribute: 'username', contentOptions: {'data-username': true}},
         {attribute: 'roles', content: [this.context, 'renderRoles']},
         {
             class: 'yii\\grid\\ActionColumn',
@@ -50,7 +50,7 @@
         {{ use('yii/widgets/ActiveForm') }}
         {% set form = active_form_begin({
                id: 'user-form',
-               action: url(['user/ajax-create']),
+               action: url(['user/ajax-save']),
                enableAjaxValidation: false,
                validateOnChange: false,
                validateOnBlur: false,
@@ -63,8 +63,8 @@
         }) %}
           {{ html.activeHiddenInput(model, 'id') | raw }}
           {{ form.field(model, 'username', {enableAjaxValidation: true}) | raw }}
-          {{ form.field(model, 'password').passwordInput() | raw }}
-          {{ form.field(model, 'password_repeat').passwordInput() | raw }}
+          {{ form.field(model, 'password', {validateOnChange: true}).passwordInput() | raw }}
+          {{ form.field(model, 'password_repeat', {validateOnChange: true}).passwordInput() | raw }}
           {{ form.field(model, 'is_admin').checkbox({value: 1}) | raw }}
         {{ active_form_end() }}
       <div class="modal-footer">
@@ -81,31 +81,35 @@
 
 {{ void(this.beginBlock('user_index_js')) }}
 var $userModal = $('#user-modal');
+var $userForm = $('#user-form');
 $('.actions .btn-add').on('click', function() {
     $userModal.removeClass('modal-edit').addClass('modal-add');
+    $userForm.find('input[name="UserForm[username]"]').attr('readonly', false);
     $userModal.find('form :input').val('');
     $userModal.modal('show');
     return false;
 });
 
-$('#table-wrapper').on('click', '.table .btn-update', function() {
+$('#users').on('click', '.table .actions a[href$="user/update"]', function() {
     $userModal.removeClass('modal-add').addClass('modal-edit');
     $userModal.modal('show');
-    $('input[name="Group_date_range"]', $groupData)
-        .val($(this).closest('tr').find('.date-range').html().trim());
-    $(this).closest('tr').find('.count').each(function(i, e) {
-        $countInputs.eq(i).val($(e).html().trim());
-    });
-    $userModal.find('form').attr('action', $(this).attr('href'));
+    var roles = $.map($(this).closest('tr').find('[data-role]'), function(e) { return $(e).html().trim()});
+    if (roles.indexOf('admin') != -1)
+        $userForm.find('input[name="UserForm[is_admin]"]').prop('checked', true);
+    else 
+        $userForm.find('input[name="UserForm[is_admin]"]').prop('checked', false);
+
+    $userForm.find('input[name="UserForm[id]"]')
+        .val($(this).closest('tr').find('td[data-id]').html().trim());
+    $userForm.find('input[name="UserForm[username]"]').attr('readonly', true)
+        .val($(this).closest('tr').find('td[data-username]').html().trim());
     return false;
 });
 
-var $userForm = $('#user-form');
 var $submitBtn;
 $userForm.on('beforeSubmit', function(e) {
-    var $form = $(this);
     // return false if form still have some validation errors
-    if ($form.find('.has-error').length) {
+    if ($userForm.find('.has-error').length) {
         return false;
     }
     $('input[type="checkbox"]', $userForm).attr('value', 1);
@@ -127,8 +131,6 @@ $('#users').on('pjax:end', function(xhr, options) {
 });
 $('button[type="submit"]', $userModal).on('click', function() {
     $submitBtn = $(this).button('loading');
-    //$userForm.data('yiiActiveForm').submitting = true;
-    //$userForm.yiiActiveForm('validate');
     $userForm.submit();
 });
 {{ void(this.endBlock()) }}

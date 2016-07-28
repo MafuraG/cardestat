@@ -11,12 +11,12 @@ use yii\base\Model;
  * @property User|null $user This property is read-only.
  *
  */
-class UserForm extends Model
+class LoginForm extends Model
 {
     public $username;
     public $password;
-    public $password_repeat;
-    public $is_admin = false;
+    public $rememberMe = true;
+
     private $_user = false;
 
 
@@ -27,10 +27,7 @@ class UserForm extends Model
     {
         return [
             // username and password are both required
-            [['username', 'password', 'password_repeat'], 'string', 'max' => 32],
-            [['password'], 'string', 'min' => 6],
-            [['username', 'password', 'password_repeat'], 'required'],
-            ['password_repeat', 'compare', 'compareAttribute' => 'password', 'message' => \Yii::t('app', 'Passwords don\'t match')],
+            [['username', 'password'], 'required'],
             // rememberMe must be a boolean value
             ['rememberMe', 'boolean'],
             // password is validated by validatePassword()
