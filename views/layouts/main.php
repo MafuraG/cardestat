@@ -41,13 +41,14 @@ AppAsset::register($this);
         'items' => [
             ['label' => \Yii::t('app', 'Home'), 'url' => ['/table/index']],
             ['label' => \Yii::t('app', 'Users'), 'url' => ['/user/index'], 'visible' => \Yii::$app->user->can('admin')],
+            ['label' => (\Yii::$app->language === 'es') ? 'English' : 'Español', 'url' => ['/site/chlan']],
             Yii::$app->user->isGuest ? (
                 ['label' => 'Login', 'url' => ['/site/login']]
             ) : (
                 '<li>'
                 . Html::beginForm(['/site/logout'], 'post', ['class' => 'navbar-form'])
                 . Html::submitButton(
-                    'Logout (' . Yii::$app->user->identity->username . ')',
+                    \Yii::t('app', 'Logout') . ' (' . Yii::$app->user->identity->username . ')',
                     ['class' => 'btn btn-link']
                 )
                 . Html::endForm()
@@ -68,9 +69,8 @@ AppAsset::register($this);
 
 <footer class="footer">
     <div class="container-fluid">
-        <p class="pull-left">&copy; Inmobiliaria Cárdenas <?= date('Y') ?></p>
-
-        <p class="pull-right"><?= Yii::powered() ?></p>
+        <p class="pull-right">&copy; Inmobiliaria Cárdenas <?= date('Y') ?></p>
+        <p class="pull-left"><?= \Yii::t('app', 'Tracking tables for performance statistical analysis.') ?></p>
     </div>
 </footer>
 

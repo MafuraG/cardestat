@@ -32,7 +32,7 @@
             <label for="Item_name">{{ t('app', 'Name') }}</label>
             <input class="form-control" id="Item_name" name="Item[name]">
           </div>
-          <button type="button" data-loading-text="{{ t('app', 'Creating') }}..." class="btn btn-primary">{{ t('app', 'Create') }}</button>
+          <button type="button" data-loading-text="{{ t('app', 'Creating...') }}" class="btn btn-primary">{{ t('app', 'Create') }}</button>
         </fieldset>
       </form>
     </div>
@@ -41,6 +41,14 @@
   <div class="col-md-8" id="item-tree"></div>
 
 </div>
+
+<hr>
+<p class="actions">
+  <a type="button" class="btn btn-add btn-lg btn-success" href="{{ url({0: 'table/view', id: item_tree['id']}) }}">
+    {{ t('app', 'View') }}
+  </a>
+</p>
+
 
 {{ void(this.beginBlock('table_edit_js')) }}
     var $currentItemPath = $('#Item_path');

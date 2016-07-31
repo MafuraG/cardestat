@@ -42,4 +42,12 @@ class UserForm extends Model
             // password is validated by validatePassword()
         ];
     }
+    public function attributeLabels() {
+        return [
+            'password' => \Yii::t('app', 'Password'),
+            'password_repeat' => \Yii::t('app', 'Repeat password'),
+            'username' => \Yii::t('app', 'Username'),
+            'is_admin' => \Yii::t('app', 'Is admin?'),
+        ];
+    }
 }

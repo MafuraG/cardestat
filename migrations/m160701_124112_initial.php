@@ -31,12 +31,14 @@ class m160701_124112_initial extends Migration {
             'from' => 'date not null',
             'to' => 'date not null',
             'created_at' => 'timestamp not null',
-            //'created_by' => 'integer not null references to usr (id)'
+            'created_by' => 'integer not null references "user" (id)',
+            'updated_at' => 'timestamp not null',
+            'updated_by' => 'integer not null references "user" (id)'
         ]);
         $this->createTable('item_reading', [
             'id' => Schema::TYPE_PK,
             'item_reading_group_id' => 'integer not null references item_reading_group (id) on delete cascade',
-            'count' => 'integer check (count >= 0)',
+            'value' => 'varchar(16)',
             'item_id' => 'integer not null references item (id) on delete cascade',
         ]);
         $this->execute('
@@ -69,6 +71,13 @@ class m160701_124112_initial extends Migration {
                  left join auth_item ai on (ai.name = aa.item_name and ai.type = 1)
             group by u.id, u.username, u."authKey", u."accessToken", u.hash;
         ');
+        $this->execute('
+            create view item_reading_group_extended as 
+            select g.*, cu.username as creator_name, uu.username as updater_name 
+            from item_reading_group g 
+                 join "user" cu on cu.id = g.created_by 
+                 join "user" uu on uu.id = g.updated_by
+        ');
         $auth = Yii::$app->authManager;
         $admin = $auth->createRole('admin');
         $auth->add($admin);
@@ -79,8 +88,10 @@ class m160701_124112_initial extends Migration {
         $this->execute('drop view item_reading_extended');
         $this->execute('drop view item_extended');
         $this->dropTable('item_reading');
+        $this->execute('drop view item_reading_group_extended');
         $this->dropTable('item_reading_group');
         $this->dropTable('item');
+        $this->execute('drop view user_extended');
         $this->dropTable('user');
     }
 }

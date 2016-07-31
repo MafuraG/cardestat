@@ -19,4 +19,9 @@ class Controller extends YiiController {
             ],
         ];
     }
+    public function beforeAction($event) {
+        if (\Yii::$app->session->get('lang') === 'es') \Yii::$app->language = 'es';
+        else \Yii::$app->language = 'en';
+        return parent::beforeAction($event);
+    }
 }

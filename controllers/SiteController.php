@@ -46,6 +46,12 @@ class SiteController extends Controller
         ];
     }
 
+    public function actionChlan() {
+        if (\Yii::$app->language === 'en') \Yii::$app->session->set('lang', 'es');
+        else \Yii::$app->session->set('lang', 'en');
+        return $this->redirect(Yii::$app->request->referrer);
+
+    }
     public function actionIndex()
     {
         return $this->render('index');

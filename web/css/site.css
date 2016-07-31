@@ -18,8 +18,8 @@ body {
     background-color: #171d7d;
     color: #fbd11a;
     border-top: 1px solid #ddd;
-    padding: 50px 0;
-    margin-top: 60px;
+    padding: 20px 0;
+    margin-top: 50px;
 }
 
 .jumbotron {
@@ -89,6 +89,10 @@ a.desc:after {
     border-left: 3px solid #eed3d7;
     padding: 10px 20px;
     margin: 0 0 15px 0;
+}
+
+.table th {
+    background-color: whitesmoke;
 }
 
 .table.text-center th {
@@ -208,4 +212,8 @@ td .btn .glyphicon {
 .btn-xs .fa {
    font-size: 14px;
    color: black;
+}
+
+.actions .dropdown-menu {
+   min-width: 360px;
 }

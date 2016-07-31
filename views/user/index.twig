@@ -7,13 +7,13 @@
 <h1>{{ t('app', 'Users') }}</h1>
 
 
-{% set buttons_tpl = '{view}' %}
+{% set buttons_tpl = '' %}
 {% if app.user().can('admin') %}
   <p class="actions">
     <button type="button" class="btn btn-add btn-lg btn-primary" data-toggle="modal" data-target="#new-user">
       {{ t('app', 'New user') }}</button>
   </p>
-  {% set buttons_tpl = buttons_tpl ~ '{update}{delete}' %}
+  {% set buttons_tpl = buttons_tpl ~ '{update}' %}
 {% endif %}
 
 {{ pjax_begin({timeout: 20000, id: 'users'}) }}
@@ -21,8 +21,8 @@
     dataProvider: dataProvider,
     columns: [
         {attribute: 'id', contentOptions: {class: 'id', 'data-id': true}},
-        {attribute: 'username', contentOptions: {'data-username': true}},
-        {attribute: 'roles', content: [this.context, 'renderRoles']},
+        {attribute: 'username', label: t('app', 'Username'), contentOptions: {'data-username': true}},
+        {attribute: 'roles', label: t('app', 'Roles'), content: [this.context, 'renderRoles']},
         {
             class: 'yii\\grid\\ActionColumn',
             contentOptions: {class: 'actions text-center'},

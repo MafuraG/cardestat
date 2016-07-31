@@ -10,6 +10,7 @@ use app\models\ItemExtended;
 use app\models\ItemReading;
 use app\models\ItemReadingExtended;
 use app\models\ItemReadingGroup;
+use app\models\ItemReadingGroupExtended;
 use yii\helpers\ArrayHelper;
 use yii\web\HttpException;
 use yii\filters\AccessControl;
@@ -173,16 +174,15 @@ class TableController extends Controller {
         $connection = \Yii::$app->db;
         $transaction = $connection->beginTransaction();
         try {
-            $sql = 'insert into item_reading (item_reading_group_id, count, item_id) values ';
+            $sql = 'insert into item_reading (item_reading_group_id, value, item_id) values ';
             if (!$group->save(false))
-                throw new HttpException(500, \Yii::t('app', 'Could not save group'));
+                throw new HttpException(500, \Yii::t('app', 'Could not save row'));
             $readings = $request->post('ItemReading', []);
             if ($id) ItemReading::deleteAll("item_reading_group_id = $id");
             $i = 0;
-            foreach ($readings as $item_id => $item_count) {
+            foreach ($readings as $item_id => $item_value) {
                 $i++;
-                if (!is_numeric($item_count) or !is_int($item_count+0)) $item_count = null;
-                $sql .= "($group->id, $item_count, $item_id),";
+                $sql .= "($group->id, '$item_value', $item_id),";
             }
             if ($i > 0) {
                 $sql = substr($sql, 0, strlen($sql) - 1);
@@ -217,13 +217,13 @@ class TableController extends Controller {
     public function actionView($id) {
         $query = ItemExtended::find()->where(['root_id' => $id])->asArray();
         $table = $this->addTreeInfo(ArrayHelper::index($query->orderBy('level,path')->all(), 'id'));
-        $query = ItemReadingGroup::find()->asArray() // Yii2 bug forces to do this!?
+        $query = ItemReadingGroupExtended::find()->asArray() // Yii2 bug forces to do this!?
             ->innerJoin(['ire' =>
                 ItemReadingExtended::find()
                     ->select(['item_reading_group_id'])
                     ->where(['root_id' => $id])
                     ->groupBy('item_reading_group_id')
-            ], 'ire.item_reading_group_id = item_reading_group.id')
+            ], 'ire.item_reading_group_id = item_reading_group_extended.id')
             ->with(['itemReadingsExtended' => function($q) use ($id) {
                 $q->where(['root_id' => $id]);
             }]);
@@ -231,13 +231,13 @@ class TableController extends Controller {
             'defaultPageSize' => 10,
             'totalCount' => $query->count()
         ]);
-        $groups = $query->offset($pagination->offset)
+        $groups = $query->orderBy('from')->offset($pagination->offset)
             ->limit($pagination->limit)
             ->all();
         //
         $rawGroups = [];
         foreach ($groups as $group) {
-            $rawGroups[$group['id']] = ArrayHelper::map($group['itemReadingsExtended'], 'path', 'count');
+            $rawGroups[$group['id']] = ArrayHelper::map($group['itemReadingsExtended'], 'path', 'value');
             $rawGroups[$group['id']]['from'] = $group['from'];
             $rawGroups[$group['id']]['to'] = $group['to'];
         }

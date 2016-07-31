@@ -19,20 +19,20 @@
 
 {{ pjax_begin({timeout: 20000, id: 'tables'}) }}
 {{ grid_view_widget({
-    'dataProvider': dataProvider,
-    'columns': [
-        {'attribute': 'id', 'contentOptions': {'class': 'id'}},
-        {'attribute': 'name'},
+    dataProvider: dataProvider,
+    columns: [
+        {attribute: 'id', contentOptions: {class: 'id'}},
+        {attribute: 'name', label: t('app', 'Name'), },
         {
-            'class': 'yii\\grid\\ActionColumn',
-            'contentOptions': {'class': 'actions text-center'},
-            'buttonOptions': {'class': 'btn btn-default btn-xs'},
-            'template': buttons_tpl 
+            class: 'yii\\grid\\ActionColumn',
+            contentOptions: {class: 'actions text-center'},
+            buttonOptions: {class: 'btn btn-default btn-xs', 'data-loading-text': fa_reload},
+            template: buttons_tpl 
         }
     ],
-    'summaryOptions': {
-        'class': 'pull-right',
-        'tag': 'em'
+    summaryOptions: {
+        class: 'pull-right',
+        tag: 'em'
     }
    })
 }}
@@ -96,7 +96,6 @@ $newTableBtn.on('click', function() {
 $('#tables').on('click', '.table .actions a[href*="table/delete"]', function(e) {
     if (!confirm('{{ t('app', 'Are you sure you want to delete this table and all its readings?') }}')) return false;
     $btn = $(this);
-    $btn.attr('data-loading-text', '{{ fa_reload | raw }}');
     $btn.button('loading');
     var href = $btn.attr('href');
     var id = href.substring(href.lastIndexOf('/') + 1);
