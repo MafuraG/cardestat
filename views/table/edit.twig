@@ -83,7 +83,7 @@
            method: 'post',
            dataType: 'json',
            data: 'name={name}&parent_id={parent_id}'
-               .replace('{name}', $newChildName.val())
+               .replace('{name}', encodeURIComponent($newChildName.val()))
                .replace('{parent_id}', $currentItemId.val()),
            success: function(data, textStatus, jqXHR) {
                var parentNode = $itemTree.tree('getNodeById', $currentItemId.val());
@@ -108,7 +108,7 @@
        $.ajax({
            url: '{{ url(['table/ajax-update-item']) | raw }}?id=' + toUpdateId,
            method: 'post',
-           data: 'name=' + toUpdateName,
+           data: 'name=' + encodeURIComponent(toUpdateName),
            dataType: 'json',
            success: function(data, textStatus, jqXHR) {
                var node = $itemTree.tree('getNodeById', toUpdateId);

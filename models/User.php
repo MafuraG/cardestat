@@ -6,6 +6,12 @@ use yii\db\ActiveRecord;
 
 class User extends ActiveRecord implements \yii\web\IdentityInterface
 {
+    public function getCreatedGroups() {
+        return $this->hasMany(ItemReadingGroup::className(), ['created_by' => 'id']);
+    }
+    public function getUpdatedGroups() {
+        return $this->hasMany(ItemReadingGroup::className(), ['updated_by' => 'id']);
+    }
     /**
      * @inheritdoc
      */

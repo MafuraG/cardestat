@@ -27,7 +27,8 @@ class UserController extends Controller {
                 'class' => \yii\filters\VerbFilter::className(),
                 'actions' => [
                     'ajax-save'  => ['post'],
-                    'validate' => ['post', 'get']
+                    'validate' => ['post', 'get'],
+                    'ajax-delete-user'  => ['post']
                 ]
             ]
         ], parent::behaviors());
@@ -43,15 +44,32 @@ class UserController extends Controller {
         $query = UserExtended::find();
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => [
-                'pageSize' => 20,
-            ],
         ]);
         $dataProvider->sort->route = 'user/index';
         return $this->render('index.twig', [
             'model' => $model,
             'dataProvider' => $dataProvider,
         ]);
+    }
+    public function actionAjaxDeleteUser() {
+        if (!\Yii::$app->user->can('admin')) throw new HttpException(403);
+        $request = \Yii::$app->request;
+        if (!$request->post('id'))  throw new HttpException(400);
+        \Yii::$app->response->format = Response::FORMAT_JSON;
+        $user = User::findOne($request->post('id'));
+        $connection = \Yii::$app->db;
+        $transaction = $connection->beginTransaction();
+        try {
+            if (count($user->createdGroups) > 0 or count($user->updatedGroups))
+                throw new HttpException(422, \Yii::t('app', 'The user cannot be deleted because is still referenced from rows he/she has created or updated'));
+            $user->delete();
+            $transaction->commit();
+            $this->layout = false;
+            return $this->actionIndex();
+        } catch (Exception $e) {
+            $transaction->rollback();
+            throw $e;
+        }
     }
     public function actionValidate() {
         $model = new UserForm();

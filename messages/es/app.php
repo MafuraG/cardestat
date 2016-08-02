@@ -59,6 +59,7 @@ return [
     'Repeat password' => 'Repetir contraseña',
     'Please fill out the following fields to login' => 'Por favor, rellene los siguientes campos para ingresar',
     'Are you sure you want to delete this table and all its readings?' => '¿Seguro que desea eliminar esta tabla y todas sus lecturas?',
+    'Are you sure you want to delete this user?' => '¿Seguro que desea eliminar este usuario?',
     'Properties' => 'Propiedades',
     'Path' => 'Ruta',
     'Create child node' => 'Crear nodo hijo',
@@ -68,5 +69,6 @@ return [
     'Update' => 'Actualizar',
     'Save' => 'Guardar',
     'Delete' => 'Eliminar',
-    'Tracking tables for performance statistical analysis.' => 'Tablas de seguimiento para análisis estadístico de rendimiento.'
+    'Tracking tables for performance statistical analysis.' => 'Tablas de seguimiento para análisis estadístico de rendimiento.',
+    'The user cannot be deleted because is still referenced from rows he/she has created or updated' => 'El usuario no se puede borrar porque todavía es referenciado por filas que ha creado o actualizado'
 ];
