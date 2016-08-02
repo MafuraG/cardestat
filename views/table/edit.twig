@@ -11,7 +11,6 @@
 <style>
     #item-tree {
         padding-left: 56px;
-        z-index: -1;
     }
 </style>
 
@@ -45,7 +44,7 @@
     </div>
   </div>
   
-  <a type="button" class="btn btn-add btn-xs btn-success" href="{{ url({0: 'table/view', id: item_tree['id']}) }}" style="position: absolute">
+  <a type="button" class="btn btn-add btn-xs btn-success" href="{{ url({0: 'table/view', id: item_tree['id']}) }}" style="position: absolute; z-index: 1">
     {{ t('app', 'View') }}
   </a>
   <div class="col-md-8" id="item-tree"></div>
