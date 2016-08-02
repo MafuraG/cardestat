@@ -17,11 +17,23 @@
 {% set glyph_trash = '<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>' %}
 
 <h1>{{ table_title }}</h1>
-<p class="actions">
+<div class="actions">
   <button type="button" class="btn btn-add btn-lg btn-primary" data-toggle="modal" data-target="#group-data">
     {{ t('app', 'New row') }}
   </button>
-</p>
+  {{ export_menu_widget({
+         dataProvider: dataProvider,
+         target: '_blank',
+         columnSelectorOptions: {
+             class: 'btn btn-lg btn-default',
+         },
+         dropdownOptions: {
+             label: t('app', 'Export'),
+             class: 'btn btn-lg btn-success',
+         },
+         filename: table_title
+  }) }}
+</div>
 
 <h2>{{ t('app', 'Rows') }}</h2>
 
@@ -70,23 +82,9 @@
   </table>
 </div>
 
-{{ link_pager_widget({'pagination': pagination}) }}
-
-<hr>
-<div class="actions">
-  {{ export_menu_widget({
-         dataProvider: dataProvider,
-         target: '_blank',
-         columnSelectorOptions: {
-             class: 'btn btn-lg btn-default',
-         },
-         dropdownOptions: {
-             label: t('app', 'Export'),
-             class: 'btn btn-lg btn-success',
-         },
-         filename: table_title
-  }) }}
-</div>
+{% if pagination %}
+    {{ link_pager_widget({'pagination': pagination}) }}
+{% endif %}
 
 <div id="group-data" class="modal modal-add fade" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-lg">

@@ -8,6 +8,13 @@
 
 <h1>{{ t('app', 'Update') }} {{ item_tree['name'] }}</h1>
 
+<style>
+    #item-tree {
+        padding-left: 56px;
+        z-index: -1;
+    }
+</style>
+
 <div class="row" style="position: relative">
   <div class="col-md-4">
     <div class="well">
@@ -38,16 +45,12 @@
     </div>
   </div>
   
+  <a type="button" class="btn btn-add btn-xs btn-success" href="{{ url({0: 'table/view', id: item_tree['id']}) }}" style="position: absolute">
+    {{ t('app', 'View') }}
+  </a>
   <div class="col-md-8" id="item-tree"></div>
 
 </div>
-
-<hr>
-<p class="actions">
-  <a type="button" class="btn btn-add btn-lg btn-success" href="{{ url({0: 'table/view', id: item_tree['id']}) }}">
-    {{ t('app', 'View') }}
-  </a>
-</p>
 
 
 {{ void(this.beginBlock('table_edit_js')) }}

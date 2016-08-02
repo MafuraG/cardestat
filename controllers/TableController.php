@@ -227,12 +227,21 @@ class TableController extends Controller {
             ->with(['itemReadingsExtended' => function($q) use ($id) {
                 $q->where(['root_id' => $id]);
             }]);
-        $pagination = new Pagination([
-            'defaultPageSize' => 10,
-            'totalCount' => $query->count()
-        ]);
-        $groups = $query->orderBy('from')->offset($pagination->offset)
-            ->limit($pagination->limit)
+        $request = \Yii::$app->request;
+        if ($request->post('export_type')) {
+            $pagination = null;
+            $offset = 0;
+            $limit = null;
+        } else {
+            $pagination = new Pagination([
+                'defaultPageSize' => 10,
+                'totalCount' => $query->count()
+            ]);
+            $offset = $pagination->offset;
+            $limit = $pagination->limit;
+        }
+        $groups = $query->orderBy('from')->offset($offset)
+            ->limit($limit)
             ->all();
         //
         $rawGroups = [];
