@@ -125,7 +125,15 @@
             <tr>
               {% for item in items %}
                 <td class="editable">
-                  <input name="ItemReading[{{ item['id'] }}]" />
+                  {% if item.values %}
+                    <select class="form-control" name="ItemReading[{{ item['id'] }}]">
+                    {% for value in item.values %}
+                      <option value="{{ value.value }}">{{ value.value }}</option>
+                    {% endfor %}
+                    </select>
+                  {% else %}
+                      <input name="ItemReading[{{ item['id'] }}]" />
+                  {% endif %}
                 </td>
               {% endfor %}
             </tr>

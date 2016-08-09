@@ -27,7 +27,18 @@
           <div class="form-group">
             <label for="Item_name">{{ t('app', 'Name') }}</label>
             <input type="hidden" id="Item_id" name="Item[id]">
-            <input class="form-control" id="Item_name" name="Item[name]">
+            <input class="form-control" id="Item_name" name="Item[name]" size="48">
+          </div>
+          <div class="form-group">
+            <label for="ItemValue_values">{{ t('app', 'Accepted values') }}</label>
+            <select class="form-control" multiple name="values[]" id="ItemValue_values">
+            </select>
+            <button type="button" class="btn btn-xs btn-del btn-block btn-warning">{{ t('app', 'Delete selected') }}</button>
+          </div>
+          <div class="form-group">
+            <label for="new-item-value">{{ t('app', 'New value') }}</label>
+            <input class="form-control" id="new-item-value" size="48">
+            <button type="button" class="btn btn-xs btn-add btn-block">{{ t('app', 'Add value') }}</button>
           </div>
           <button type="button" class="btn btn-primary"data-loading-text="{{ t('app', 'Saving') }}...">{{ t('app', 'Save') }}</button>
           <button type="button" class="btn btn-danger" data-loading-text="{{ t('app', 'Deleting') }}...">{{ t('app', 'Delete') }}</button>
@@ -36,7 +47,7 @@
         <fieldset class="new-child">
           <div class="form-group">
             <label for="Item_name">{{ t('app', 'Name') }}</label>
-            <input class="form-control" id="Item_name" name="Item[name]">
+            <input class="form-control" id="Item_name" name="Item[name]" size="48">
           </div>
           <button type="button" data-loading-text="{{ t('app', 'Creating...') }}" class="btn btn-primary">{{ t('app', 'Create') }}</button>
         </fieldset>
@@ -56,6 +67,8 @@
     var $currentItemPath = $('#Item_path');
     var $currentItemName = $('fieldset.current #Item_name');
     var $currentItemId = $('fieldset.current #Item_id');
+    var $currentItemValues = $('fieldset.current #ItemValue_values');
+    var $newItemValue = $('fieldset.current #new-item-value');
     var $newChildName = $('fieldset.new-child #Item_name');
     var treeData = {{ item_tree | json_encode() | raw }};
     $itemTree = $('#item-tree');
@@ -66,6 +79,10 @@
         $currentItemName.val(node.name);
         $currentItemPath.val(node.path.substring(node.path.indexOf('\\') + 1));
         $currentItemId.val(node.id);
+        $currentItemValues.empty();
+        $.each(node.values, function(i, e) {
+            $currentItemValues.append($('<option>').attr('value', e.value).html(e.value));
+        });
     });
     $newChildName.on('keyup', function (e) {
         if (e.keyCode == 13) {
@@ -105,16 +122,18 @@
        var toUpdateId = $currentItemId.val();
        if (!toUpdateId || !toUpdateName) return;
        var $btn = $(this).button('loading');
+       $currentItemValues.find('option').prop('selected', true);
        $.ajax({
            url: '{{ url(['table/ajax-update-item']) | raw }}?id=' + toUpdateId,
            method: 'post',
-           data: 'name=' + encodeURIComponent(toUpdateName),
+           data: 'name=' + encodeURIComponent(toUpdateName) + '&' + $currentItemValues.serialize(),
            dataType: 'json',
            success: function(data, textStatus, jqXHR) {
                var node = $itemTree.tree('getNodeById', toUpdateId);
                $itemTree.tree('updateNode', node, {
                    name: toUpdateName,
-                   path: data.path
+                   path: data.path,
+                   values: data.values
                });
                $currentItemPath.val(node.path.substring(node.path.indexOf('\\') + 1));
            },
@@ -122,6 +141,7 @@
                $btn.button('reset');
            }
        });
+       $currentItemValues.find('option').prop('selected', false);
     });
     $('fieldset.current .btn-danger').on('click', function() {
        var toDelete = $currentItemId.val();
@@ -144,6 +164,19 @@
                $btn.button('reset');
            }
        });
+    });
+    $('fieldset.current .btn-block.btn-add').on('click', addValue);
+    function addValue() {
+        $currentItemValues.append($('<option>').attr('value', $newItemValue.val()).html($newItemValue.val()));
+        $newItemValue.val('');
+    };
+    $('fieldset.current .btn-block.btn-del').on('click', function() {
+        $currentItemValues.empty();
+    });
+    $newItemValue.on('keyup', function (e) {
+        if (e.keyCode == 13) {
+            addValue();
+        }
     });
 {{ void(this.endBlock()) }}
 

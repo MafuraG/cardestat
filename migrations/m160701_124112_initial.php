@@ -26,6 +26,11 @@ class m160701_124112_initial extends Migration {
             'parent_id' => 'integer references item (id) on delete cascade',
             'unique (name, parent_id)'
         ]);
+        $this->createTable('item_value', [
+            'id' => Schema::TYPE_PK,
+            'value' => 'varchar(48) not null',
+            'item_id' => 'integer not null references item (id) on delete cascade',
+        ]);
         $this->createTable('item_reading_group', [
             'id' => Schema::TYPE_PK,
             'from' => 'date not null',
@@ -90,6 +95,7 @@ class m160701_124112_initial extends Migration {
         $this->dropTable('item_reading');
         $this->execute('drop view item_reading_group_extended');
         $this->dropTable('item_reading_group');
+        $this->dropTable('item_value');
         $this->dropTable('item');
         $this->execute('drop view user_extended');
         $this->dropTable('user');

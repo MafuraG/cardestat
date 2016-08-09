@@ -21,6 +21,9 @@ class Item extends ActiveRecord {
     public function getChildren() {
         return $this->hasMany(Item::className(), ['parent_id' => 'id']);
     }
+    public function getValues() {
+        return $this->hasMany(ItemValue::className(), ['item_id' => 'id']);
+    }
     public function getReadings() {
         return $this->hasMany(ItemReading::className(), ['item_id' => 'id']);
     }

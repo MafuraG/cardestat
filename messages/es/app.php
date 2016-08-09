@@ -70,5 +70,8 @@ return [
     'Save' => 'Guardar',
     'Delete' => 'Eliminar',
     'Tracking tables for performance statistical analysis.' => 'Tablas de seguimiento para análisis estadístico de rendimiento.',
-    'The user cannot be deleted because is still referenced from rows he/she has created or updated' => 'El usuario no se puede borrar porque todavía es referenciado por filas que ha creado o actualizado'
+    'The user cannot be deleted because is still referenced from rows he/she has created or updated' => 'El usuario no se puede borrar porque todavía es referenciado por filas que ha creado o actualizado',
+    'Accepted values' => 'Valores aceptados',
+    'Delete selected' => 'Eliminar selección',
+    'Add value' => 'Añadir valor',
 ];

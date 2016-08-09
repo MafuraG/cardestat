@@ -6,6 +6,7 @@ use yii\data\Pagination;
 use yii\data\ActiveDataProvider;
 use yii\web\Response;
 use app\models\Item;
+use app\models\ItemValue;
 use app\models\ItemExtended;
 use app\models\ItemReading;
 use app\models\ItemReadingExtended;
@@ -118,10 +119,33 @@ class TableController extends Controller {
         $request = \Yii::$app->request;
         $item = Item::findOne($id);
         $item->name = $request->post('name');
-        if (!$item->save())
-            throw new HttpException(422, \yii\helpers\Json::encode($item->errors));
-        $itemX = ItemExtended::findOne($id);
-        return $itemX;
+        $connection = \Yii::$app->db;
+        $transaction = $connection->beginTransaction();
+        try {
+            if (!$item->save())
+                throw new HttpException(422, \yii\helpers\Json::encode($item->errors));
+            if ($item->values > 0) foreach ($item->values as $value) $value->delete();
+            foreach ($request->post('values') as $value) {
+                $itemValue = new ItemValue();
+                $itemValue->value = $value;
+                $itemValue->item_id = $item->id;
+                $itemValue->save(false);
+            }
+            $itemX = ItemExtended::findOne($id);
+            $transaction->commit();
+            return ArrayHelper::toArray($itemX, [
+                'app\models\ItemExtended' => [
+                    'id',
+                    'name',
+                    'parent_id',
+                    'path',
+                    'values'
+                ]
+            ]);
+        } catch (Exception $e) {
+            $transaction->rollback();
+            throw $e;
+        }
     }
     public function actionAjaxCreateItem() {
         if (!\Yii::$app->user->can('admin')) throw new HttpException(403);
@@ -207,7 +231,8 @@ class TableController extends Controller {
                 'name',
                 'parent_id',
                 'path',
-                'children'
+                'children',
+                'values'
             ]
         ]);
         return $this->render('edit.twig', [
@@ -258,7 +283,7 @@ class TableController extends Controller {
         $table_title = array_values($root)[0]['name'];
 
         $group_model = new ItemReadingGroup();
-        $items = ItemExtended::findLeaves($id)->orderBy('path')->asArray()->all();
+        $items = ItemExtended::findLeaves($id)->orderBy('path')->asArray()->with('values')->all();
 
         return $this->render('view.twig', [
             'table_title' => $table_title,
