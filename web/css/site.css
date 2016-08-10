@@ -136,6 +136,9 @@ a.desc:after {
     background-color: #001B4B;
 }
 
+.table tbody tr td.editable {
+    vertical-align: bottom;
+}
 td.editable input {
     display: block;
     padding: 0;
