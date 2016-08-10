@@ -125,7 +125,8 @@ class TableController extends Controller {
             if (!$item->save())
                 throw new HttpException(422, \yii\helpers\Json::encode($item->errors));
             if ($item->values > 0) foreach ($item->values as $value) $value->delete();
-            foreach ($request->post('values') as $value) {
+            $values = $request->post('values');
+            if ($values) foreach ($values as $value) {
                 $itemValue = new ItemValue();
                 $itemValue->value = $value;
                 $itemValue->item_id = $item->id;
