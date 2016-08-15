@@ -171,7 +171,7 @@
         $newItemValue.val('');
     };
     $('fieldset.current .btn-block.btn-del').on('click', function() {
-        $currentItemValues.empty();
+        $currentItemValues.find(':selected').remove();
     });
     $newItemValue.on('keyup', function (e) {
         if (e.keyCode == 13) {

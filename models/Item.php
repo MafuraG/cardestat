@@ -22,7 +22,7 @@ class Item extends ActiveRecord {
         return $this->hasMany(Item::className(), ['parent_id' => 'id']);
     }
     public function getValues() {
-        return $this->hasMany(ItemValue::className(), ['item_id' => 'id']);
+        return $this->hasMany(ItemValue::className(), ['item_id' => 'id'])->orderBy('value');
     }
     public function getReadings() {
         return $this->hasMany(ItemReading::className(), ['item_id' => 'id']);
