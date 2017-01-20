@@ -1,0 +1,329 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Cardestat -- Nueva transacción</title>
+  <meta name="description" content="The HTML5 Herald">
+  <meta name="author" content="SitePoint">
+
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+  <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+  <![endif]-->
+</head>
+<body>
+<!--
+<div class="container">
+    <div class="col-sm-7 pull-right well">
+      <form class="form-inline" action="#" method="get">
+        <div class="input-group col-sm-8">
+          <input class="form-control" type="text" value="" placeholder="Search" name="q">
+       <div class="input-group-btn">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Select <span class="caret"></span></button>
+        <ul class="dropdown-menu">
+          <li><a href="#">1</a></li>
+          <li><a href="#">2</a></li>
+          <li><a href="#">3</a></li>
+        </ul>
+         <input type="hidden" name="category" class="category">
+      </div>
+        </div>
+        <button class="btn btn-primary col-sm-3 pull-right" type="submit">Search</button>
+      </form>
+    </div>
+</div>
+-->
+  <div class="container">
+    <h1 class="page-header">Prototipo <small>Registro de transacciones</small></h1>
+    <div class="well">
+      <form>
+        <h3>Nueva transacción</h3>
+        <div class="row">
+          <fieldset>
+            <legend class="col-md-12">Clasificación</legend>
+            <div class="form-group col-md-6">
+              <label>Tipo de transacción</label>
+              <select class="form-control">
+                <option>COMPRAVENTA</option>
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label>Tipo de encargo</label>
+              <select class="form-control">
+                <option>MULTIEXCLUSIVA</option>
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label>Transmisión</label>
+              <select class="form-control">
+                <option>SEGUNDA MANO</option>
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label>Promoción</label>
+              <select class="form-control">
+                <option>PARTICULAR</option>
+              </select>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend class="col-md-12">Evolución</legend>
+            <div class="form-group col-md-6">
+              <label>Fecha primera publicación</label>
+              <div class="input-group">
+                <input class="form-control" value="04/02/2016">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></span>
+              </div>
+            </div>
+            <div class="form-group col-md-6">
+              <label>Primer precio publicado</label>
+              <div class="input-group">
+                <input class="form-control text-right" value="240.000,00">
+                <span class="input-group-addon">€</span>
+              </div>
+            </div>
+            <div class="form-group col-md-6">
+              <label>Fecha última publicación</label>
+              <div class="input-group">
+                <input class="form-control" value="12/11/2016">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></span>
+              </div>
+            </div>
+            <div class="form-group col-md-6">
+              <label>Último precio publicado</label>
+              <div class="input-group">
+                <input class="form-control text-right" value="225.000,00">
+                <span class="input-group-addon">€</span>
+              </div>
+            </div>
+            <div class="form-group col-md-6">
+              <label>Fecha de contrato de venta</label>
+              <div class="input-group">
+                <input class="form-control" value="05/01/2017">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></span>
+              </div>
+            </div>
+            <div class="form-group col-md-6">
+              <label>Precio de venta</label>
+              <div class="input-group">
+                <input class="form-control text-right" value="220.000,00">
+                <span class="input-group-addon">€</span>
+              </div>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend class="col-md-12">Participantes</legend>
+            <div class="form-group col-md-6">
+              <label>Vendedor</label>
+              <div class="input-group">
+                <input class="form-control" value="Warren Buffett">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></span>
+                <span class="input-group-addon"><span class="glyphicon glyphicon-list" aria-hidden="true"></span></span>
+              </div>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox"> ¿El vendedor es un nuevo cliente?
+                </label>
+              </div>
+            </div>
+            <div class="form-group col-md-6">
+              <label>Comprador</label>
+              <div class="input-group">
+                <input class="form-control" value="Charlie Munger">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></span>
+                <span class="input-group-addon"><span class="glyphicon glyphicon-list" aria-hidden="true"></span></span>
+              </div>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox"> ¿El comprador es un nuevo cliente?
+                </label>
+              </div>
+            </div>
+            <div class="form-group col-md-6">
+              <label>Quien trae al vendedor</label>
+              <select class="form-control">
+                <option>CÁRDENAS</option>
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label>Quien trae al comprador</label>
+              <select class="form-control">
+                <option>CANARINVEST</option>
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label>Precio sugerido</label>
+              <div class="input-group">
+                <input class="form-control text-right" value="220.000,00">
+                <span class="input-group-addon">€</span>
+              </div>
+            </div>
+            <div class="form-group col-md-6">
+              <label>Tipo y fecha iniciales de búsqueda</label>
+              <div class="input-group">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-hand-right" aria-hidden="true"></span></span>
+                <div class="input-group-btn">
+                  <select class="form-control" style="width: 90px">
+                    <option>A+</option>
+                  </select>
+                </div>
+                <input class="form-control" value="09/12/2015">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></span>
+              </div>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend class="col-md-12">Propiedad</legend>
+            <div class="form-group col-md-6">
+              <label>Inmueble</label>
+              <div class="input-group">
+                <input class="form-control" value="23188-RK-e (LOMA DOS, ARGUINEGUÍN)">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></span>
+                <span class="input-group-addon"><span class="glyphicon glyphicon-list" aria-hidden="true"></span></span>
+              </div>
+            </div>
+            <div class="form-group col-md-6">
+              <label>Pasado a ventas por</label>
+              <select class="form-control">
+                <option>ANZHELA</option>
+              </select>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend class="col-md-12">Honorarios</legend>
+            <div class="form-group col-md-6">
+              <label>Fecha de facturación</label>
+              <div class="input-group">
+                <input class="form-control" value="11/01/2017">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></span>
+              </div>
+            </div>
+            <div class="form-group col-md-6">
+              <label>Número de factura</label>
+              <input class="form-control" value="F201700120">
+            </div>
+            <div class="form-group col-md-6">
+              <label>Cárdenas</label>
+              <div class="input-group">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-hand-right" aria-hidden="true"></span></span>
+                <div class="input-group-btn">
+                  <select class="form-control" style="width: 90px">
+                    <option>2,50%</option>
+                  </select>
+                </div>
+                <input class="form-control text-right" value="4.400,00">
+                <span class="input-group-addon">€</span>
+              </div>
+            </div>
+            <div class="form-group col-md-6">
+              <label>Colaborador</label>
+              <div class="input-group">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-hand-right" aria-hidden="true"></span></span>
+                <div class="input-group-btn">
+                  <select class="form-control" style="width: 90px">
+                    <option>2,50%</option>
+                  </select>
+                </div>
+                <input class="form-control text-right" value="4.400,00">
+                <span class="input-group-addon">€</span>
+              </div>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend class="col-md-12">Asesores</legend>
+            <table class="table">
+              <thead><tr><th>#</th><th>Nombre</th><th>Oficina</th><th>Tipo de atribución</th><th>Atribución</th><th>Comentarios</th><th></th></tr></thead>
+              <tbody>
+                <tr><th scope="row">1</th><td>Tina</td><td>Arguineguín</td><td>CAPTACIÓN 30%</td><td>66.000,00 €</td><td>Comentarios para el asesor</td><td><button class="btn btn-xs btn-danger">Eliminar</td></tr> 
+                <tr><th scope="row">2</th><td>Robert</td><td>Puerto Rico</td><td>VENTA 70%</td><td>154.000,00 €</td><td></td><td><button class="btn btn-xs btn-danger">Eliminar</td></tr> 
+                <tr><th scope="row">3</th><td>Inge</td><td>Arguineguín</td><td>VENTA 70%</td><td>154.000,00 €</td><td></td><td><button class="btn btn-xs btn-danger">Eliminar</td></tr></tbody>
+            </table>
+            <!--
+            <div class="form-group col-md-12">
+              <button class="btn btn-link" type="button">+ Añadir asesor</button>
+            </div>
+            -->
+            <div class="col-md-12">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">Añadir asesor</h3>
+              </div>
+              <div class="panel-body">
+                <div class="form-group col-md-6">
+                  <label>Asesor</label>
+                  <select class="form-control">
+                    <option>TOMAS</option>
+                  </select>
+                </div>
+                <div class="form-group col-md-6">
+                  <label>Oficina</label>
+                  <select class="form-control">
+                    <option>ARGUINEGUÍN</option>
+                  </select>
+                </div>
+                <div class="form-group col-md-6">
+                  <label>Tipo de atribución</label>
+                  <select class="form-control">
+                    <option>CAPTACIÓN 30%</option>
+                  </select>
+                </div>
+                <div class="form-group col-md-6">
+                  <label>Atribución</label>
+                  <div class="input-group">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-hand-right" aria-hidden="true"></span></span>
+                    <div class="input-group-btn">
+                      <select class="form-control">
+                        <option>AUTOMÁTICA</option>
+                      </select>
+                    </div>
+                    <input class="form-control text-right" disabled value="66.000,00">
+                    <span class="input-group-addon">€</span>
+                  </div>
+                </div>
+                <div class="form-group col-md-12">
+                  <label>Comentarios para el asesor</label>
+                  <textarea class="form-control" rows="3"></textarea>
+                </div>
+                <div class="form-group col-md-12">
+                  <button class="btn btn-sm btn-primary" type="button">Añadir</button>
+                </div>
+              </div>
+            </div>
+            </div>
+          </fieldset>
+            <fieldset>
+              <legend class="col-md-12">Vistos buenos</legend>
+            <div class="form-group col-md-6">
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox"> Visto bueno de la dirección
+                </label>
+              </div>
+            </div>
+            <div class="form-group col-md-6">
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox"> Visto bueno de contabilidad
+                </label>
+              </div>
+            </div>
+          </fieldset>
+          <hr style="border-top: 1px solid #ddd">
+          <div class="form-group col-md-12">
+            <label>Observaciones</label>
+            <textarea class="form-control" rows="3"></textarea>
+          </div>
+          <div class="form-group col-md-12">
+            <button class="btn btn-lg btn-primary" type="button">Guardar</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

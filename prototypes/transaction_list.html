@@ -1,0 +1,315 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Cardestat -- Listado de transacciones</title>
+  <meta name="description" content="The HTML5 Herald">
+  <meta name="author" content="SitePoint">
+
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+  <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+  <![endif]-->
+  <style>
+    .transaction {
+      padding: 6px 0;
+      border-bottom: 1px solid #ccc;
+      position: relative;
+    }
+    .transaction .btn-group {
+      position: absolute;
+      right: 0;
+      top: 2px;
+      z-index: 1;
+    }
+    .transaction.first {
+      border-top: 1px solid #ccc;
+    }
+    .transaction .btn-default:before {
+      font-family: 'Glyphicons Halflings';
+      content: "\e113";
+      line-height: 1;
+      position: relative;
+      top: 2px;
+    }
+    .transaction .btn-default.collapsed:before {
+      font-family: 'Glyphicons Halflings';
+      content: "\e114";
+      line-height: 1;
+      position: relative;
+      top: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="page-header">Prototipo <small>Listado de transacciones</small></h1>
+    <h2>Modo lista</h2>
+    <div class="transaction first">
+      <div class="btn-group btn-group-xs" role="group">
+        <button type="button" class="btn btn-default collapsed" data-toggle="collapse" data-target="#trdt_1">
+          </button>
+        <button type="button" class="btn btn-primary">
+          <span class="glyphicon glyphicon-edit"></span></button>
+        <button type="button" class="btn btn-danger">
+          <span class="glyphicon glyphicon-trash"></span></button>
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span class="label label-primary">COMPRAVENTA</span> <small>05 dic '16</small>
+        </div>
+        <div class="col-md-2 text-right">
+           200.000,00 €
+        </div>
+        <div class="col-md-2">
+          <a href="#">23188-RK-e</a> <small class="glyphicon glyphicon-info-sign"></small>
+        </div>
+        <div class="col-md-6">
+         <div class="row">
+          <div class="col-md-5 text-right">
+            <a href="#">WARREN E. BUFFETT</a> <small class="glyphicon glyphicon-info-sign"></small>
+          </div>
+          <div class="col-md-1 text-center">
+            <span class="glyphicon glyphicon-transfer"></span>
+          </div>
+          <div class="col-md-6">
+             <a href="#">CHARLES T. MUNGER</a> <small class="glyphicon glyphicon-info-sign"></small>
+          </div>
+         </div>
+        </div>
+        <div class="col-md-2">
+          <span class="label label-default">100% Cárdenas</span>
+        </div>
+        <div class="col-md-2 text-right">
+          10.000,00 €
+        </div>
+        <div class="col-md-2">
+          <small class="label label-danger">SIN FACTURAR</small>
+        </div>
+        <div class="col-md-2">
+          <span class="glyphicon glyphicon-time"></span> 315 días en venta
+        </div>
+      </div>
+      <div class="row collapse" id="trdt_1">
+        <div class="col-md-12">
+          <span class="label label-warning">Otra información adicional...</span>
+        </div>
+      </div>
+    </div>
+    <div class="transaction">
+      <div class="btn-group btn-group-xs" role="group">
+        <button type="button" class="btn btn-default collapsed" data-toggle="collapse" data-target="#trdt_2"></button>
+        <button type="button" class="btn btn-primary">
+          <span class="glyphicon glyphicon-edit"></span></button>
+        <button type="button" class="btn btn-danger">
+          <span class="glyphicon glyphicon-trash"></span></button>
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span class="label label-primary">COMPRAVENTA</span> <small>15 oct '16</small>
+        </div>
+        <div class="col-md-2 text-right">
+           240.000,00 €
+        </div>
+        <div class="col-md-2">
+          <a href="#">20111-RS-t</a> <small class="glyphicon glyphicon-info-sign"></small>
+        </div>
+        <div class="col-md-6">
+          <div class="row">
+            <div class="col-md-5 text-right">
+              <a href="#">SETH KLARMAN</a> <small class="glyphicon glyphicon-info-sign"></small>
+            </div>
+            <div class="col-md-1 text-center">
+              <span class="glyphicon glyphicon-transfer"></span>
+            </div>
+            <div class="col-md-6">
+               <a href="#">WALTER SCHLOSS</a> <small class="glyphicon glyphicon-info-sign"></small>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span class="label label-default">100% Cárdenas</span>
+        </div>
+        <div class="col-md-2 text-right">
+          12.000,00 €
+        </div>
+        <div class="col-md-2">
+          <small class="label label-success">30 oct '16</small>
+        </div>
+        <div class="col-md-2">
+          <span class="glyphicon glyphicon-time"></span> 227 días en venta
+        </div>
+      </div>
+      <div class="row collapse" id="trdt_2">
+        <div class="col-md-12">
+          <span class="label label-warning">Otra información adicional...</span>
+        </div>
+      </div>
+    </div>
+    <div class="transaction">
+      <div class="btn-group btn-group-xs" role="group">
+        <button type="button" class="btn btn-default collapsed" data-toggle="collapse" data-target="#trdt_3"></button>
+        <button type="button" class="btn btn-primary">
+          <span class="glyphicon glyphicon-edit"></span></button>
+        <button type="button" class="btn btn-danger">
+          <span class="glyphicon glyphicon-trash"></span></button>
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span class="label label-info">ALQUILER</span> <small>21 jul '16</small>
+        </div>
+        <div class="col-md-2 text-right">
+           900,00 €
+        </div>
+        <div class="col-md-2">
+          <a href="#">11360-TS-a</a> <small class="glyphicon glyphicon-info-sign"></small>
+        </div>
+        <div class="col-md-6">
+          <div class="row">
+            <div class="col-md-5 text-right">
+              <a href="#">BENJAMIN GRAHAM</a> <small class="glyphicon glyphicon-info-sign"></small>
+            </div>
+            <div class="col-md-1 text-center">
+              <span class="glyphicon glyphicon-transfer"></span>
+            </div>
+            <div class="col-md-6">
+               <a href="#">IRVING KAHN</a> <small class="glyphicon glyphicon-info-sign"></small>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span class="label label-default">100% Cárdenas</span>
+        </div>
+        <div class="col-md-2 text-right">
+          450,00 €
+        </div>
+        <div class="col-md-2">
+          <small class="label label-success">02 ago '16</small>
+        </div>
+        <div class="col-md-2">
+          <span class="glyphicon glyphicon-time"></span> 112 días en alquiler
+        </div>
+      </div>
+      <div class="row collapse" id="trdt_3">
+        <div class="col-md-12">
+          <span class="label label-warning">Otra información adicional...</span>
+        </div>
+      </div>
+    </div>
+    <br>
+    <p>* El botón <button class="btn btn-default btn-xs"><span class="glyphicon glyphicon-chevron-down"></span></button> muestra datos adicionales (este botón es funcional).</p>
+    <h2>Modo tabla</h2>
+    <div class="form-group btn-group">
+      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Mostrar columnas <span class="caret"></span></button>
+      <ul class="dropdown-menu">
+        <li><a href="#"><input type="checkbox"> Todas</a></li>
+        <li role="separator" class="divider"></li>
+        <li><a href="#"><input type="checkbox" checked> Tipo de transacción</a></li>
+        <li><a href="#"><input type="checkbox"> Transmisión</a></li>
+        <li><a href="#"><input type="checkbox"> Tipo de encargo</a></li>
+        <li><a href="#"><input type="checkbox"> Promoción</a></li>
+        <li><a href="#"><input type="checkbox"> Fecha primera publicación</a></li>
+        <li><a href="#"><input type="checkbox"> Fecha última publicación</a></li>
+        <li><a href="#"><input type="checkbox" checked> Fecha contrato venta</a></li>
+        <li><a href="#"><input type="checkbox"> Primer precio publicado</a></li>
+        <li><a href="#"><input type="checkbox"> Último precio publicado</a></li>
+        <li><a href="#"><input type="checkbox" checked> Precio de venta</a></li>
+        <li><a href="#"><input type="checkbox" checked> Vendedor</a></li>
+        <li><a href="#"><input type="checkbox"> ¿Vendedor es nuevo cliente?</a></li>
+        <li><a href="#"><input type="checkbox"> Quien trae al vendedor</a></li>
+        <li><a href="#"><input type="checkbox"> Precio sugerido</a></li>
+        <li><a href="#"><input type="checkbox" checked> Comprador</a></li>
+        <li><a href="#"><input type="checkbox"> ¿Comprador es nuevo cliente?</a></li>
+        <li><a href="#"><input type="checkbox"> Quien trae al comprador</a></li>
+        <li><a href="#"><input type="checkbox"> Tipo de buscador</a></li>
+        <li><a href="#"><input type="checkbox"> Fecha de inicio de búsqueda</a></li>
+        <li><a href="#"><input type="checkbox" checked> Inmueble</a></li>
+        <li><a href="#"><input type="checkbox"> Pasado a ventas por</a></li>
+        <li><a href="#"><input type="checkbox" checked> Fecha de facturación</a></li>
+        <li><a href="#"><input type="checkbox" checked> Participación de Cárdenas</a></li>
+        <li><a href="#"><input type="checkbox" checked> Honorarios de Cárdenas</a></li>
+        <li><a href="#"><input type="checkbox"> Participación de Colaborador</a></li>
+        <li><a href="#"><input type="checkbox"> Honorarios de Colaborador</a></li>
+      </ul>
+    </div>
+    <table class="table table-condensed table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>Tipo</th>
+          <th>Precio trans.</th>
+          <th>Fecha trans. <span class="glyphicon glyphicon-sort-by-order"></span></th>
+          <th>Propiedad</th>
+          <th>Part. Cárdenas</th>
+          <th>Honor. Cárdenas</th>
+          <th>Fecha factura</th>
+          <th>Vendedor</th>
+          <th>Comprador</th>
+          <th></th>
+        </tr>
+        <tr>
+          <th><input class="form-control input-sm"></th>
+          <th><input class="form-control input-sm"></th>
+          <th><input class="form-control input-sm"></th>
+          <th><input class="form-control input-sm"></th>
+          <th><input class="form-control input-sm"></th>
+          <th><input class="form-control input-sm"></th>
+          <th><input class="form-control input-sm"></th>
+          <th><input class="form-control input-sm"></th>
+          <th><input class="form-control input-sm"></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>COMPRAVENTA</td>
+          <td>200.000,00 €</td>
+          <td>04 dic '16</td>
+          <td>23188-RK-e</td>
+          <td>100%</td>
+          <td>10.000,00 €</td>
+          <td>SIN FACTURAR</td>
+          <td>WARREN BUFFETT</td>
+          <td>CHARLIE MUNGER</td>
+          <td><button class="btn btn-xs btn-default"><span class="glyphicon glyphicon-eye-open"></span></button>
+            <button class="btn btn-xs btn-primary"><span class="glyphicon glyphicon-edit"></span></button>
+            <button class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span></button></td>
+        </tr>
+        <tr>
+          <td>COMPRAVENTA</td>
+          <td>240.000,00 €</td>
+          <td>11 oct '16</td>
+          <td>43088-EL-n</td>
+          <td>100%</td>
+          <td>12.000,00 €</td>
+          <td>30 oct '16</td>
+          <td>SETH KLARMAN</td>
+          <td>WALTER SCHLOSS</td>
+          <td><button class="btn btn-xs btn-default"><span class="glyphicon glyphicon-eye-open"></span></button>
+            <button class="btn btn-xs btn-primary"><span class="glyphicon glyphicon-edit"></span></button>
+            <button class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span></button></td>
+        </tr>
+        <tr>
+          <td>ALQUILER</td>
+          <td>1000,00 €</td>
+          <td>10 ago '16</td>
+          <td>13117-KM-a</td>
+          <td>100%</td>
+          <td>500,00 €</td>
+          <td>20 ago '16</td>
+          <td>BENJAMIN GRAHAM</td>
+          <td>IRVING KAHN</td>
+          <td><button class="btn btn-xs btn-default"><span class="glyphicon glyphicon-eye-open"></span></button>
+            <button class="btn btn-xs btn-primary"><span class="glyphicon glyphicon-edit"></span></button>
+            <button class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span></button></td>
+        </tr>
+      </tbody>
+    </table>
+    <p>* Si el número de columnas hiciera desbordar el ancho de la pantalla, aparecería una barra de scroll para poder verlas todas.</p>
+    <p>** Haciendo click en la cabecera de una columna se ordena por esa columna; la entrada de formulario de cada columna permite filtrar por esa columna.</p>
+  </div>
+</body>
+</html>
