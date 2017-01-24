@@ -1,0 +1,249 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Cardestat -- Nueva transacción</title>
+  <meta name="description" content="The HTML5 Herald">
+  <meta name="author" content="SitePoint">
+
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+  <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+  <![endif]-->
+  <style>
+    .transaction {
+      padding: 8px 0;
+      border-bottom: 1px solid #ccc;
+      position: relative;
+    }
+    /*
+    .transaction .btn-group {
+      position: fixed;
+      right: 0;
+      top: 2px;
+      z-index: 1;
+    }
+    */
+    .transaction.first {
+      border-top: 1px solid #ccc;
+    }
+    .transaction .btn-default:before {
+      font-family: 'Glyphicons Halflings';
+      content: "\e113";
+      line-height: 1;
+      position: relative;
+      top: 2px;
+    }
+    .transaction .btn-default.collapsed:before {
+      font-family: 'Glyphicons Halflings';
+      content: "\e114";
+      line-height: 1;
+      position: relative;
+      top: 2px;
+    }
+    .transaction .btn {
+      margin-top: 2px;
+    }
+    .ellipsis {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      width: 100%;
+      display: block;
+    }
+    .onoffice-icon {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      position: relative;
+      top: 3px;
+      background-repeat: no-repeat;
+      background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4QEUCw8GkXnd5AAAAh5JREFUOMuNk81OU0EUx39zO0UG0VJpaaExJBoCJuxM1EdwL8/Awg07Vyxd+QK8hE/g1p2YoAkJSEyQRgRpgdKv296Pc1z03kvriklOTiaZ8/U7/zH7+/tTvu9/ADaMMTXucFT1FPjonHtnfd9/X6lUtqrVKtbmAUVHr9CRQ1XTQBQIgqDWbDS2LpuNwDPGbC4uLmGtRdEsQBKfmiSmolhrKZfLGGM2LVDwct4oEIXE65i/7ea2AJ4HULBpaygEUcynL6d8+3nJi9V5Xq0v4KbzqCpRrOwdNfn8/ZycMbx98wwALxkXUaXTDzn+06FSdKw/fUQ+nyMWIRbBAJWi4+F9yyCMMy5e2oGoUP/bJQqF1y9rlOam8QyoJBxQqvOOx+VZpqyHJAksjKpHkXBy1mVlucBC0RHHMgGVZD/GUxaK97IEWQf+MOamF1ArO0RlRF3G6KvS6QV0eyGLJYfKWAIRpTsY0h+EFB7kJ9aXjiAqNG+GtLoB5YKbHEFV+X3h0+mF5IzJKqdrA4hEOKpfMxhGFB/mJyGKKgfHV7T7A36ddTLBSLL/KI7ZO2zw9bBBpeSYnZnKEmQQl0ozDAPhtNFnad5RLrpEGxE/6jccnLRZW57j+WoJGCkVwOzu7naerKzNGs9MKG1ceYwpM1WqiHBeP+56wM5l84IwDDPiMg7xv7uoEkcxndYVwI51zm23W9eu3breAKrc7Zwn33n7HyA+r3XcoM9zAAAAAElFTkSuQmCC);
+    }
+    .advanced-input {
+      padding: 12px;
+      position: absolute;
+      width: 100%;
+      border: 1px solid #ccc;
+      background: white;
+      z-index: 3;
+    }
+    .form-group .input-group input.date, .form-group .input-group input.euros {
+      width: 96px;
+    }
+    .extra-info {
+      margin-top: 8px;
+    }
+    p.pagination-info {
+      margin-bottom: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="page-header">Prototipo <small>Listado de comisiones</small></h1>
+    <div class="well well-sm">
+      <div class="row">
+        <form class="col-md-4 form">
+          <select class="form-control input-sm">
+            <option selected>MOSTRAR TODAS</option>
+            <option>MOSTRAR PAGADAS</option>
+            <option>MOSTRAR SIN PAGAR</option>
+          </select>
+        </form>
+      </div>
+    </div>
+    <p class="pagination-info text-right"><em>Mostrando 1-20 de 127 resultados</em></p>
+    <div class="transaction first">
+      <div class="row">
+        <div class="col-md-2">
+          <span class="label label-primary">COMPRAVENTA</span> <small>05 dic '16</small>
+        </div>
+        <div class="col-md-5">
+          <div class="ellipsis">
+            <small class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>GUACIMARA 27, LOMA DOS<br>REF. 33117-RK-e<br>5 hab. 137m2<br>Constr. 1998</div>"></small> 
+            <a target="_blank" href="https://www.google.es/maps/place/Apartamentos+Do%C3%B1ana/@27.7638682,-15.6865285,18z/data=!4m5!3m4!1s0xc408201d1b02f27:0xea53801c0c8ead94!8m2!3d27.7702887!4d-15.6879293?hl=en" class="glyphicon glyphicon-map-marker"></a> 
+            <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?modul_name=daten&datensatz=193&inhalt=grunddaten" class="onoffice-icon">&nbsp;</a> 
+            <a title="GUACIMARA 27, LOMA DOS" href="#">GUACIMARA 27, LOMA DOS</a>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <small class="label label-default">F2017010032</small> <small>19 dic '16</small>
+        </div>
+        <div class="col-md-3 text-right">7.000,00 €</div>
+        <div class="col-md-2">
+          <span class="label label-default">CAPTACIÓN 30%</span>
+        </div>
+        <div class="col-md-5">
+          <span class="glyphicon glyphicon-piggy-bank"></span> TINA
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-xs btn-danger" data-toggle="popover" title="Asignar nómina<button type=&quot;button&quot; class=&quot;close&quot; onclick=&quot;$(this).closest('.popover').siblings('[data-toggle=popover]').popover('hide');&quot;><span aria-hidden=&quot;true&quot;>&times;</span></button>" data-html="true" data-content="<form class=&quot;form&quot;><div class=&quot;form-group&quot;><label>Factura</label><input class=&quot;form-control input-sm&quot; readonly value=&quot;F2017010032&quot;></div><div class=&quot;form-group&quot;><label>Nómina</label><input class=&quot;form-control input-sm&quot;></div><div class=&quot;form-group&quot;><button class=&quot;btn btn-primary&quot;>Guardar</button></form>">Sin nómina <span class="glyphicon glyphicon-hand-up"></span></button>
+        </div>
+        <div class="col-md-2 text-right">
+          2.100,00 €
+        </div>
+      </div>
+    </div>
+    <div class="transaction">
+      <div class="row">
+        <div class="col-md-2">
+          <span class="label label-primary">COMPRAVENTA</span> <small>05 dic '16</small>
+        </div>
+        <div class="col-md-5">
+          <div class="ellipsis">
+            <small class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>LOS GUAIRES 22, PATALAVACA<br>REF. 33117-RK-e<br>5 hab. 137m2<br>Constr. 1998</div>"></small> 
+            <a target="_blank" href="https://www.google.es/maps/place/Apartamentos+Do%C3%B1ana/@27.7638682,-15.6865285,18z/data=!4m5!3m4!1s0xc408201d1b02f27:0xea53801c0c8ead94!8m2!3d27.7702887!4d-15.6879293?hl=en" class="glyphicon glyphicon-map-marker"></a> 
+            <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?modul_name=daten&datensatz=193&inhalt=grunddaten" class="onoffice-icon">&nbsp;</a> 
+            <a title="LOS GUAIRES 22, PATALAVACA" href="#">LOS GUAIRES 22, PATALAVACA</a>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <small class="label label-default">F2017010092</small> <small>19 dic '16</small>
+        </div>
+        <div class="col-md-3 text-right">7.000,00 €</div>
+        <div class="col-md-2">
+          <span class="label label-default">VENTA 70%</span>
+        </div>
+        <div class="col-md-5">
+          <span class="glyphicon glyphicon-piggy-bank"></span> ROBERT
+        </div>
+        <div class="col-md-3">
+          <span class="label label-success">N-2017-01-02</button>
+        </div>
+        <div class="col-md-2 text-right">
+          4.900,00 €
+        </div>
+      </div>
+    </div>
+    <div class="transaction">
+      <div class="row">
+        <div class="col-md-2">
+          <span class="label label-primary">COMPRAVENTA</span> <small>05 oct '16</small>
+        </div>
+        <div class="col-md-5">
+          <div class="ellipsis">
+            <small class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>FRANCISCO NAVARRO 11, LOMA DOS<br>REF. 33117-RK-e<br>5 hab. 137m2<br>Constr. 1998</div>"></small> 
+            <a target="_blank" href="https://www.google.es/maps/place/Apartamentos+Do%C3%B1ana/@27.7638682,-15.6865285,18z/data=!4m5!3m4!1s0xc408201d1b02f27:0xea53801c0c8ead94!8m2!3d27.7702887!4d-15.6879293?hl=en" class="glyphicon glyphicon-map-marker"></a> 
+            <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?modul_name=daten&datensatz=193&inhalt=grunddaten" class="onoffice-icon">&nbsp;</a> 
+            <a title="FRANCISCO NAVARRO 11, LOMA DOS" href="#">FRANCISCO NAVARRO 11, LOMA DOS</a>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <small class="label label-default">F2017010002</small> <small>19 dic '16</small>
+        </div>
+        <div class="col-md-3 text-right">10.000,00 €</div>
+        <div class="col-md-2">
+          <span class="label label-default">VENTA 70%</span>
+        </div>
+        <div class="col-md-5">
+          <span class="glyphicon glyphicon-piggy-bank"></span> TOMAS
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-xs btn-danger" data-toggle="popover" title="Asignar nómina<button type=&quot;button&quot; class=&quot;close&quot; onclick=&quot;$(this).closest('.popover').siblings('[data-toggle=popover]').popover('hide');&quot;><span aria-hidden=&quot;true&quot;>&times;</span></button>" data-html="true" data-content="<form class=&quot;form&quot;><div class=&quot;form-group&quot;><label>Factura</label><input class=&quot;form-control input-sm&quot; readonly value=&quot;F2017010002&quot;></div><div class=&quot;form-group&quot;><label>Nómina</label><input class=&quot;form-control input-sm&quot;></div><div class=&quot;form-group&quot;><button class=&quot;btn btn-primary&quot;>Guardar</button></form>">Sin nómina <span class="glyphicon glyphicon-hand-up"></span></button>
+        </div>
+        <div class="col-md-2 text-right">
+          7.000,00 €
+        </div>
+      </div>
+    </div>
+    <div class="transaction">
+      <div class="row">
+        <div class="col-md-2">
+          <span class="label label-info">ALQUILER</span> <small>12 dic '16</small>
+        </div>
+        <div class="col-md-5">
+          <div class="ellipsis">
+            <small class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>LOS ALBARICOQUES 307, SAN BARTOLOMÉ DE TIRAJANA<br>REF. 33117-RK-e<br>5 hab. 137m2<br>Constr. 1998</div>"></small> 
+            <a target="_blank" href="https://www.google.es/maps/place/Apartamentos+Do%C3%B1ana/@27.7638682,-15.6865285,18z/data=!4m5!3m4!1s0xc408201d1b02f27:0xea53801c0c8ead94!8m2!3d27.7702887!4d-15.6879293?hl=en" class="glyphicon glyphicon-map-marker"></a> 
+            <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?modul_name=daten&datensatz=193&inhalt=grunddaten" class="onoffice-icon">&nbsp;</a> 
+            <a title="LOS ALBARICOQUES 307, SAN BARTOLOMÉ DE TIRAJANA" href="#">LOS ALBARICOQUES 307, SAN BARTOLOMÉ DE TIRAJANA</a>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <small class="label label-default">F2017010029</small> <small>19 dic '16</small>
+        </div>
+        <div class="col-md-3 text-right">700,00 €</div>
+        <div class="col-md-2">
+          <span class="label label-default">ALQUILER 50%</span>
+        </div>
+        <div class="col-md-5">
+          <span class="glyphicon glyphicon-piggy-bank"></span> ANZHELA
+        </div>
+        <div class="col-md-3">
+          <span class="label label-success">N-2016-11-20</button>
+        </div>
+        <div class="col-md-2 text-right">
+          350,00 €
+        </div>
+      </div>
+    </div>
+    <br>
+    <nav class="text-center" aria-label="...">
+      <ul class="pagination pagination-lg">
+        <li><a href="#" aria-label="Previous"><span aria-hidden="true">«</span></a></li>
+        <li><a href="#">1</a></li>
+        <li><a href="#">2</a></li>
+        <li><a href="#">3</a></li>
+        <li><a href="#">4</a></li>
+        <li><a href="#">5</a></li>
+        <li><a href="#" aria-label="Next"><span aria-hidden="true">»</span></a></li>
+      </ul>
+    </nav>
+    <br><br>
+    * El botón <button class="btn btn-xs btn-danger">Sin nómina <span class="glyphicon glyphicon-hand-up"></span></button> permite asignar una nómina en que la comisión del asesor se paga.
+  </div>
+  <script>
+    $(function () {
+      $('[data-toggle="popover"]').popover()
+    });
+    $('body').on('hidden.bs.popover', function (e) {
+      $(e.target).data("bs.popover").inState = { click: false, hover: false, focus: false }
+    });
+  </script>
+</body>
+</html>

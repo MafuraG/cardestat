@@ -16,16 +16,18 @@
   <![endif]-->
   <style>
     .transaction {
-      padding: 6px 0;
+      padding: 8px 0;
       border-bottom: 1px solid #ccc;
       position: relative;
     }
+    /*
     .transaction .btn-group {
-      position: absolute;
+      position: fixed;
       right: 0;
       top: 2px;
       z-index: 1;
     }
+    */
     .transaction.first {
       border-top: 1px solid #ccc;
     }
@@ -43,273 +45,595 @@
       position: relative;
       top: 2px;
     }
+    .ellipsis {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      width: 100%;
+      display: block;
+    }
+    .onoffice-icon {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      position: relative;
+      top: 3px;
+      background-repeat: no-repeat;
+      background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4QEUCw8GkXnd5AAAAh5JREFUOMuNk81OU0EUx39zO0UG0VJpaaExJBoCJuxM1EdwL8/Awg07Vyxd+QK8hE/g1p2YoAkJSEyQRgRpgdKv296Pc1z03kvriklOTiaZ8/U7/zH7+/tTvu9/ADaMMTXucFT1FPjonHtnfd9/X6lUtqrVKtbmAUVHr9CRQ1XTQBQIgqDWbDS2LpuNwDPGbC4uLmGtRdEsQBKfmiSmolhrKZfLGGM2LVDwct4oEIXE65i/7ea2AJ4HULBpaygEUcynL6d8+3nJi9V5Xq0v4KbzqCpRrOwdNfn8/ZycMbx98wwALxkXUaXTDzn+06FSdKw/fUQ+nyMWIRbBAJWi4+F9yyCMMy5e2oGoUP/bJQqF1y9rlOam8QyoJBxQqvOOx+VZpqyHJAksjKpHkXBy1mVlucBC0RHHMgGVZD/GUxaK97IEWQf+MOamF1ArO0RlRF3G6KvS6QV0eyGLJYfKWAIRpTsY0h+EFB7kJ9aXjiAqNG+GtLoB5YKbHEFV+X3h0+mF5IzJKqdrA4hEOKpfMxhGFB/mJyGKKgfHV7T7A36ddTLBSLL/KI7ZO2zw9bBBpeSYnZnKEmQQl0ozDAPhtNFnad5RLrpEGxE/6jccnLRZW57j+WoJGCkVwOzu7naerKzNGs9MKG1ceYwpM1WqiHBeP+56wM5l84IwDDPiMg7xv7uoEkcxndYVwI51zm23W9eu3breAKrc7Zwn33n7HyA+r3XcoM9zAAAAAElFTkSuQmCC);
+    }
+    .advanced-input {
+      padding: 12px;
+      position: absolute;
+      width: 100%;
+      border: 1px solid #ccc;
+      background: white;
+      z-index: 3;
+    }
+    .form-group .input-group input.date, .form-group .input-group input.euros {
+      width: 96px;
+    }
+    .extra-info {
+      margin-top: 8px;
+    }
+    .text-warning {
+      color: gold;
+      background-color: gray;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1 class="page-header">Prototipo <small>Listado de transacciones</small></h1>
-    <h2>Modo lista</h2>
-    <div class="transaction first">
-      <div class="btn-group btn-group-xs" role="group">
-        <button type="button" class="btn btn-default collapsed" data-toggle="collapse" data-target="#trdt_1">
-          </button>
-        <button type="button" class="btn btn-primary">
-          <span class="glyphicon glyphicon-edit"></span></button>
-        <button type="button" class="btn btn-danger">
-          <span class="glyphicon glyphicon-trash"></span></button>
+    <div class="well well-sm">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="input-group">
+            <div style="position: relative">
+              <input type="text" class="form-control" placeholder="Buscar">
+              <a id="advanced-search-caret" href="#" style="padding: 6px; position: absolute; right: 2px; z-index: 3"><span class="caret" ></span></a>
+            </div>
+            <div class="input-group-btn">
+              <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+            </div>
+          </div>
+          <div id="advanced-search-box" class="advanced-input hidden">
+            <button type="button" class="close"><span aria-hidden="true">&times;</span></button>
+            <form>
+              <fieldset class="form-inline">
+                <div class="form-group">
+                  <label >Tipo de transacción</label>
+                  <select class="form-control input-sm">
+                    <option selected>COMPRAVENTA</option>
+                  </select>
+                </div>
+              </fieldset>
+              <fieldset class="form-inline">
+                <label>Fecha de venta</label><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <div class="form-group">
+                  <label>desde</label>
+                  <div class="input-group">
+                    <input class="form-control input-sm date" value="11/01/2017">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>&nbsp;&nbsp;&nbsp;hasta</label>
+                  <div class="input-group">
+                    <input class="form-control input-sm date">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></span>
+                  </div>
+                </div>
+              </fieldset>
+              <br>
+              <fieldset class="form-inline">
+                <label>Precio de venta</label><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <div class="form-group">
+                  <label>desde</label>
+                  <div class="input-group">
+                    <input class="form-control input-sm date">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-euro" aria-hidden="true"></span></span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>&nbsp;&nbsp;&nbsp;hasta</label>
+                  <div class="input-group">
+                    <input class="form-control input-sm date">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-euro" aria-hidden="true"></span></span>
+                  </div>
+                </div>
+              </fieldset>
+              <br>
+              <fieldset>
+                <div class="form-group">
+                  <label >Vendedor</label>
+                  <input class="form-control input-sm">
+                </div>
+              </fieldset>
+              <fieldset>
+                <div class="form-group">
+                  <label >Comprador</label>
+                  <input class="form-control input-sm">
+                </div>
+              </fieldset>
+              <fieldset>
+                <div class="form-group">
+                  <label >Propiedad</label>
+                  <input class="form-control input-sm">
+                </div>
+              </fieldset>
+              <fieldset class="form-inline">
+                <div class="form-group">
+                  <label >Ordenar por</label>
+<div class="input-group">
+                  <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-hand-right" aria-hidden="true"></span></span>
+                  <div class="input-group-btn">
+                    <select class="form-control">
+                      <option selected="">Fecha de venta</option>
+                      <option>Precio de venta</option>
+                    </select>
+                  </div>
+                  <select class="form-control">
+                    <option selected="">Asc</option>
+                    <option>Desc</option>
+                  </select>
+                </div>
+              </fieldset>
+              <br>
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary">Buscar</button>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
+    </div>
+    <div class="transaction first">
+      <div class="row">
+        <div class="col-md-2">
+          <span class="label label-primary" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>MULTIEXCLUSIVA</br>2ª MANO</br>PARTICULAR</div>">COMPRAVENTA</span> <small>05 dic '16</small>
+        </div>
+        <div class="col-md-8">
+          <div class="row">
+            <div class="col-md-5">
+              <div class="ellipsis">
+                <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?modul_name=daten&datensatz=193&inhalt=grunddaten" class="onoffice-icon"></a> 
+                <a  data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>GUACIMARA 27, LOMA DOS<br>REF. 33117-RK-e</div>" href="#">GUACIMARA 27, LOMA DOS</a>
+              </div>
+              <!--<a href="#">23188-RK-e</a> <small class="glyphicon glyphicon-info-sign"></small>-->
+            </div>
+            <div class="col-md-3 text-right">
+              <div class="ellipsis">
+                <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?datensatz=33297&seite=0&modul_name=adressen&inhalt=adresse-bearbeiten" class="onoffice-icon"></a> 
+                <a  data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>WARREN E. BUFFETT<br>Ref. 2342-CO-ct</div>" href="#">WARREN E. BUFFETT</a>
+              </div>
+            </div>
+            <div class="col-md-1 text-center">
+              <span class="glyphicon glyphicon-transfer"></span>
+            </div>
+            <div class="col-md-3">
+              <div title="CHARLES T. MUNGER" class="ellipsis">
+                <small class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>CHARLES T. MUNGER<br>Ref. 2341-CO-ct<br>Nac. NORTEAMERICANA</div>"></small> 
+                <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?datensatz=33297&seite=0&modul_name=adressen&inhalt=adresse-bearbeiten" class="onoffice-icon"></a> 
+                <a href="#">CHARLES T. MUNGER</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2 text-right">
+           280.000,00 € &nbsp;
+          <button type="button" class="btn btn-default btn-xs collapsed pull-right" data-toggle="collapse" data-target="#trdt_1">
+          </button>
+        </div>
+        <div class="col-md-2">
+          <span class="label label-warning" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>50% CANARINVEST</div>">50% Cárdenas</span> <small><span class="glyphicon glyphicon-time"></span> 331 días</small>
+        </div>
+        <div class="col-md-4">
+          TINA, INGE
+        </div>
+        <div class="col-md-2">
+          <small>EN NÓMINA <span class="glyphicon glyphicon-ok text-success"></span></small>
+        </div>
+        <div class="col-md-2">
+          <small class="label label-success">FACTURADO</small> <small>19 dic '16</small>
+        </div>
+        <div class="col-md-2 text-right">
+          7.000,00 € &nbsp;
+          <span class="text-success glyphicon glyphicon-ok-sign"></span>&nbsp;
+          </button>
+        </div>
+      </div>
+      <div id="trdt_1" class="extra-info collapse">
+        <div class="row">
+          <div class="col-md-4">
+            <small class="label label-default">50% CANARINVEST</small>
+          </div>
+          <div class="col-md-4">
+            <strong class="small">PRECIO SUGERIDO</strong>: 280.000,00 €
+          </div>
+          <div class="col-md-4">
+            <strong class="small">ALTA INICIAL</strong>: A <small>(12 ago '16)</small>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4">
+            <small><span class="glyphicon glyphicon-briefcase"></span> MULTIEXCLUSIVA, 2ª MANO, PARTICULAR</small>
+          </div>
+          <div class="col-md-4">
+            <strong class="small">PRIMERA PUBLICACIÓN</strong>: 300.000,00 € <small>(09 may '16)</small>
+          </div>
+          <div class="col-md-4">
+            <strong class="small">ÚLTIMA PUBLICACIÓN</strong>: 285.000,00 € <small>(11 nov '16)</small>
+            <div class="btn-group pull-right">
+              <button type="button" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-edit"></span></button>
+              <button type="button" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="transaction">
       <div class="row">
         <div class="col-md-2">
           <span class="label label-primary">COMPRAVENTA</span> <small>05 dic '16</small>
         </div>
+        <div class="col-md-8">
+          <div class="row">
+            <div class="col-md-5">
+              <div class="ellipsis">
+                <small class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>FRANCISCO NAVARRO 11, LOMA DOS<br>REF. 23188-RK-e<br>4 hab. 128m2<br>Constr. 1999</div>"></small> 
+                <a target="_blank" href="https://www.google.es/maps/place/Apartamentos+Do%C3%B1ana/@27.7638682,-15.6865285,18z/data=!4m5!3m4!1s0xc408201d1b02f27:0xea53801c0c8ead94!8m2!3d27.7702887!4d-15.6879293?hl=en" class="glyphicon glyphicon-map-marker"></a> 
+                <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?modul_name=daten&datensatz=193&inhalt=grunddaten" class="onoffice-icon"></a> 
+                <a title="FRANCISCO NAVARRO 11, LOMA DOS" href="#">FRANCISCO NAVARRO 11, LOMA DOS</a>
+              </div>
+              <!--<a href="#">23188-RK-e</a> <small class="glyphicon glyphicon-info-sign"></small>-->
+            </div>
+            <div class="col-md-3 text-right">
+              <div title="BENJAMING GRAHAM" class="ellipsis">
+                <small class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>BENJAMING GRAHAM<br>Ref. 1312-CO-ct<br>Nac. NORTEAMERICANA</div>"></small> 
+                <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?datensatz=33297&seite=0&modul_name=adressen&inhalt=adresse-bearbeiten" class="onoffice-icon"></a> 
+                <a target="_blank" href="#">BENJAMING GRAHAM</a>
+              </div>
+            </div>
+            <div class="col-md-1 text-center">
+              <span class="glyphicon glyphicon-transfer"></span>
+            </div>
+            <div class="col-md-3">
+              <div title="WALTER SCHLOSS" class="ellipsis">
+                <small class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>WALTER SCHLOSS<br>Ref. 1147-CO-ct<br>Nac. NORTEAMERICANA</div>"></small> 
+                <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?datensatz=33297&seite=0&modul_name=adressen&inhalt=adresse-bearbeiten" class="onoffice-icon"></a> 
+                <a target="_blank" href="#">WALTER SCHLOSS</a>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="col-md-2 text-right">
-           200.000,00 €
+           200.000,00 € &nbsp;
+          <button type="button" class="btn btn-default btn-xs collapsed pull-right" data-toggle="collapse" data-target="#trdt_2">
+          </button>
         </div>
         <div class="col-md-2">
-          <a href="#">23188-RK-e</a> <small class="glyphicon glyphicon-info-sign"></small>
+          <span class="label label-default">100% Cárdenas</span> <small><span class="glyphicon glyphicon-time"></span> 315 días</small>
         </div>
         <div class="col-md-6">
-         <div class="row">
-          <div class="col-md-5 text-right">
-            <a href="#">WARREN E. BUFFETT</a> <small class="glyphicon glyphicon-info-sign"></small>
-          </div>
-          <div class="col-md-1 text-center">
-            <span class="glyphicon glyphicon-transfer"></span>
-          </div>
-          <div class="col-md-6">
-             <a href="#">CHARLES T. MUNGER</a> <small class="glyphicon glyphicon-info-sign"></small>
-          </div>
-         </div>
-        </div>
-        <div class="col-md-2">
-          <span class="label label-default">100% Cárdenas</span>
-        </div>
-        <div class="col-md-2 text-right">
-          10.000,00 €
+          <span class="glyphicon glyphicon-piggy-bank"></span> TINA <small>(CAPTACIÓN 30%)</small>, ROBERT <small>(VENTA 70%)</small>, INGE <small>(VENTA 70%)</small>
         </div>
         <div class="col-md-2">
           <small class="label label-danger">SIN FACTURAR</small>
         </div>
-        <div class="col-md-2">
-          <span class="glyphicon glyphicon-time"></span> 315 días en venta
+        <div class="col-md-2 text-right">
+          10.000,00 € &nbsp;
+          <span class="text-warning glyphicon glyphicon-alert"></span>&nbsp;
+          </button>
         </div>
       </div>
-      <div class="row collapse" id="trdt_1">
-        <div class="col-md-12">
-          <span class="label label-warning">Otra información adicional...</span>
+      <div id="trdt_2" class="extra-info collapse">
+        <div class="row">
+          <div class="col-md-4">
+          </div>
+          <div class="col-md-4">
+            <strong class="small">PRECIO SUGERIDO</strong>: 220.000,00 €
+          </div>
+          <div class="col-md-4">
+            <strong class="small">ALTA INICIAL</strong>: C+ <small>(09 ene '16)</small>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4">
+            <small><span class="glyphicon glyphicon-briefcase"></span> EXCLUSIVA, 2ª MANO, APTOS. DOÑANA</small>
+          </div>
+          <div class="col-md-4">
+            <strong class="small">PRIMERA PUBLICACIÓN</strong>: 240.000,00 € <small>(04 feb '16)</small>
+          </div>
+          <div class="col-md-4">
+            <strong class="small">ÚLTIMA PUBLICACIÓN</strong>: 225.000,00 € <small>(12 nov '16)</small>
+            <div class="btn-group pull-right">
+              <button type="button" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-edit"></span></button>
+              <button type="button" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
     <div class="transaction">
-      <div class="btn-group btn-group-xs" role="group">
-        <button type="button" class="btn btn-default collapsed" data-toggle="collapse" data-target="#trdt_2"></button>
-        <button type="button" class="btn btn-primary">
-          <span class="glyphicon glyphicon-edit"></span></button>
-        <button type="button" class="btn btn-danger">
-          <span class="glyphicon glyphicon-trash"></span></button>
-      </div>
       <div class="row">
         <div class="col-md-2">
-          <span class="label label-primary">COMPRAVENTA</span> <small>15 oct '16</small>
+          <span class="label label-info">ALQUILER</span> <small>05 oct '16</small>
         </div>
-        <div class="col-md-2 text-right">
-           240.000,00 €
-        </div>
-        <div class="col-md-2">
-          <a href="#">20111-RS-t</a> <small class="glyphicon glyphicon-info-sign"></small>
-        </div>
-        <div class="col-md-6">
+        <div class="col-md-8">
           <div class="row">
-            <div class="col-md-5 text-right">
-              <a href="#">SETH KLARMAN</a> <small class="glyphicon glyphicon-info-sign"></small>
+            <div class="col-md-5">
+              <div class="ellipsis">
+                <small class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>LOS CANARIOS 2 - 207, MOGÁN<br>REF. 43178-KK-e<br>2 hab. 58m2<br>Constr. 1983</div>"></small> 
+                <a target="_blank" href="https://www.google.es/maps/place/Apartamentos+Do%C3%B1ana/@27.7638682,-15.6865285,18z/data=!4m5!3m4!1s0xc408201d1b02f27:0xea53801c0c8ead94!8m2!3d27.7702887!4d-15.6879293?hl=en" class="glyphicon glyphicon-map-marker"></a> 
+                <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?modul_name=daten&datensatz=193&inhalt=grunddaten" class="onoffice-icon"></a> 
+                <a title="LOS CANARIOS 2 - 207, MOGÁN" href="#">LOS CANARIOS 2 - 207, MOGÁN</a>
+              </div>
+              <!--<a href="#">23188-RK-e</a> <small class="glyphicon glyphicon-info-sign"></small>-->
+            </div>
+            <div class="col-md-3 text-right">
+              <div title="SETH KLARMAN" class="ellipsis">
+                <small class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>SETH KLARMAN<br>Ref. 7302-CO-ct<br>Nac. NORTEAMERICANA</div>"></small> 
+                <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?datensatz=33297&seite=0&modul_name=adressen&inhalt=adresse-bearbeiten" class="onoffice-icon"></a> 
+                <a target="_blank" href="#">SETH KLARMAN</a>
+              </div>
             </div>
             <div class="col-md-1 text-center">
               <span class="glyphicon glyphicon-transfer"></span>
             </div>
-            <div class="col-md-6">
-               <a href="#">WALTER SCHLOSS</a> <small class="glyphicon glyphicon-info-sign"></small>
+            <div class="col-md-3">
+              <div title="RICK GUERIN" class="ellipsis">
+                <small class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>RICK GUERIN<br>Ref. 3090-CO-ct<br>Nac. NORTEAMERICANA</div>"></small> 
+                <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?datensatz=33297&seite=0&modul_name=adressen&inhalt=adresse-bearbeiten" class="onoffice-icon"></a> 
+                <a target="_blank" href="#">RICK GUERIN</a>
+              </div>
             </div>
           </div>
         </div>
+        <div class="col-md-2 text-right">
+           500,00 € &nbsp;
+          <button type="button" class="btn btn-default btn-xs collapsed pull-right" data-toggle="collapse" data-target="#trdt_3">
+          </button>
+        </div>
         <div class="col-md-2">
-          <span class="label label-default">100% Cárdenas</span>
+          <span class="label label-default">100% Cárdenas</span> <small><span class="glyphicon glyphicon-time"></span> 31 días</small>
+        </div>
+        <div class="col-md-6">
+          <span class="glyphicon glyphicon-piggy-bank"></span> ANZHELA <small>(CAPTACIÓN 30%)</small>, DIRECCIÓN <small>(VENTA 70%)</small>
+        </div>
+        <div class="col-md-2">
+          <small class="label label-success">FACTURADO</small> <small>(11 oct '16)</small>
         </div>
         <div class="col-md-2 text-right">
-          12.000,00 €
-        </div>
-        <div class="col-md-2">
-          <small class="label label-success">30 oct '16</small>
-        </div>
-        <div class="col-md-2">
-          <span class="glyphicon glyphicon-time"></span> 227 días en venta
+          500,00 € &nbsp;
+          <span class="text-warning glyphicon glyphicon-alert"></span>&nbsp;
+          </button>
         </div>
       </div>
-      <div class="row collapse" id="trdt_2">
-        <div class="col-md-12">
-          <span class="label label-warning">Otra información adicional...</span>
+      <div id="trdt_3" class="extra-info collapse">
+        <div class="row">
+          <div class="col-md-4">
+          </div>
+          <div class="col-md-4">
+            <strong class="small">PRECIO SUGERIDO</strong>: 500,00 €
+          </div>
+          <div class="col-md-4">
+            <strong class="small">ALTA INICIAL</strong>: A+ <small>(30 ago '15)</small>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4">
+            <small><span class="glyphicon glyphicon-briefcase"></span> EXCLUSIVA, 2ª MANO, PARTICULAR</small>
+          </div>
+          <div class="col-md-4">
+            <strong class="small">PRIMERA PUBLICACIÓN</strong>: 550,00 € <small>(04 sep '16)</small>
+          </div>
+          <div class="col-md-4">
+            <strong class="small">ÚLTIMA PUBLICACIÓN</strong>: 500,00 € <small>(17 sep '16)</small>
+            <div class="btn-group pull-right">
+              <button type="button" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-edit"></span></button>
+              <button type="button" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
     <div class="transaction">
-      <div class="btn-group btn-group-xs" role="group">
-        <button type="button" class="btn btn-default collapsed" data-toggle="collapse" data-target="#trdt_3"></button>
-        <button type="button" class="btn btn-primary">
-          <span class="glyphicon glyphicon-edit"></span></button>
-        <button type="button" class="btn btn-danger">
-          <span class="glyphicon glyphicon-trash"></span></button>
-      </div>
       <div class="row">
         <div class="col-md-2">
-          <span class="label label-info">ALQUILER</span> <small>21 jul '16</small>
+          <span class="label label-primary">COMPRAVENTA</span> <small>17 nov '16</small>
         </div>
-        <div class="col-md-2 text-right">
-           900,00 €
-        </div>
-        <div class="col-md-2">
-          <a href="#">11360-TS-a</a> <small class="glyphicon glyphicon-info-sign"></small>
-        </div>
-        <div class="col-md-6">
+        <div class="col-md-8">
           <div class="row">
-            <div class="col-md-5 text-right">
-              <a href="#">BENJAMIN GRAHAM</a> <small class="glyphicon glyphicon-info-sign"></small>
+            <div class="col-md-5">
+              <div class="ellipsis">
+                <small class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>LOS GUAIRES 22, PATALAVACA<br>REF. 18034-RV-e<br>3 hab. 88m2<br>Constr. 1993</div>"></small> 
+                <a target="_blank" href="https://www.google.es/maps/place/Apartamentos+Do%C3%B1ana/@27.7638682,-15.6865285,18z/data=!4m5!3m4!1s0xc408201d1b02f27:0xea53801c0c8ead94!8m2!3d27.7702887!4d-15.6879293?hl=en" class="glyphicon glyphicon-map-marker"></a> 
+                <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?modul_name=daten&datensatz=193&inhalt=grunddaten" class="onoffice-icon"></a> 
+                <a title="LOS GUAIRES 22, PATALAVACA" href="#">LOS GUAIRES 22, PATALAVACA</a>
+              </div>
+              <!--<a href="#">23188-RK-e</a> <small class="glyphicon glyphicon-info-sign"></small>-->
+            </div>
+            <div class="col-md-3 text-right">
+              <div title="IRVING KAHN" class="ellipsis">
+                <small class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>IRVING KAHN<br>Ref. 0036-CB-ct<br>Nac. NORTEAMERICANA</div>"></small> 
+                <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?datensatz=33297&seite=0&modul_name=adressen&inhalt=adresse-bearbeiten" class="onoffice-icon"></a> 
+                <a target="_blank" href="#">IRVING KAHN</a>
+              </div>
             </div>
             <div class="col-md-1 text-center">
               <span class="glyphicon glyphicon-transfer"></span>
             </div>
-            <div class="col-md-6">
-               <a href="#">IRVING KAHN</a> <small class="glyphicon glyphicon-info-sign"></small>
+            <div class="col-md-3">
+              <div title="JOHN TEMPLETON" class="ellipsis">
+                <small class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>JOHN TEMPLETON<br>Ref. 0947-CO-ct<br>Nac. NORTEAMERICANA</div>"></small> 
+                <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?datensatz=33297&seite=0&modul_name=adressen&inhalt=adresse-bearbeiten" class="onoffice-icon"></a> 
+                <a target="_blank" href="#">JOHN TEMPLETON</a>
+              </div>
             </div>
           </div>
         </div>
+        <div class="col-md-2 text-right">
+           180.000,00 € &nbsp;
+          <button type="button" class="btn btn-default btn-xs collapsed pull-right" data-toggle="collapse" data-target="#trdt_4">
+          </button>
+        </div>
         <div class="col-md-2">
-          <span class="label label-default">100% Cárdenas</span>
+          <span class="label label-default">100% Cárdenas</span> <small><span class="glyphicon glyphicon-time"></span> 401 días</small>
+        </div>
+        <div class="col-md-6">
+          <span class="glyphicon glyphicon-piggy-bank"></span> TOMAS <small>(CAPTACIÓN 30%)</small>, ROBERT <small>(VENTA 70%)</small>
+        </div>
+        <div class="col-md-2">
+          <small class="label label-success">FACTURADO</small> <small>(29 nov '16)</small>
         </div>
         <div class="col-md-2 text-right">
-          450,00 €
-        </div>
-        <div class="col-md-2">
-          <small class="label label-success">02 ago '16</small>
-        </div>
-        <div class="col-md-2">
-          <span class="glyphicon glyphicon-time"></span> 112 días en alquiler
+          9.000,00 € &nbsp;
+          <span class="text-success glyphicon glyphicon-ok-sign"></span>&nbsp;
+          </button>
         </div>
       </div>
-      <div class="row collapse" id="trdt_3">
-        <div class="col-md-12">
-          <span class="label label-warning">Otra información adicional...</span>
+      <div id="trdt_4" class="extra-info collapse">
+        <div class="row">
+          <div class="col-md-4">
+          </div>
+          <div class="col-md-4">
+            <strong class="small">PRECIO SUGERIDO</strong>: 182.000,00 €
+          </div>
+          <div class="col-md-4">
+            <strong class="small">ALTA INICIAL</strong>: B <small>(07 mar '16)</small>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4">
+            <small><span class="glyphicon glyphicon-briefcase"></span> SIN EXCLUSIVA, 2ª MANO, PARTICULAR</small>
+          </div>
+          <div class="col-md-4">
+            <strong class="small">PRIMERA PUBLICACIÓN</strong>: 195.000,00 € <small>(04 feb '16)</small>
+          </div>
+          <div class="col-md-4">
+            <strong class="small">ÚLTIMA PUBLICACIÓN</strong>: 187.000,00 € <small>(12 nov '16)</small>
+            <div class="btn-group pull-right">
+              <button type="button" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-edit"></span></button>
+              <button type="button" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="transaction">
+      <div class="row">
+        <div class="col-md-2">
+          <span class="label label-info">ALQUILER</span> <small>13 ago '16</small>
+        </div>
+        <div class="col-md-8">
+          <div class="row">
+            <div class="col-md-5">
+              <div class="ellipsis">
+                <small class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>LOS ALBARICOQUES 307, SAN BARTOLOMÉ DE TIRAJANA<br>REF. 43178-KK-e<br>2 hab. 58m2<br>Constr. 1983</div>"></small> 
+                <a target="_blank" href="https://www.google.es/maps/place/Apartamentos+Do%C3%B1ana/@27.7638682,-15.6865285,18z/data=!4m5!3m4!1s0xc408201d1b02f27:0xea53801c0c8ead94!8m2!3d27.7702887!4d-15.6879293?hl=en" class="glyphicon glyphicon-map-marker"></a> 
+                <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?modul_name=daten&datensatz=193&inhalt=grunddaten" class="onoffice-icon"></a> 
+                <a title="LOS ALBARICOQUES 307, SAN BARTOLOMÉ DE TIRAJANA" href="#">LOS ALBARICOQUES 307, SAN BARTOLOMÉ DE TIRAJANA</a>
+              </div>
+              <!--<a href="#">23188-RK-e</a> <small class="glyphicon glyphicon-info-sign"></small>-->
+            </div>
+            <div class="col-md-3 text-right">
+              <div title="MICHAEL F. PRICE" class="ellipsis">
+                <small class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>MICHAEL F. PRICE<br>Ref. 7302-CO-ct<br>Nac. BRITÁNICA</div>"></small> 
+                <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?datensatz=33297&seite=0&modul_name=adressen&inhalt=adresse-bearbeiten" class="onoffice-icon"></a> 
+                <a target="_blank" href="#">MICHAEL F. PRICE</a>
+              </div>
+            </div>
+            <div class="col-md-1 text-center">
+              <span class="glyphicon glyphicon-transfer"></span>
+            </div>
+            <div class="col-md-3">
+              <div title="MARIO GABELLI" class="ellipsis">
+                <small class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>MARIO GABELLI<br>Ref. 3090-CO-ct<br>Nac. ITALIANA</div>"></small> 
+                <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?datensatz=33297&seite=0&modul_name=adressen&inhalt=adresse-bearbeiten" class="onoffice-icon"></a> 
+                <a target="_blank" href="#">MARIO GABELLI</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2 text-right">
+           700,00 € &nbsp;
+          <button type="button" class="btn btn-default btn-xs collapsed pull-right" data-toggle="collapse" data-target="#trdt_5">
+          </button>
+        </div>
+        <div class="col-md-2">
+          <span class="label label-default">100% Cárdenas</span> <small><span class="glyphicon glyphicon-time"></span> 38 días</small>
+        </div>
+        <div class="col-md-6">
+          <span class="glyphicon glyphicon-piggy-bank"></span> TINA <small>(CAPTACIÓN 30%)</small>, DIRECCIÓN <small>(VENTA 70%)</small>
+        </div>
+        <div class="col-md-2">
+          <small class="label label-danger">SIN FACTURAR</small>
+        </div>
+        <div class="col-md-2 text-right">
+          500,00 € &nbsp;
+          <span class="text-warning glyphicon glyphicon-alert"></span>&nbsp;
+          </button>
+        </div>
+      </div>
+      <div id="trdt_5" class="extra-info collapse">
+        <div class="row">
+          <div class="col-md-4">
+          </div>
+          <div class="col-md-4">
+            <strong class="small">PRECIO SUGERIDO</strong>: 750,00 €
+          </div>
+          <div class="col-md-4">
+            <strong class="small">ALTA INICIAL</strong>: B+ <small>(07 jul '16)</small>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4">
+            <small><span class="glyphicon glyphicon-briefcase"></span> MULTIEXCLUSIVA, 2ª MANO, PARTICULAR</small>
+          </div>
+          <div class="col-md-4">
+            <strong class="small">PRIMERA PUBLICACIÓN</strong>: 750,00 € <small>(09 jul '16)</small>
+          </div>
+          <div class="col-md-4">
+            <strong class="small">ÚLTIMA PUBLICACIÓN</strong>: 700,00 € <small>(17 ago '16)</small>
+            <div class="btn-group pull-right">
+              <button type="button" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-edit"></span></button>
+              <button type="button" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-trash"></span></button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
     <br>
     <p>* El botón <button class="btn btn-default btn-xs"><span class="glyphicon glyphicon-chevron-down"></span></button> muestra datos adicionales (este botón es funcional).</p>
-    <h2>Modo tabla</h2>
-    <div class="form-group btn-group">
-      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Mostrar columnas <span class="caret"></span></button>
-      <ul class="dropdown-menu">
-        <li><a href="#"><input type="checkbox"> Todas</a></li>
-        <li role="separator" class="divider"></li>
-        <li><a href="#"><input type="checkbox" checked> Tipo de transacción</a></li>
-        <li><a href="#"><input type="checkbox"> Transmisión</a></li>
-        <li><a href="#"><input type="checkbox"> Tipo de encargo</a></li>
-        <li><a href="#"><input type="checkbox"> Promoción</a></li>
-        <li><a href="#"><input type="checkbox"> Fecha primera publicación</a></li>
-        <li><a href="#"><input type="checkbox"> Fecha última publicación</a></li>
-        <li><a href="#"><input type="checkbox" checked> Fecha contrato venta</a></li>
-        <li><a href="#"><input type="checkbox"> Primer precio publicado</a></li>
-        <li><a href="#"><input type="checkbox"> Último precio publicado</a></li>
-        <li><a href="#"><input type="checkbox" checked> Precio de venta</a></li>
-        <li><a href="#"><input type="checkbox" checked> Vendedor</a></li>
-        <li><a href="#"><input type="checkbox"> ¿Vendedor es nuevo cliente?</a></li>
-        <li><a href="#"><input type="checkbox"> Quien trae al vendedor</a></li>
-        <li><a href="#"><input type="checkbox"> Precio sugerido</a></li>
-        <li><a href="#"><input type="checkbox" checked> Comprador</a></li>
-        <li><a href="#"><input type="checkbox"> ¿Comprador es nuevo cliente?</a></li>
-        <li><a href="#"><input type="checkbox"> Quien trae al comprador</a></li>
-        <li><a href="#"><input type="checkbox"> Tipo de buscador</a></li>
-        <li><a href="#"><input type="checkbox"> Fecha de inicio de búsqueda</a></li>
-        <li><a href="#"><input type="checkbox" checked> Inmueble</a></li>
-        <li><a href="#"><input type="checkbox"> Pasado a ventas por</a></li>
-        <li><a href="#"><input type="checkbox" checked> Fecha de facturación</a></li>
-        <li><a href="#"><input type="checkbox" checked> Participación de Cárdenas</a></li>
-        <li><a href="#"><input type="checkbox" checked> Honorarios de Cárdenas</a></li>
-        <li><a href="#"><input type="checkbox"> Participación de Colaborador</a></li>
-        <li><a href="#"><input type="checkbox"> Honorarios de Colaborador</a></li>
-      </ul>
-    </div>
-    <table class="table table-condensed table-bordered table-striped">
-      <thead>
-        <tr>
-          <th>Tipo</th>
-          <th>Precio trans.</th>
-          <th>Fecha trans. <span class="glyphicon glyphicon-sort-by-order"></span></th>
-          <th>Propiedad</th>
-          <th>Part. Cárdenas</th>
-          <th>Honor. Cárdenas</th>
-          <th>Fecha factura</th>
-          <th>Vendedor</th>
-          <th>Comprador</th>
-          <th></th>
-        </tr>
-        <tr>
-          <th><input class="form-control input-sm"></th>
-          <th><input class="form-control input-sm"></th>
-          <th><input class="form-control input-sm"></th>
-          <th><input class="form-control input-sm"></th>
-          <th><input class="form-control input-sm"></th>
-          <th><input class="form-control input-sm"></th>
-          <th><input class="form-control input-sm"></th>
-          <th><input class="form-control input-sm"></th>
-          <th><input class="form-control input-sm"></th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>COMPRAVENTA</td>
-          <td>200.000,00 €</td>
-          <td>04 dic '16</td>
-          <td>23188-RK-e</td>
-          <td>100%</td>
-          <td>10.000,00 €</td>
-          <td>SIN FACTURAR</td>
-          <td>WARREN BUFFETT</td>
-          <td>CHARLIE MUNGER</td>
-          <td><button class="btn btn-xs btn-default"><span class="glyphicon glyphicon-eye-open"></span></button>
-            <button class="btn btn-xs btn-primary"><span class="glyphicon glyphicon-edit"></span></button>
-            <button class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span></button></td>
-        </tr>
-        <tr>
-          <td>COMPRAVENTA</td>
-          <td>240.000,00 €</td>
-          <td>11 oct '16</td>
-          <td>43088-EL-n</td>
-          <td>100%</td>
-          <td>12.000,00 €</td>
-          <td>30 oct '16</td>
-          <td>SETH KLARMAN</td>
-          <td>WALTER SCHLOSS</td>
-          <td><button class="btn btn-xs btn-default"><span class="glyphicon glyphicon-eye-open"></span></button>
-            <button class="btn btn-xs btn-primary"><span class="glyphicon glyphicon-edit"></span></button>
-            <button class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span></button></td>
-        </tr>
-        <tr>
-          <td>ALQUILER</td>
-          <td>1000,00 €</td>
-          <td>10 ago '16</td>
-          <td>13117-KM-a</td>
-          <td>100%</td>
-          <td>500,00 €</td>
-          <td>20 ago '16</td>
-          <td>BENJAMIN GRAHAM</td>
-          <td>IRVING KAHN</td>
-          <td><button class="btn btn-xs btn-default"><span class="glyphicon glyphicon-eye-open"></span></button>
-            <button class="btn btn-xs btn-primary"><span class="glyphicon glyphicon-edit"></span></button>
-            <button class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span></button></td>
-        </tr>
-      </tbody>
-    </table>
-    <p>* Si el número de columnas hiciera desbordar el ancho de la pantalla, aparecería una barra de scroll para poder verlas todas.</p>
-    <p>** Haciendo click en la cabecera de una columna se ordena por esa columna; la entrada de formulario de cada columna permite filtrar por esa columna.</p>
+    <p>** El icono <span class="text-warning glyphicon glyphicon-alert"></span> indica falta de visto bueno de dirección.</p>
+    <p>*** El icono <span class="text-success glyphicon glyphicon-ok-sign"></span> indica tiene visto bueno de dirección.</p>
+    <p>**** El icono <span class="onoffice-icon"></span> es un enlace a los datos en onOffice.</p>
+    <p>***** El signo <span class="glyphicon glyphicon-info-sign"></span> muestra información adicional de la entidad.
+    <p>****** Búsqueda avanzada haciendo click en el símbolo [<span class="caret"></span>].
   </div>
+  <script>
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+      $('#advanced-search-caret').on('click', function() {
+        $('#advanced-search-box').css('width', $(this).siblings('.form-control').eq(0).outerWidth());
+        $('#advanced-search-box').toggleClass('hidden');
+        $(document).on('click', closeAdvancedSearch);
+        return false;
+      });
+      $('#advanced-search-box .close').on('click', function() {
+        $('#advanced-search-box').addClass('hidden');
+        $(document).off('click', closeAdvancedSearch);
+      });
+      function closeAdvancedSearch(e) {
+        if (!$(e.target).closest('#advanced-search-box').length) {
+          $('#advanced-search-box').addClass('hidden');
+          $(document).off('click', closeAdvancedSearch);
+        }
+      }
+    });
+  </script>
 </body>
 </html>

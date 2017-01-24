@@ -1,0 +1,60 @@
+Hola Claudio
+ 
+Me gusta mucho!!!
+ 
+Metiendome en materia me doy cuenta que necesitamos varias vistas:
+ 
+VISTAS DIFERENTES
+Transacción
+Comisionamiento
+Propiedades vendidas (le podríamos dar acceso a otro nivel de usuarios que no podría ver las facturas ni comisionamientos sino solamente las estadísticas)
+Compradores
+Vendedores
+ 
+TRANSACCION
+Al desplegar saldrían todos los campos
+ 
+FILTRAR Y ORDENAR
+Igual no hace falta la visión de tabla. Podriamos poner un campo para filtrado y una lista para indicar sobre que campo se aplica y para ordenar una lista que indica el orden y otra lista que indica el campo por el cual ordenar. Tb un rango de fecha de facturación y un rango de fecha de ctos opción.
+ 
+VISTA TRANSACCIONES
+Debajo del precio pone los honorarios de Cardenas? Poner % en paréntesis pf
+Asesor o nombre colaborador debajo de vendedor y comprador?
+Direccion propiedad,
+Ref comprador y ref vendedor
+Días en venta no hace falta
+ 
+PROPIEDADES VENDIDAS
+Se me ocurre que podríamos incluso incluir las coordenadas para mostrar en un mapa las propiedades vendidas J
+ 
+Te llamo tb
+ 
+Saludos
+
+Ramon
+ 
+------
+
+Fecha de factura sirve V/B de contabilidad
+Modo lista campos clave: dirección propiedad, refs. vendedor y comprador, colaboradores y asesores, indicar qué porcentaje de la venta es la comisión, días en venta junto a "100% cárdenas", nombres en el centro, importes a la dcha., otra opción: nombres en medio y debajo la dirección postal de la propiedad, y fcha. facturación al lado de los importes, colaborador junto a "100% Cárdenas"?, "225 días" en lugar de "225 días en venta", info. propiedad: mostrar la dirección en lugar de la ref. centrado debajo de los contactos, link desde propiedad al onOffice (ref. interna y externa desde el CSV) con logotivo de onOffice, filtrar tb. por visto bueno y por rangos de fechas.
+
+Cuando Carolina da V/B, Pilar debe poder elegir qué incluye y qué no incluye en la nómina (incluyendo preferiblemente todas las comisiones de una transacción atómicamente). Posibilidad de filtrar qué tiene v/b de dirección pero aun no se ha incluido en nómina.
+
+La hoja de comisiones es de 1 ene a 31 dic, y es acumulado. Se le envía a los asesores en cualquier momento del año. Y poder ver qué se ha incluido en cada nómina. PDF a enviar. Ideal con info. del cálculo (Excel?). Cálculo por rangos: de 0 a 100000€ un 10%, 100001 a 150000€ un 15%, 
+
+Glosario: interviniente, aka contactos?
+
+Listado de propiedades vendidas: por zona, referencia, nº dormitorios, etc.
+
+Idea: mapa de google superponer info de ventas.
+
+Rol: asesores: acceso estadísticas, lista de propiedades vendidas, hojas de comisionamiento?
+Rol: contratación.
+
+Departamento de contratos mete los primeros datos, después contabilidad asesores, etc.
+
+Hoja de comisiones solo puede ver contabilidad y dirección.
+
+Nº de factura incluir en el form. de transacción.
+
+Honorarios y asesores solo lo ve contabilidad y superiores.
