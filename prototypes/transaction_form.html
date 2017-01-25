@@ -117,7 +117,7 @@
             </div>
           </fieldset>
           <fieldset>
-            <legend class="col-md-12">Participantes</legend>
+            <legend class="col-md-12">Intervinientes</legend>
             <div class="form-group col-md-6">
               <label>Vendedor</label>
               <div class="input-group">
@@ -243,68 +243,77 @@
           </fieldset>
           <fieldset>
             <legend class="col-md-12">Asesores</legend>
-            <table class="table">
-              <thead><tr><th>#</th><th>Nombre</th><th>Oficina</th><th>Tipo de atribución</th><th>Atribución</th><th>Comentarios</th><th></th></tr></thead>
-              <tbody>
-                <tr><th scope="row">1</th><td>Tina</td><td>Arguineguín</td><td>CAPTACIÓN 30%</td><td>66.000,00 €</td><td>Comentarios para el asesor</td><td><button class="btn btn-xs btn-danger">Eliminar</td></tr> 
-                <tr><th scope="row">2</th><td>Robert</td><td>Puerto Rico</td><td>VENTA 70%</td><td>154.000,00 €</td><td></td><td><button class="btn btn-xs btn-danger">Eliminar</td></tr> 
-                <tr><th scope="row">3</th><td>Inge</td><td>Arguineguín</td><td>VENTA 70%</td><td>154.000,00 €</td><td></td><td><button class="btn btn-xs btn-danger">Eliminar</td></tr></tbody>
-            </table>
+            <div class="form-group col-md-6">
+              <label>Pasado a nómina</label>
+              <div class="input-group">
+                <input class="form-control" value="12/11/2016">
+                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></span>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <table class="table">
+                <thead><tr><th>#</th><th>Nombre</th><th>Oficina</th><th>Tipo de atribución</th><th>Atribución</th><th>Comentarios</th><th></th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">1</th><td>Tina</td><td>Arguineguín</td><td>CAPTACIÓN 30%</td><td>66.000,00 €</td><td>Comentarios para el asesor</td><td><button class="btn btn-xs btn-danger">Eliminar</td></tr> 
+                  <tr><th scope="row">2</th><td>Robert</td><td>Puerto Rico</td><td>VENTA 70%</td><td>154.000,00 €</td><td></td><td><button class="btn btn-xs btn-danger">Eliminar</td></tr> 
+                  <tr><th scope="row">3</th><td>Inge</td><td>Arguineguín</td><td>VENTA 70%</td><td>154.000,00 €</td><td></td><td><button class="btn btn-xs btn-danger">Eliminar</td></tr></tbody>
+              </table>
+            </div>
             <!--
             <div class="form-group col-md-12">
               <button class="btn btn-link" type="button">+ Añadir asesor</button>
             </div>
             -->
             <div class="col-md-12">
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">Añadir asesor</h3>
-              </div>
-              <div class="panel-body">
-                <div class="form-group col-md-6">
-                  <label>Asesor</label>
-                  <select class="form-control">
-                    <option selected>TOMAS</option>
-                  </select>
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h3 class="panel-title">Añadir asesor</h3>
                 </div>
-                <div class="form-group col-md-6">
-                  <label>Oficina</label>
-                  <select class="form-control">
-                    <option selected>ARGUINEGUÍN</option>
-                  </select>
-                </div>
-                <div class="form-group col-md-6">
-                  <label>Tipo de atribución</label>
-                  <select class="form-control">
-                    <option selected>CAPTACIÓN 30%</option>
-                  </select>
-                </div>
-                <div class="form-group col-md-6">
-                  <label>Atribución</label>
-                  <div class="input-group">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-hand-right" aria-hidden="true"></span></span>
-                    <div class="input-group-btn">
-                      <select class="form-control">
-                        <option selected>AUTOMÁTICA</option>
-                      </select>
+                <div class="panel-body">
+                  <div class="form-group col-md-6">
+                    <label>Asesor</label>
+                    <select class="form-control">
+                      <option selected>TOMAS</option>
+                    </select>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label>Oficina</label>
+                    <select class="form-control">
+                      <option selected>ARGUINEGUÍN</option>
+                    </select>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label>Tipo de atribución</label>
+                    <select class="form-control">
+                      <option selected>CAPTACIÓN 30%</option>
+                    </select>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label>Atribución</label>
+                    <div class="input-group">
+                      <span class="input-group-addon"><span class="glyphicon glyphicon-hand-right" aria-hidden="true"></span></span>
+                      <div class="input-group-btn">
+                        <select class="form-control">
+                          <option selected>AUTOMÁTICA</option>
+                        </select>
+                      </div>
+                      <input class="form-control text-right" disabled value="66.000,00">
+                      <span class="input-group-addon">€</span>
                     </div>
-                    <input class="form-control text-right" disabled value="66.000,00">
-                    <span class="input-group-addon">€</span>
+                  </div>
+                  <div class="form-group col-md-12">
+                    <label>Comentarios para el asesor</label>
+                    <textarea class="form-control" rows="3"></textarea>
+                  </div>
+                  <div class="form-group col-md-12">
+                    <button class="btn btn-sm btn-primary" type="button">Añadir</button>
                   </div>
                 </div>
-                <div class="form-group col-md-12">
-                  <label>Comentarios para el asesor</label>
-                  <textarea class="form-control" rows="3"></textarea>
-                </div>
-                <div class="form-group col-md-12">
-                  <button class="btn btn-sm btn-primary" type="button">Añadir</button>
-                </div>
               </div>
-            </div>
             </div>
           </fieldset>
           <fieldset>
-            <legend class="col-md-12">Vistos buenos</legend>
+            <div class="col-md-12"><hr style="border-top: 1px solid #ddd"></div>
             <div class="form-group col-md-6">
               <div class="checkbox">
                 <label>
@@ -312,15 +321,7 @@
                 </label>
               </div>
             </div>
-            <div class="form-group col-md-6">
-              <div class="checkbox">
-                <label>
-                  <input type="checkbox"> Visto bueno de contabilidad
-                </label>
-              </div>
-            </div>
           </fieldset>
-          <hr style="border-top: 1px solid #ddd">
           <div class="form-group col-md-12">
             <label>Observaciones</label>
             <textarea class="form-control" rows="3"></textarea>

@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
 
-  <title>Cardestat -- Nueva transacción</title>
+  <title>Cardestat -- Hoja de comisiones</title>
   <meta name="description" content="The HTML5 Herald">
   <meta name="author" content="SitePoint">
 
@@ -19,6 +19,9 @@
       padding: 8px 0;
       border-bottom: 1px solid #ccc;
       position: relative;
+    }
+    th {
+      text-align: center;
     }
     /*
     .transaction .btn-group {
@@ -47,6 +50,9 @@
     }
     .transaction .btn {
       margin-top: 2px;
+    }
+    .transaction h3, .transaction h4 {
+      margin-top: 0;
     }
     .ellipsis {
       overflow: hidden;
@@ -85,148 +91,86 @@
 </head>
 <body>
   <div class="container">
-    <h1 class="page-header">Prototipo <small>Listado de comisiones</small></h1>
+    <h1 class="page-header">Prototipo <small>Hoja de comisiones</small></h1>
     <div class="well well-sm">
       <div class="row">
-        <form class="col-md-4 form">
-          <select class="form-control input-sm">
-            <option selected>MOSTRAR TODAS</option>
-            <option>MOSTRAR PAGADAS</option>
-            <option>MOSTRAR SIN PAGAR</option>
-          </select>
+        <form class="form">
+          <div class="col-md-3"> 
+            <div class="input-group date">
+              <span class="input-group-addon">Desde</span>
+              <input type="text" class="input-sm form-control" value="2016-12-31">
+              <span class="input-group-addon" title="Select date">
+                <i class="glyphicon glyphicon-calendar"></i></span>
+            </div>
+          </div>
+          <div class="col-md-3"> 
+            <div class="input-group date">
+              <span class="input-group-addon">Hasta</span>
+              <input type="text" class="input-sm form-control" value="2016-07-01">
+              <span class="input-group-addon" title="Select date">
+                <i class="glyphicon glyphicon-calendar"></i></span>
+            </div>
+          </div>
+          <div class="col-md-3"> 
+            <select class="form-control input-sm">
+              <option selected>TODOS LOS ASESORES</option>
+              <option>ROBERT</option>
+              <option>INGE</option>
+              <option>ANZHELA</option>
+              <option>TOMAS</option>
+            </select>
+          </div>
         </form>
       </div>
     </div>
     <p class="pagination-info text-right"><em>Mostrando 1-20 de 127 resultados</em></p>
     <div class="transaction first">
       <div class="row">
-        <div class="col-md-2">
-          <span class="label label-primary">COMPRAVENTA</span> <small>05 dic '16</small>
-        </div>
-        <div class="col-md-5">
-          <div class="ellipsis">
-            <small class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>GUACIMARA 27, LOMA DOS<br>REF. 33117-RK-e<br>5 hab. 137m2<br>Constr. 1998</div>"></small> 
-            <a target="_blank" href="https://www.google.es/maps/place/Apartamentos+Do%C3%B1ana/@27.7638682,-15.6865285,18z/data=!4m5!3m4!1s0xc408201d1b02f27:0xea53801c0c8ead94!8m2!3d27.7702887!4d-15.6879293?hl=en" class="glyphicon glyphicon-map-marker"></a> 
-            <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?modul_name=daten&datensatz=193&inhalt=grunddaten" class="onoffice-icon">&nbsp;</a> 
-            <a title="GUACIMARA 27, LOMA DOS" href="#">GUACIMARA 27, LOMA DOS</a>
-          </div>
-        </div>
-        <div class="col-md-2">
-          <small class="label label-default">F2017010032</small> <small>19 dic '16</small>
-        </div>
-        <div class="col-md-3 text-right">7.000,00 €</div>
-        <div class="col-md-2">
-          <span class="label label-default">CAPTACIÓN 30%</span>
-        </div>
-        <div class="col-md-5">
-          <span class="glyphicon glyphicon-piggy-bank"></span> TINA
-        </div>
         <div class="col-md-3">
-          <button class="btn btn-xs btn-danger" data-toggle="popover" title="Asignar nómina<button type=&quot;button&quot; class=&quot;close&quot; onclick=&quot;$(this).closest('.popover').siblings('[data-toggle=popover]').popover('hide');&quot;><span aria-hidden=&quot;true&quot;>&times;</span></button>" data-html="true" data-content="<form class=&quot;form&quot;><div class=&quot;form-group&quot;><label>Factura</label><input class=&quot;form-control input-sm&quot; readonly value=&quot;F2017010032&quot;></div><div class=&quot;form-group&quot;><label>Nómina</label><input class=&quot;form-control input-sm&quot;></div><div class=&quot;form-group&quot;><button class=&quot;btn btn-primary&quot;>Guardar</button></form>">Sin nómina <span class="glyphicon glyphicon-hand-up"></span></button>
+          <h4><span class="label label-primary">TINA</span><small> 01 jul '16 &ndash; 31 dic '16</small></h4>
         </div>
-        <div class="col-md-2 text-right">
-          2.100,00 €
+        <div class="col-md-9 text-right">
+          959,00 €
+        </div>
+        <div class="clearfix"></div>
+        <div class="col-md-offset-1 col-md-10">
+          <table class="table table-condensed table-bordered table-striped">
+            <thead><tr><th>Nº factura</th><th>Fecha factura</th><th>Facturado</th><th>Oficina</th><th>Tipo de atribución</th><th>Comisión</th><th>Nómina</th></tr></thead>
+                  <tbody>
+                    <tr><td>F2016120013</td><td>07 dic '16</td><td class="text-right">7.000,00 €</td><td>Arguineguín</td><td>CAPTACIÓN 30%</td><td class="text-right">210,00 €</td><td>ene '17</td></tr> 
+                    <tr><td>F2016110018</td><td>13 nov '16</td><td class="text-right">10.000,00 €</td><td>Puerto Rico</td><td>VENTA 70%</td><td class="text-right">700,00 €</td><td>dic '16</td></tr> 
+                    <tr><td>F2016100003</td><td>02 oct '16</td><td class="text-right">700,00 €</td><td>Arguineguín</td><td>ALQUILER 25%</td><td class="text-right">49,00 €</td><td>nov '16</td></tr></tbody>
+                    <tr><td>F2016080093</td><td>27 ago '16</td><td class="text-right">4000,00 €</td><td>Arguineguín</td><td>VENTA 70%</td><td class="text-right">28,00 €</td><td>oct '16</td></tr></tbody>
+          </table>
         </div>
       </div>
     </div>
     <div class="transaction">
       <div class="row">
-        <div class="col-md-2">
-          <span class="label label-primary">COMPRAVENTA</span> <small>05 dic '16</small>
-        </div>
-        <div class="col-md-5">
-          <div class="ellipsis">
-            <small class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>LOS GUAIRES 22, PATALAVACA<br>REF. 33117-RK-e<br>5 hab. 137m2<br>Constr. 1998</div>"></small> 
-            <a target="_blank" href="https://www.google.es/maps/place/Apartamentos+Do%C3%B1ana/@27.7638682,-15.6865285,18z/data=!4m5!3m4!1s0xc408201d1b02f27:0xea53801c0c8ead94!8m2!3d27.7702887!4d-15.6879293?hl=en" class="glyphicon glyphicon-map-marker"></a> 
-            <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?modul_name=daten&datensatz=193&inhalt=grunddaten" class="onoffice-icon">&nbsp;</a> 
-            <a title="LOS GUAIRES 22, PATALAVACA" href="#">LOS GUAIRES 22, PATALAVACA</a>
-          </div>
-        </div>
-        <div class="col-md-2">
-          <small class="label label-default">F2017010092</small> <small>19 dic '16</small>
-        </div>
-        <div class="col-md-3 text-right">7.000,00 €</div>
-        <div class="col-md-2">
-          <span class="label label-default">VENTA 70%</span>
-        </div>
-        <div class="col-md-5">
-          <span class="glyphicon glyphicon-piggy-bank"></span> ROBERT
-        </div>
         <div class="col-md-3">
-          <span class="label label-success">N-2017-01-02</button>
+          <h4><span class="label label-primary">ROBERT</span><small> 01 jul '16 &ndash; 31 dic '16</small></h4>
         </div>
-        <div class="col-md-2 text-right">
-          4.900,00 €
+        <div class="col-md-9 text-right">
+          730,00 €
         </div>
-      </div>
-    </div>
-    <div class="transaction">
-      <div class="row">
-        <div class="col-md-2">
-          <span class="label label-primary">COMPRAVENTA</span> <small>05 oct '16</small>
-        </div>
-        <div class="col-md-5">
-          <div class="ellipsis">
-            <small class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>FRANCISCO NAVARRO 11, LOMA DOS<br>REF. 33117-RK-e<br>5 hab. 137m2<br>Constr. 1998</div>"></small> 
-            <a target="_blank" href="https://www.google.es/maps/place/Apartamentos+Do%C3%B1ana/@27.7638682,-15.6865285,18z/data=!4m5!3m4!1s0xc408201d1b02f27:0xea53801c0c8ead94!8m2!3d27.7702887!4d-15.6879293?hl=en" class="glyphicon glyphicon-map-marker"></a> 
-            <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?modul_name=daten&datensatz=193&inhalt=grunddaten" class="onoffice-icon">&nbsp;</a> 
-            <a title="FRANCISCO NAVARRO 11, LOMA DOS" href="#">FRANCISCO NAVARRO 11, LOMA DOS</a>
-          </div>
-        </div>
-        <div class="col-md-2">
-          <small class="label label-default">F2017010002</small> <small>19 dic '16</small>
-        </div>
-        <div class="col-md-3 text-right">10.000,00 €</div>
-        <div class="col-md-2">
-          <span class="label label-default">VENTA 70%</span>
-        </div>
-        <div class="col-md-5">
-          <span class="glyphicon glyphicon-piggy-bank"></span> TOMAS
-        </div>
-        <div class="col-md-3">
-          <button class="btn btn-xs btn-danger" data-toggle="popover" title="Asignar nómina<button type=&quot;button&quot; class=&quot;close&quot; onclick=&quot;$(this).closest('.popover').siblings('[data-toggle=popover]').popover('hide');&quot;><span aria-hidden=&quot;true&quot;>&times;</span></button>" data-html="true" data-content="<form class=&quot;form&quot;><div class=&quot;form-group&quot;><label>Factura</label><input class=&quot;form-control input-sm&quot; readonly value=&quot;F2017010002&quot;></div><div class=&quot;form-group&quot;><label>Nómina</label><input class=&quot;form-control input-sm&quot;></div><div class=&quot;form-group&quot;><button class=&quot;btn btn-primary&quot;>Guardar</button></form>">Sin nómina <span class="glyphicon glyphicon-hand-up"></span></button>
-        </div>
-        <div class="col-md-2 text-right">
-          7.000,00 €
-        </div>
-      </div>
-    </div>
-    <div class="transaction">
-      <div class="row">
-        <div class="col-md-2">
-          <span class="label label-info">ALQUILER</span> <small>12 dic '16</small>
-        </div>
-        <div class="col-md-5">
-          <div class="ellipsis">
-            <small class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>LOS ALBARICOQUES 307, SAN BARTOLOMÉ DE TIRAJANA<br>REF. 33117-RK-e<br>5 hab. 137m2<br>Constr. 1998</div>"></small> 
-            <a target="_blank" href="https://www.google.es/maps/place/Apartamentos+Do%C3%B1ana/@27.7638682,-15.6865285,18z/data=!4m5!3m4!1s0xc408201d1b02f27:0xea53801c0c8ead94!8m2!3d27.7702887!4d-15.6879293?hl=en" class="glyphicon glyphicon-map-marker"></a> 
-            <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?modul_name=daten&datensatz=193&inhalt=grunddaten" class="onoffice-icon">&nbsp;</a> 
-            <a title="LOS ALBARICOQUES 307, SAN BARTOLOMÉ DE TIRAJANA" href="#">LOS ALBARICOQUES 307, SAN BARTOLOMÉ DE TIRAJANA</a>
-          </div>
-        </div>
-        <div class="col-md-2">
-          <small class="label label-default">F2017010029</small> <small>19 dic '16</small>
-        </div>
-        <div class="col-md-3 text-right">700,00 €</div>
-        <div class="col-md-2">
-          <span class="label label-default">ALQUILER 50%</span>
-        </div>
-        <div class="col-md-5">
-          <span class="glyphicon glyphicon-piggy-bank"></span> ANZHELA
-        </div>
-        <div class="col-md-3">
-          <span class="label label-success">N-2016-11-20</button>
-        </div>
-        <div class="col-md-2 text-right">
-          350,00 €
+        <div class="clearfix"></div>
+        <div class="col-md-offset-1 col-md-10">
+          <table class="table table-condensed table-bordered table-striped">
+            <thead><tr><th>Nº factura</th><th>Fecha factura</th><th>Facturado</th><th>Oficina</th><th>Tipo de atribución</th><th>Comisión</th><th>Nómina</th></tr></thead>
+                  <tbody>
+                    <tr><td>F2016120015</td><td>09 dic '16</td><td class="text-right">8.000,00 €</td><td>Arguineguín</td><td>CAPTACIÓN 30%</td><td class="text-right">220,00 €</td><td>ene '17</td></tr> 
+                    <tr><td>F2016110028</td><td>23 nov '16</td><td class="text-right">9.000,00 €</td><td>Puerto Rico</td><td>CAPTACIÓN 30%%</td><td class="text-right">300,00 €</td><td>dic '16</td></tr> 
+                    <tr><td>F2016100021</td><td>07 oct '16</td><td class="text-right">1700,00 €</td><td>Arguineguín</td><td>VENTA 70%</td><td class="text-right">150,00 €</td><td>nov '16</td></tr></tbody>
+                    <tr><td>F2016080110</td><td>20 ago '16</td><td class="text-right">600,00 €</td><td>Arguineguín</td><td>ALQUILER 25%</td><td class="text-right">50,00 €</td><td>oct '16</td></tr></tbody>
+          </table>
         </div>
       </div>
     </div>
     <br>
     <nav class="text-center" aria-label="...">
       <ul class="pagination pagination-lg">
-        <li><a href="#" aria-label="Previous"><span aria-hidden="true">«</span></a></li>
-        <li><a href="#">1</a></li>
+        <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">«</span></a></li>
+        <li class="active"><a href="#">1</a></li>
         <li><a href="#">2</a></li>
         <li><a href="#">3</a></li>
         <li><a href="#">4</a></li>
@@ -234,8 +178,6 @@
         <li><a href="#" aria-label="Next"><span aria-hidden="true">»</span></a></li>
       </ul>
     </nav>
-    <br><br>
-    * El botón <button class="btn btn-xs btn-danger">Sin nómina <span class="glyphicon glyphicon-hand-up"></span></button> permite asignar una nómina en que la comisión del asesor se paga.
   </div>
   <script>
     $(function () {
