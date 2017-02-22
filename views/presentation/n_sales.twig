@@ -25,98 +25,6 @@
   <li><a href="#nsales-goals">{{ t('app', 'Goal configuration') }}</a></li>
 </ul>
 
-<div id="nsales-modal" class="modal fade" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title"></h4>
-      </div>
-      <div class="modal-body">
-        <form class="form-horizontal">
-          <div class="form-group">
-            <label class="col-sm-6 control-label">{{ t('app', 'January') }}</label>
-            <div class="col-sm-6">
-              <input type="number" name="january" class="form-control text-right">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-6 control-label">{{ t('app', 'February') }}</label>
-            <div class="col-sm-6">
-              <input type="number" name="february" class="form-control text-right" value="0">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-6 control-label">{{ t('app', 'March') }}</label>
-            <div class="col-sm-6">
-              <input type="number" name="march" class="form-control text-right" value="0">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-6 control-label">{{ t('app', 'April') }}</label>
-            <div class="col-sm-6">
-              <input type="number" name="april" class="form-control text-right" value="0">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-6 control-label">{{ t('app', 'May') }}</label>
-            <div class="col-sm-6">
-              <input type="number" name="may" class="form-control text-right" value="0">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-6 control-label">{{ t('app', 'June') }}</label>
-            <div class="col-sm-6">
-              <input type="number" name="june" class="form-control text-right" value="0">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-6 control-label">{{ t('app', 'July') }}</label>
-            <div class="col-sm-6">
-              <input type="number" name="july" class="form-control text-right" value="0">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-6 control-label">{{ t('app', 'August') }}</label>
-            <div class="col-sm-6">
-              <input type="number" name="august" class="form-control text-right" value="0">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-6 control-label">{{ t('app', 'September') }}</label>
-            <div class="col-sm-6">
-              <input type="number" name="september" class="form-control text-right" value="0">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-6 control-label">{{ t('app', 'October') }}</label>
-            <div class="col-sm-6">
-              <input type="number" name="october" class="form-control text-right" value="0">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-6 control-label">{{ t('app', 'November') }}</label>
-            <div class="col-sm-6">
-              <input type="number" name="november" class="form-control text-right" value="0">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-6 control-label">{{ t('app', 'December') }}</label>
-            <div class="col-sm-6">
-              <input type="number" name="december" class="form-control text-right" value="0">
-            </div>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal" >{{ t('app', 'Cancel') }}</button>
-        <button type="submit" class="btn btn-primary modal-edit-only" data-loading-text="{{ t('app', 'Saving') }}...">{{ t('app', 'Save') }}</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.bundle.js" integrity="sha256-1qeNeAAFNi/g6PFChfXQfa6CQ8eXoHXreohinZsoJOQ=" crossorigin="anonymous"></script>
 
 {% set json_goals = goals | json_encode() %}
@@ -244,10 +152,101 @@
   });
   $('#p0').on('pjax:beforeReplace', function(e) {
     $('#nsales-modal').modal('hide');
-    $('.modal-backdrop').remove();
-    $('.modal-open').removeClass('modal-open');
   })
 {{ void(this.endBlock()) }}
 
 {{ this.registerJs(this.blocks['nsales_js']) }}
 {{ pjax_end() }}
+
+<div id="nsales-modal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"></h4>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal">
+          <div class="form-group">
+            <label class="col-sm-6 control-label">{{ t('app', 'January') }}</label>
+            <div class="col-sm-6">
+              <input type="number" name="january" class="form-control text-right">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-6 control-label">{{ t('app', 'February') }}</label>
+            <div class="col-sm-6">
+              <input type="number" name="february" class="form-control text-right" value="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-6 control-label">{{ t('app', 'March') }}</label>
+            <div class="col-sm-6">
+              <input type="number" name="march" class="form-control text-right" value="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-6 control-label">{{ t('app', 'April') }}</label>
+            <div class="col-sm-6">
+              <input type="number" name="april" class="form-control text-right" value="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-6 control-label">{{ t('app', 'May') }}</label>
+            <div class="col-sm-6">
+              <input type="number" name="may" class="form-control text-right" value="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-6 control-label">{{ t('app', 'June') }}</label>
+            <div class="col-sm-6">
+              <input type="number" name="june" class="form-control text-right" value="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-6 control-label">{{ t('app', 'July') }}</label>
+            <div class="col-sm-6">
+              <input type="number" name="july" class="form-control text-right" value="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-6 control-label">{{ t('app', 'August') }}</label>
+            <div class="col-sm-6">
+              <input type="number" name="august" class="form-control text-right" value="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-6 control-label">{{ t('app', 'September') }}</label>
+            <div class="col-sm-6">
+              <input type="number" name="september" class="form-control text-right" value="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-6 control-label">{{ t('app', 'October') }}</label>
+            <div class="col-sm-6">
+              <input type="number" name="october" class="form-control text-right" value="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-6 control-label">{{ t('app', 'November') }}</label>
+            <div class="col-sm-6">
+              <input type="number" name="november" class="form-control text-right" value="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-6 control-label">{{ t('app', 'December') }}</label>
+            <div class="col-sm-6">
+              <input type="number" name="december" class="form-control text-right" value="0">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" >{{ t('app', 'Cancel') }}</button>
+        <button type="submit" class="btn btn-primary modal-edit-only" data-loading-text="{{ t('app', 'Saving') }}...">{{ t('app', 'Save') }}</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
