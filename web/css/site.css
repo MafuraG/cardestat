@@ -220,3 +220,7 @@ td .btn .glyphicon {
 .actions .dropdown-menu {
    min-width: 360px;
 }
+
+.text-huge {
+   font-size: 20em;
+}

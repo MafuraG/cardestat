@@ -10,7 +10,7 @@ return [
     // Defaults to 'Yii::t'. This is used as a mark to find the messages to be
     // translated. You may use a string for single function name or an array for
     // multiple function names.
-    'translator' => 'Yii::t',
+    'translator' => ['Yii::t', 't'],
     // boolean, whether to sort messages by keys when merging new messages
     // with the existing ones. Defaults to false, which means the new (untranslated)
     // messages will be separated from the old (translated) ones.
@@ -24,7 +24,7 @@ return [
     // array, list of patterns that specify which files (not directories) should be processed.
     // If empty or not set, all files will be processed.
     // Please refer to "except" for details about the patterns.
-    //'only' => ['*.php', '*.twig'],
+    'only' => ['*.php', '*.twig'],
     // array, list of patterns that specify which files/directories should NOT be processed.
     // If empty or not set, all files/directories will be processed.
     // A path matches a pattern if it contains the pattern string at its end. For example,

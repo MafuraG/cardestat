@@ -40,6 +40,9 @@ AppAsset::register($this);
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
             ['label' => \Yii::t('app', 'Home'), 'url' => ['/table/index']],
+            ['label' => \Yii::t('app', 'Presentations'), 'items' => [
+                ['label' => \Yii::t('app', 'Number of sales'), 'url' => ['/goal/n-sales']],
+            ]],
             ['label' => \Yii::t('app', 'Users'), 'url' => ['/user/index'], 'visible' => \Yii::$app->user->can('admin')],
             ['label' => (\Yii::$app->language === 'es') ? 'English' : 'Español', 'url' => ['/site/chlan']],
             Yii::$app->user->isGuest ? (
@@ -69,8 +72,7 @@ AppAsset::register($this);
 
 <footer class="footer">
     <div class="container-fluid">
-        <p class="pull-right">&copy; Inmobiliaria Cárdenas <?= date('Y') ?></p>
-        <p class="pull-left"><?= \Yii::t('app', 'Tracking tables for performance statistical analysis.') ?></p>
+        <p class="text-center">&copy; Inmobiliaria Cárdenas <?= date('Y') ?></p>
     </div>
 </footer>
 

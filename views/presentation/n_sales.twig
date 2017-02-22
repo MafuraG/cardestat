@@ -1,0 +1,253 @@
+{# <?php #}
+{{ use('dosamigos/chartjs/ChartJs') }}
+{{ use('yii/widgets/Pjax') }}
+{{ set(this, 'params', {'breadcrumbs': [{
+    'label': t('app', 'Presentations')
+    }, t('app', 'No. sales')]})
+}}
+
+<h1>{{ t('app', 'No. sales') }} <small>{{ t('app', 'Accumulated as of') ~ ' ' ~ app.formatter.asDate('now', 'long') }}</small></h1>
+
+{{ pjax_begin() }}
+<p class="text-center">
+  <span class="text-huge" contenteditable="true"></span>
+  {{ t('app', 'Properties sold') }}
+  <button class="btn btn-sm btn-success"><span class="glyphicon glyphicon-plus"></span></button>
+  <button class="btn btn-sm btn-danger invisible">{{ t('app', 'Save') }}</button>
+</p>
+
+<h2>{{ t('app', 'Comparison goal vs. actual') }}</h2>
+<canvas id="actual-vs-goals" style="display: inline; width: 100%; height: 400px" ></canvas>
+
+<h2>{{ t('app', 'Related data') }}</h2>
+<ul>
+  <li><a href="#nsales-history">{{ t('app', 'History of sales') }}</a></li>
+  <li><a href="#nsales-goals">{{ t('app', 'Goal configuration') }}</a></li>
+</ul>
+
+<div id="nsales-modal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"></h4>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal">
+          <div class="form-group">
+            <label class="col-sm-6 control-label">{{ t('app', 'January') }}</label>
+            <div class="col-sm-6">
+              <input type="number" name="january" class="form-control text-right">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-6 control-label">{{ t('app', 'February') }}</label>
+            <div class="col-sm-6">
+              <input type="number" name="february" class="form-control text-right" value="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-6 control-label">{{ t('app', 'March') }}</label>
+            <div class="col-sm-6">
+              <input type="number" name="march" class="form-control text-right" value="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-6 control-label">{{ t('app', 'April') }}</label>
+            <div class="col-sm-6">
+              <input type="number" name="april" class="form-control text-right" value="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-6 control-label">{{ t('app', 'May') }}</label>
+            <div class="col-sm-6">
+              <input type="number" name="may" class="form-control text-right" value="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-6 control-label">{{ t('app', 'June') }}</label>
+            <div class="col-sm-6">
+              <input type="number" name="june" class="form-control text-right" value="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-6 control-label">{{ t('app', 'July') }}</label>
+            <div class="col-sm-6">
+              <input type="number" name="july" class="form-control text-right" value="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-6 control-label">{{ t('app', 'August') }}</label>
+            <div class="col-sm-6">
+              <input type="number" name="august" class="form-control text-right" value="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-6 control-label">{{ t('app', 'September') }}</label>
+            <div class="col-sm-6">
+              <input type="number" name="september" class="form-control text-right" value="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-6 control-label">{{ t('app', 'October') }}</label>
+            <div class="col-sm-6">
+              <input type="number" name="october" class="form-control text-right" value="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-6 control-label">{{ t('app', 'November') }}</label>
+            <div class="col-sm-6">
+              <input type="number" name="november" class="form-control text-right" value="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-6 control-label">{{ t('app', 'December') }}</label>
+            <div class="col-sm-6">
+              <input type="number" name="december" class="form-control text-right" value="0">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" >{{ t('app', 'Cancel') }}</button>
+        <button type="submit" class="btn btn-primary modal-edit-only" data-loading-text="{{ t('app', 'Saving') }}...">{{ t('app', 'Save') }}</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.bundle.js" integrity="sha256-1qeNeAAFNi/g6PFChfXQfa6CQ8eXoHXreohinZsoJOQ=" crossorigin="anonymous"></script>
+
+{% set json_goals = goals | json_encode() %}
+{% set json_actuals = actuals | json_encode() %}
+{{ void(this.beginBlock('nsales_js')) }}
+  var months_tr = {
+    january: '{{ t('app', 'January') }}',
+    february: '{{ t('app', 'February') }}',
+    march: '{{ t('app', 'March') }}',
+    april: '{{ t('app', 'April') }}',
+    may: '{{ t('app', 'May') }}',
+    june: '{{ t('app', 'June') }}',
+    july: '{{ t('app', 'July') }}',
+    august: '{{ t('app', 'August') }}',
+    september: '{{ t('app', 'September') }}',
+    october: '{{ t('app', 'October') }}',
+    november: '{{ t('app', 'November') }}',
+    december: '{{ t('app', 'December') }}'
+  };
+  var months = $.map(months_tr, function(v, i) { return i});
+  var goals = {{ json_goals | raw}};
+  var actuals = {{ json_actuals | raw}};
+  function sortByMonth(a, b) {
+      if (months.indexOf(a.name) < months.indexOf(b.name)) return -1; 
+      else if (months.indexOf(a.name) > months.indexOf(b.name)) return 1; 
+      else return 0;
+  }
+  var ctx1 = $('#actual-vs-goals').get(0);
+  var data1 = {
+      labels: $.map(months_tr, function(v, i) { return v}),
+      datasets: [{
+          label: '{{ t('app', 'Goal') }}',
+          backgroundColor: 'rgba(255, 99, 132, 0.4)',
+          borderColor: 'rgba(255,99,132,1)',
+          borderWidth: 1,
+          data: $.map(goals.sort(sortByMonth), function (v) { return v.value; })
+      }, {
+          label: '{{ t('app', 'Actual') }}',
+          backgroundColor: 'rgba(54, 162, 235, 0.4)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1,
+          data: $.map(actuals.sort(sortByMonth), function (v) { return v.value; })
+      }]
+  };
+  new Chart(ctx1, {
+      type: 'bar',
+      data: data1,
+      options: {
+          title: {
+              display: true,
+              text: '{{ t('app', 'Goals vs. actual no. sales') }}',
+          }, barValueSpacing: 90,
+          responsive: false,
+          scales: {
+              xAxes: [{
+                  stacked: false
+              }], yAxes: [{
+                  stacked: false,
+                  ticks: {
+                      min: 0,
+                  }, 
+              }]
+          }
+      }
+  });
+
+  $('a[href="#nsales-history"]').on('click', function() {
+    updateFields(actuals);
+    $('#nsales-modal').removeClass('nsales-goal').addClass('nsales-history').modal('show');
+    $('#nsales-modal .modal-title').html('{{ t('app', 'History of no. sales') }}');
+  });
+  $('a[href="#nsales-goals"]').on('click', function() {
+    updateFields(goals);
+    $('#nsales-modal').addClass('nsales-goal').removeClass('nsales-history').modal('show');
+    $('#nsales-modal .modal-title').html('{{ t('app', 'No. sales goals') }}');
+  });
+  function updateFields(arr) {
+    arr.forEach(function(e, i) {
+      var selector = 'input[name="{month}"]'.replace('{month}', e.name);
+      $(selector).val(e.value);
+    });
+  }
+  var first = actuals.reduce(add, 0);
+  function add(total, actual) {
+    return total + parseInt(actual.value);
+  };
+  $('.text-huge').html(first);
+
+  var last = first;
+  $('.text-huge').on('focus', function(e) {
+    last = $(this).html();
+  }).on('keyup', function(e) {
+    var n = $(this).html();
+    if (n >>> 0 !== parseFloat(n)) $(this).html(last);
+    else last = n;
+    if ($('.text-huge').html() != first) $('.btn-danger').removeClass('invisible');
+    else $('.btn-danger').addClass('invisible');
+  });
+  $('.btn-success').on('click', function() {
+    last = parseInt($('.text-huge').html()) + 1
+    $('.text-huge').html(last);
+    if ($('.text-huge').html() != first) $('.btn-danger').removeClass('invisible');
+    else $('.btn-danger').addClass('invisible');
+  });
+  $('.btn-danger').on('click', function() {
+    var qty = (last - first);
+    var month = months[new Date().getMonth()];
+    $.pjax({url: 'add-n-sales', data: {qty: qty, month: month}, container: '#p0', success: function() {
+      last = first;
+    }, scrollTo: false, push: false, method: 'POST'}); 
+  });
+  $('#nsales-modal button[type="submit"]').on('click', function() {
+    var category = $('#nsales-modal').hasClass('nsales-goal') ? goals[0].category : actuals[0].category;
+    var data = {
+      category: category,
+      fields: $('form input[type="number"]').serializeArray().reduce(function(acc, cur, i) {
+        var aux = {};
+        aux[cur.name] = cur.value;
+        return $.extend(acc, aux);
+      }, {})
+    };
+    $.pjax({url: 'update-n-sales', data: data, container: '#p0', success: function() {
+      last = first;
+    }, scrollTo: false, push: false, method: 'POST'}); 
+  });
+  $('#p0').on('pjax:beforeReplace', function(e) {
+    $('#nsales-modal').modal('hide');
+    $('.modal-backdrop').remove();
+    $('.modal-open').removeClass('modal-open');
+  })
+{{ void(this.endBlock()) }}
+
+{{ this.registerJs(this.blocks['nsales_js']) }}
+{{ pjax_end() }}

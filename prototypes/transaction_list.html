@@ -15,6 +15,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
   <![endif]-->
   <style>
+    .table th {
+      text-align: center;
+    }
     .modal-header {
       background:#f1f1f1;
       border-top-left-radius: 5px;
@@ -75,14 +78,14 @@
         margin-left: 128px;
       }
     }
-    [data-toggle="collapse"]:before {
+    .btn-default[data-toggle="collapse"]:before {
       font-family: 'Glyphicons Halflings';
       content: "\e106";
       line-height: 1;
       position: relative;
       top: 2px;
     }
-    [data-toggle="collapse"].collapsed:before {
+    .btn-default[data-toggle="collapse"].collapsed:before {
       font-family: 'Glyphicons Halflings';
       content: "\e105";
       line-height: 1;
@@ -177,6 +180,60 @@
               <fieldset>
                 <legend class="col-md-12">Intervinientes</legend>
                 <div class="form-group col-md-6">
+                  <label>Comprador</label>
+                  <div class="input-group">
+                    <span class="input-group-btn">
+                      <button class="btn btn-sm btn-default collapsed" role="button" data-toggle="collapse" href="#collapse2"></button>
+                    </span>
+                    <input class="input-sm form-control" value="Charles T. Munger">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-list" aria-hidden="true"></span></span>
+                  </div>
+                  <div id="collapse2" class="collapse well well-sm">
+                    <dl class="dl-horizontal">
+                      <dt>Referencia</dt>
+                      <dd>2001-CO-ct</dd>
+                      <dt>NIE/NIF</dt>
+                      <dd>X0888903Y</dd>
+                      <dt>Teléfono</dt>
+                      <dd>928 732 030</dd>
+                      <dt>Email</dt>
+                      <dd>cmunger@berkshirehathaway.com</dd>
+                      <dt>Nacionalidad</dt>
+                      <dd>Norteamericana</dd>
+                    </dl>
+                  </div>
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox"> ¿El comprador es un nuevo cliente?
+                    </label>
+                  </div>
+                  <div class="form-group">
+                    <label>Quien trae al comprador</label>
+                    <select class="input-sm form-control">
+                      <option selected>CANARINVEST</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Tipo y fecha iniciales de búsqueda</label>
+                    <div class="input-group">
+                      <span class="input-group-addon"></span>
+                      <div class="input-group-btn">
+                        <select class="input-sm form-control" style="width: 90px">
+                          <option selected>A+</option>
+                        </select>
+                      </div>
+                      <input class="input-sm form-control" value="09/12/2015">
+                      <span class="input-group-addon"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></span>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Pasado a ventas por</label>
+                    <select class="input-sm form-control">
+                      <option selected>ANZHELA</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group col-md-6">
                   <label>Vendedor</label>
                   <div class="input-group">
                     <span class="input-group-btn">
@@ -218,60 +275,6 @@
                     </div>
                   </div>
                 </div>
-                <div class="form-group col-md-6">
-                  <label>Comprador</label>
-                  <div class="input-group">
-                    <span class="input-group-btn">
-                      <button class="btn btn-sm btn-default collapsed" role="button" data-toggle="collapse" href="#collapse2"></button>
-                    </span>
-                    <input class="input-sm form-control" value="Charles T. Munger">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-list" aria-hidden="true"></span></span>
-                  </div>
-                  <div id="collapse2" class="collapse well well-sm">
-                    <dl class="dl-horizontal">
-                      <dt>Referencia</dt>
-                      <dd>2001-CO-ct</dd>
-                      <dt>NIE/NIF</dt>
-                      <dd>X0888903Y</dd>
-                      <dt>Teléfono</dt>
-                      <dd>928 732 030</dd>
-                      <dt>Email</dt>
-                      <dd>cmunger@berkshirehathaway.com</dd>
-                      <dt>Nacionalidad</dt>
-                      <dd>Norteamericana</dd>
-                    </dl>
-                  </div>
-                  <div class="checkbox">
-                    <label>
-                      <input type="checkbox"> ¿El comprador es un nuevo cliente?
-                    </label>
-                  </div>
-                  <div class="form-group">
-                    <label>Quien trae al comprador</label>
-                    <select class="input-sm form-control">
-                      <option selected>CANARINVEST</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label>Tipo y fecha iniciales de búsqueda</label>
-                    <div class="input-group">
-                      <span class="input-group-addon"><span class="glyphicon glyphicon-hand-right" aria-hidden="true"></span></span>
-                      <div class="input-group-btn">
-                        <select class="input-sm form-control" style="width: 90px">
-                          <option selected>A+</option>
-                        </select>
-                      </div>
-                      <input class="input-sm form-control" value="09/12/2015">
-                      <span class="input-group-addon"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></span>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <label>Pasado a ventas por</label>
-                    <select class="input-sm form-control">
-                      <option selected>ANZHELA</option>
-                    </select>
-                  </div>
-                </div>
               </fieldset>
               <fieldset>
                 <legend class="col-md-12">Propiedad</legend>
@@ -310,20 +313,9 @@
               <fieldset>
                 <legend class="col-md-12">Honorarios</legend>
                 <div class="form-group col-md-6">
-                  <label>Fecha de facturación</label>
+                  <label>Honorarios Cárdenas</label>
                   <div class="input-group">
-                    <input class="input-sm form-control" value="11/01/2017">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></span>
-                  </div>
-                </div>
-                <div class="form-group col-md-6">
-                  <label>Número de factura</label>
-                  <input class="input-sm form-control" value="F201700120">
-                </div>
-                <div class="form-group col-md-6">
-                  <label>Cárdenas</label>
-                  <div class="input-group">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-hand-right" aria-hidden="true"></span></span>
+                    <span class="input-group-addon"></span>
                     <div class="input-group-btn">
                       <select class="input-sm form-control" style="width: 90px">
                         <option selected>2,50%</option>
@@ -334,9 +326,9 @@
                   </div>
                 </div>
                 <div class="form-group col-md-6">
-                  <label>Colaborador</label>
+                  <label>Honorarios colaborador</label>
                   <div class="input-group">
-                    <span class="input-group-addon"><span class="glyphicon glyphicon-hand-right" aria-hidden="true"></span></span>
+                    <span class="input-group-addon"></span>
                     <div class="input-group-btn">
                       <select class="input-sm form-control" style="width: 90px">
                         <option selected>2,50%</option>
@@ -344,75 +336,119 @@
                     </div>
                     <input class="input-sm form-control text-right" value="4.400,00">
                     <span class="input-group-addon">€</span>
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <div class="panel panel-default">
+                    <div class="panel-heading"><h4 class="panel-title">Facturas</h4></div>
+                    <div class="panel-body">
+                      <table class="table table-condensed">
+                        <thead><tr><th>Número</th><th>Fecha</th><th>Importe</th><th>Destinatario</th><th></th></tr></thead>
+                        <tbody>
+                          <tr><td>F201612091</td><td class="text-center">15 dic '16</td><td class="text-right">2.200,00 €</td><td class="text-center">COMPRADOR</td><td><button class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span></td></tr> 
+                          <tr><td>F201612013</td><td class="text-center">06 dic '16</td><td class="text-right">2.200,00 €</td><td class="text-center">VENDEDOR</td><td><button class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span></td></tr></tbody>
+                      </table>
+                      <div class="edit-mode">
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#add-invoice">+ Añadir factura</button>
+                        <div id="add-invoice" class="collapse">
+                          <div class="form-group col-md-6">
+                            <label>Número de factura</label>
+                            <input class="input-sm form-control" value="F201700120">
+                          </div>
+                          <div class="form-group col-md-6">
+                            <label>Fecha de facturación</label>
+                            <div class="input-group">
+                              <input class="input-sm form-control" value="11/01/2017">
+                              <span class="input-group-addon"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></span>
+                            </div>
+                          </div>
+                          <div class="form-group col-md-6">
+                            <label>Importe de factura</label>
+                            <div class="input-group">
+                              <input class="input-sm form-control text-right">
+                              <span class="input-group-addon">€</span>
+                            </div>
+                          </div>
+                          <div class="form-group col-md-6">
+                            <label>Destinatario</label>
+                            <select class="input-sm form-control">
+                              <option selected>VENDEDOR</option>
+                              <option>COMPRADOR</option>
+                              <option>COLABORADOR</option>
+                            </select>
+                          </div>
+                          <div class="form-group col-md-12">
+                            <button class="btn btn-sm btn-primary" type="button">Añadir</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </fieldset>
               <fieldset>
-                <legend class="col-md-12">Asesores</legend>
+                <legend class="col-md-12">Comisiones</legend>
                 <div class="form-group col-md-6">
                   <label>Pasado a nómina</label>
                   <div class="input-group">
-                    <input class="input-sm form-control" value="12/11/2016">
+                    <input class="input-sm form-control" value="Mayo 2016">
                     <span class="input-group-addon"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></span>
                   </div>
                 </div>
                 <div class="col-md-12">
-                <table class="table table-condensed">
-                  <thead><tr><th>#</th><th>Nombre</th><th>Oficina</th><th>Tipo de atribución</th><th>Atribución</th><th>Comentarios</th><th></th></tr></thead>
-                  <tbody>
-                    <tr><th scope="row">1</th><td>Tina</td><td>Arguineguín</td><td>CAPTACIÓN 30%</td><td>66.000,00 €</td><td>Comentarios para el asesor</td><td><button class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span></td></tr> 
-                    <tr><th scope="row">2</th><td>Robert</td><td>Puerto Rico</td><td>VENTA 70%</td><td>154.000,00 €</td><td></td><td><button class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span></td></tr> 
-                    <tr><th scope="row">3</th><td>Inge</td><td>Arguineguín</td><td>VENTA 70%</td><td>154.000,00 €</td><td></td><td><button class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span></td></tr></tbody>
-                </table>
-                </div>
-                <!--
-                <div class="form-group col-md-12">
-                  <button class="btn btn-link" type="button">+ Añadir asesor</button>
-                </div>
-                -->
-                <div class="col-md-12">
                   <div class="panel panel-default">
-                    <div class="panel-heading">
-                      <h3 class="panel-title">Añadir asesor</h3>
-                    </div>
+                    <div class="panel-heading"><h4 class="panel-title">Atribuciones</h4></div>
                     <div class="panel-body">
-                      <div class="form-group col-md-6">
-                        <label>Asesor</label>
-                        <select class="input-sm form-control">
-                          <option selected>TOMAS</option>
-                        </select>
-                      </div>
-                      <div class="form-group col-md-6">
-                        <label>Oficina</label>
-                        <select class="input-sm form-control">
-                          <option selected>ARGUINEGUÍN</option>
-                        </select>
-                      </div>
-                      <div class="form-group col-md-6">
-                        <label>Tipo de atribución</label>
-                        <select class="input-sm form-control">
-                          <option selected>CAPTACIÓN 30%</option>
-                        </select>
-                      </div>
-                      <div class="form-group col-md-6">
-                        <label>Atribución</label>
-                        <div class="input-group">
-                          <span class="input-group-addon"><span class="glyphicon glyphicon-hand-right" aria-hidden="true"></span></span>
-                          <div class="input-group-btn">
+                      <table class="table table-condensed">
+                        <thead><tr><th>Nombre</th><th>Oficina</th><th>Tipo de atribución</th><th>Atribución</th><th>Comentarios</th><th></th></tr></thead>
+                        <tbody>
+                          <tr><td>Tina</td><td>Arguineguín</td><td class="text-center">CAPTACIÓN 30%</td><td class="text-right">1.320,00 €</td><td>Comentarios para el asesor</td><td><button class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span></td></tr> 
+                          <tr><td>Robert</td><td></td><td class="text-center">VENTA 70%</td><td class="text-right">1.540,00 €</td><td></td><td><button class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span></td></tr> 
+                          <tr><td>Inge</td><td>Arguineguín</td><td class="text-center">VENTA 70%</td><td class="text-right">1.540,00 €</td><td></td><td><button class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span></td></tr></tbody>
+                      </table>
+                      <div class="edit-mode">
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#add-advisor">+ Añadir atribución</button>
+                        <div id="add-advisor" class="collapse">
+                          <div class="form-group col-md-6">
+                            <label>Asesor</label>
                             <select class="input-sm form-control">
-                              <option selected>AUTOMÁTICA</option>
+                              <option selected>TOMAS</option>
                             </select>
                           </div>
-                          <input class="input-sm form-control text-right" disabled value="66.000,00">
-                          <span class="input-group-addon">€</span>
+                          <div class="form-group col-md-6">
+                            <label>Oficina</label>
+                            <select class="input-sm form-control">
+                              <option>-- SIN ESTABLECER --</option>
+                              <option selected>ARGUINEGUÍN</option>
+                            </select>
+                          </div>
+                          <div class="form-group col-md-6">
+                            <label>Tipo de atribución</label>
+                            <select class="input-sm form-control">
+                              <option selected>CAPTACIÓN 30%</option>
+                            </select>
+                          </div>
+                          <div class="form-group col-md-6">
+                            <label>Atribución</label>
+                            <div class="input-group">
+                              <span class="input-group-addon"></span>
+                              <div class="input-group-btn">
+                                <select class="input-sm form-control">
+                                  <option selected>AUTOMÁTICA</option>
+                                </select>
+                              </div>
+                              <input class="input-sm form-control text-right" disabled>
+                              <span class="input-group-addon">€</span>
+                            </div>
+                          </div>
+                          <div class="form-group col-md-12">
+                            <label>Comentarios para el asesor</label>
+                            <textarea class="form-control" rows="3"></textarea>
+                          </div>
+                          <div class="form-group col-md-12">
+                            <button class="btn btn-sm btn-primary" type="button">Añadir</button>
+                          </div>
                         </div>
-                      </div>
-                      <div class="form-group col-md-12">
-                        <label>Comentarios para el asesor</label>
-                        <textarea class="form-control" rows="3"></textarea>
-                      </div>
-                      <div class="form-group col-md-12">
-                        <button class="btn btn-sm btn-primary" type="button">Añadir</button>
                       </div>
                     </div>
                   </div>
@@ -539,7 +575,7 @@
                 </div>
                 <div class="col-md-3">
                   <div class="form-group">
-                    <label>Con factura</label>
+                    <label>Facturado</label>
                     <select class="input-sm form-control">
                       <option selected>TODOS</option>
                       <option>SÍ</option>
@@ -562,8 +598,7 @@
                   <div class="form-group">
                     <label >Ordenar por</label>
                     <div class="input-group">
-                      <span class="input-group-addon">
-                        <span class="glyphicon glyphicon-hand-right" aria-hidden="true"></span></span>
+                      <span class="input-group-addon"></span>
                       <div class="input-group-btn">
                         <select class="input-sm form-control">
                           <option selected="">Fecha de venta</option>
@@ -940,15 +975,17 @@
     });
     $('.edit').on('click', function() {
       $('.edit-modal').find('.modal-header h4').html('Editar transacción');
-      $('.edit-modal').find('.btn-primary, .panel').removeClass('hidden');
+      $('.edit-modal').find('.btn-primary, .edit-mode').removeClass('hidden');
       $('.edit-modal').find('input, select, textarea, checkbox, .btn-danger').attr('disabled', false);
       $('.edit-modal').modal('show');
+      return false;
     });
     $('.details').on('click', function() {
       $('.edit-modal').find('.modal-header h4').html('Detalles de la transacción');
-      $('.edit-modal').find('.btn-primary, .panel').addClass('hidden');
+      $('.edit-modal').find('.btn-primary, .edit-mode').addClass('hidden');
       $('.edit-modal').find('input, select, textarea, checkbox, .btn-danger').attr('disabled', true);
       $('.edit-modal').modal('show');
+      return false;
     });
   </script>
 </body>
