@@ -41,7 +41,7 @@ AppAsset::register($this);
         'items' => [
             ['label' => \Yii::t('app', 'Home'), 'url' => ['/table/index']],
             ['label' => \Yii::t('app', 'Presentations'), 'items' => [
-                ['label' => \Yii::t('app', 'Number of sales'), 'url' => ['/goal/n-sales']],
+                ['label' => \Yii::t('app', 'Number of sales'), 'url' => ['/presentation/n-sales']],
             ]],
             ['label' => \Yii::t('app', 'Users'), 'url' => ['/user/index'], 'visible' => \Yii::$app->user->can('admin')],
             ['label' => (\Yii::$app->language === 'es') ? 'English' : 'Español', 'url' => ['/site/chlan']],
