@@ -74,7 +74,7 @@
       options: {
           title: {
               display: true,
-              text: '{{ t('app', 'Goals vs. actual no. sales') }}',
+              text: '{{ t('app', 'Number of sales: goals vs. actual') }}',
           }, barValueSpacing: 90,
           responsive: false,
           scales: {
@@ -112,12 +112,12 @@
   $('a[href="#nsales-history"]').on('click', function() {
     updateFields(actuals);
     $('#nsales-modal').removeClass('nsales-goal').addClass('nsales-history').modal('show');
-    $('#nsales-modal .modal-title').html('{{ t('app', 'History of no. sales') }}');
+    $('#nsales-modal .modal-title').html('{{ t('app', 'History: accumulated number of sales') }}');
   });
   $('a[href="#nsales-goals"]').on('click', function() {
     updateFields(goals);
     $('#nsales-modal').addClass('nsales-goal').removeClass('nsales-history').modal('show');
-    $('#nsales-modal .modal-title').html('{{ t('app', 'No. sales goals') }}');
+    $('#nsales-modal .modal-title').html('{{ t('app', 'Goal: accumulated number of sales') }}');
   });
   function updateFields(arr) {
     arr.forEach(function(e, i) {
