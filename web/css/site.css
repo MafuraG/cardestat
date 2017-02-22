@@ -222,5 +222,17 @@ td .btn .glyphicon {
 }
 
 .text-huge {
-   font-size: 20em;
+   font-size: 26em;
+   line-height: 1;
+}
+
+.btn-xl {
+    padding: 14px 20px;
+    font-size: 24px;
+    line-height: 1.6;
+    border-radius: 8px;
+}
+
+.text-bottom {
+    vertical-align: text-bottom;
 }

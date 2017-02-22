@@ -35,29 +35,16 @@ class PresentationController extends Controller {
             'actuals' => $actuals
         ]);
     }
-    public function actionAddNSales() {
-        $request = Yii::$app->request;
-        $qty = $request->post('qty');
-        $month = $request->post('month');
-        $model = Configuration::find()->where(['category' => 'NSALES_ACCU_ACTUAL'])
-            ->andWhere(['name' => $month])->one();
-        $model->value = (string) ($model->value + $qty);
-        $model->save();
-        //return $this->redirect(['n-sales']);
-        return $this->actionNSales();
-    }
     public function actionUpdateNSales() {
         $request = Yii::$app->request;
         $category = $request->post('category');
         $models = Configuration::find()->where(['category' => $category])->all();
-        $fields = $request->post('fields');
-        //\yii\helpers\VarDumper::dump($fields, 5, true); die;
-        Yii::warning('fields: ' . var_export($fields, 1));
+        $months = $request->post('months');
         $transaction = Yii::$app->db->beginTransaction();
         try {
             foreach ($models as $model) {
-                if (isset($fields[$model->name])) {
-                    $model->value = $fields[$model->name];
+                if (isset($months[$model->name])) {
+                    $model->value = $months[$model->name];
                     if (!$model->value) $model->value = '0';
                     $model->save();
                 }
@@ -67,7 +54,7 @@ class PresentationController extends Controller {
             $transaction->rollback();
             throw $e;
         }
-        //return $this->redirect(['n-sales']);
+        //return $this->redirect(['n-sales']); // won't work with pjax!
         return $this->actionNSales();
     }
 }

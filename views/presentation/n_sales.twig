@@ -3,26 +3,26 @@
 {{ use('yii/widgets/Pjax') }}
 {{ set(this, 'params', {'breadcrumbs': [{
     'label': t('app', 'Presentations')
-    }, t('app', 'No. sales')]})
+    }, t('app', 'Salesmeter')]})
 }}
 
-<h1>{{ t('app', 'No. sales') }} <small>{{ t('app', 'Accumulated as of') ~ ' ' ~ app.formatter.asDate('now', 'long') }}</small></h1>
+<h1>{{ t('app', 'Salesmeter') }} <small>{{ t('app', 'Accumulated as of') ~ ' ' ~ app.formatter.asDate('now', 'long') }}</small></h1>
 
 {{ pjax_begin() }}
 <p class="text-center">
   <span class="text-huge" contenteditable="true"></span>
-  {{ t('app', 'Properties sold') }}
-  <button class="btn btn-sm btn-success"><span class="glyphicon glyphicon-plus"></span></button>
-  <button class="btn btn-sm btn-danger invisible">{{ t('app', 'Save') }}</button>
+  <strong>{{ t('app', 'Properties sold') }}</strong>&nbsp;
+  <button class="text-bottom btn btn-xl btn-success"><span class="glyphicon glyphicon-plus"></span></button>
+  <button class="text-bottom btn btn-xl btn-danger invisible">{{ t('app', 'Save') }}</button>
 </p>
 
-<h2>{{ t('app', 'Comparison goal vs. actual') }}</h2>
+<hr>
 <canvas id="actual-vs-goals" style="display: inline; width: 100%; height: 400px" ></canvas>
 
 <h2>{{ t('app', 'Related data') }}</h2>
 <ul>
-  <li><a href="#nsales-history">{{ t('app', 'History of sales') }}</a></li>
-  <li><a href="#nsales-goals">{{ t('app', 'Goal configuration') }}</a></li>
+  <li><a href="#nsales-history">{{ t('app', 'History of sales') }}</a> <span class="glyphicon glyphicon-modal-window"></span></li>
+  <li><a href="#nsales-goals">{{ t('app', 'Goal configuration') }}</a> <span class="glyphicon glyphicon-modal-window"></span></li>
 </ul>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.bundle.js" integrity="sha256-1qeNeAAFNi/g6PFChfXQfa6CQ8eXoHXreohinZsoJOQ=" crossorigin="anonymous"></script>
@@ -45,8 +45,8 @@
     december: '{{ t('app', 'December') }}'
   };
   var months = $.map(months_tr, function(v, i) { return i});
-  var goals = {{ json_goals | raw}};
-  var actuals = {{ json_actuals | raw}};
+  var goals = {{ json_goals | raw}}.sort(sortByMonth);
+  var actuals = {{ json_actuals | raw}}.sort(sortByMonth);
   function sortByMonth(a, b) {
       if (months.indexOf(a.name) < months.indexOf(b.name)) return -1; 
       else if (months.indexOf(a.name) > months.indexOf(b.name)) return 1; 
@@ -60,13 +60,13 @@
           backgroundColor: 'rgba(255, 99, 132, 0.4)',
           borderColor: 'rgba(255,99,132,1)',
           borderWidth: 1,
-          data: $.map(goals.sort(sortByMonth), function (v) { return v.value; })
+          data: $.map(goals, function (v) { return v.value; })
       }, {
           label: '{{ t('app', 'Actual') }}',
           backgroundColor: 'rgba(54, 162, 235, 0.4)',
           borderColor: 'rgba(54, 162, 235, 1)',
           borderWidth: 1,
-          data: $.map(actuals.sort(sortByMonth), function (v) { return v.value; })
+          data: $.map(actuals, function (v) { return v.value; })
       }]
   };
   new Chart(ctx1, {
@@ -87,6 +87,25 @@
                       min: 0,
                   }, 
               }]
+          }, animation: {
+              duration: 1,
+              onComplete: function () {
+                  var chartInstance = this.chart,
+                      ctx = chartInstance.ctx;
+                  ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
+                  console.log(ctx);
+                  console.log(Chart.defaults);
+                  ctx.fillStyle = Chart.defaults.global.defaultFontColor;//'#333';
+                  ctx.textAlign = 'center';
+                  ctx.textBaseline = 'bottom';
+                  this.data.datasets.forEach(function (dataset, i) {
+                      var meta = chartInstance.controller.getDatasetMeta(i);
+                      meta.data.forEach(function (bar, index) {
+                          var data = dataset.data[index];                            
+                          ctx.fillText(data, bar._model.x, bar._model.y - 5);
+                      });
+                  });
+              }
           }
       }
   });
@@ -107,9 +126,9 @@
       $(selector).val(e.value);
     });
   }
-  var first = actuals.reduce(add, 0);
-  function add(total, actual) {
-    return total + parseInt(actual.value);
+  var first = actuals.reduce(max, 0);
+  function max(final, actual) {
+    return final < actual.value ? parseInt(actual.value) : final;// + parseInt(actual.value);
   };
   $('.text-huge').html(first);
 
@@ -124,6 +143,7 @@
     else $('.btn-danger').addClass('invisible');
   });
   $('.btn-success').on('click', function() {
+    for (var i = new Date().getMonth(); i < 12; i++) actuals[i].value++;
     last = parseInt($('.text-huge').html()) + 1
     $('.text-huge').html(last);
     if ($('.text-huge').html() != first) $('.btn-danger').removeClass('invisible');
@@ -132,7 +152,15 @@
   $('.btn-danger').on('click', function() {
     var qty = (last - first);
     var month = months[new Date().getMonth()];
-    $.pjax({url: 'add-n-sales', data: {qty: qty, month: month}, container: '#p0', success: function() {
+    var data = {
+      category: actuals[0].category,
+      months: actuals.reduce(function(acc, cur) {
+        var aux = {};
+        aux[cur.name] = cur.value;
+        return $.extend(acc, aux);
+      }, {})
+    };
+    $.pjax({url: 'update-n-sales', data: data, container: '#p0', success: function() {
       last = first;
     }, scrollTo: false, push: false, method: 'POST'}); 
   });
@@ -140,7 +168,7 @@
     var category = $('#nsales-modal').hasClass('nsales-goal') ? goals[0].category : actuals[0].category;
     var data = {
       category: category,
-      fields: $('form input[type="number"]').serializeArray().reduce(function(acc, cur, i) {
+      months: $('form input[type="number"]').serializeArray().reduce(function(acc, cur) {
         var aux = {};
         aux[cur.name] = cur.value;
         return $.extend(acc, aux);
