@@ -1,5 +1,4 @@
 {# <?php #}
-{{ use('dosamigos/chartjs/ChartJs') }}
 {{ use('yii/widgets/Pjax') }}
 {{ set(this, 'params', {'breadcrumbs': [{
     'label': t('app', 'Presentations')
@@ -128,7 +127,8 @@
   }
   var first = actuals.reduce(max, 0);
   function max(final, actual) {
-    return final < actual.value ? parseInt(actual.value) : final;// + parseInt(actual.value);
+    var v = parseInt(actual.value);
+    return final < v ? v : final;
   };
   $('.text-huge').html(first);
 
@@ -137,10 +137,16 @@
     last = $(this).html();
   }).on('keyup', function(e) {
     var n = $(this).html();
-    if (n >>> 0 !== parseFloat(n)) $(this).html(last);
-    else last = n;
+    if (n >>> 0 !== parseFloat(n)) {
+      $(this).html(last);
+      return;
+    }
     if ($('.text-huge').html() != first) $('.btn-danger').removeClass('invisible');
     else $('.btn-danger').addClass('invisible');
+    last = n;
+    for (var i = new Date().getMonth(); i < 12; i++)
+      actuals[i].value = parseInt(last);
+    console.log(last, first, actuals);
   });
   $('.btn-success').on('click', function() {
     for (var i = new Date().getMonth(); i < 12; i++) actuals[i].value++;
@@ -150,8 +156,6 @@
     else $('.btn-danger').addClass('invisible');
   });
   $('.btn-danger').on('click', function() {
-    var qty = (last - first);
-    var month = months[new Date().getMonth()];
     var data = {
       category: actuals[0].category,
       months: actuals.reduce(function(acc, cur) {
@@ -160,9 +164,7 @@
         return $.extend(acc, aux);
       }, {})
     };
-    $.pjax({url: 'update-n-sales', data: data, container: '#p0', success: function() {
-      last = first;
-    }, scrollTo: false, push: false, method: 'POST'}); 
+    $.pjax({url: 'update-n-sales', data: data, container: '#p0', scrollTo: false, push: false, method: 'POST'}); 
   });
   $('#nsales-modal button[type="submit"]').on('click', function() {
     var category = $('#nsales-modal').hasClass('nsales-goal') ? goals[0].category : actuals[0].category;
@@ -174,9 +176,7 @@
         return $.extend(acc, aux);
       }, {})
     };
-    $.pjax({url: 'update-n-sales', data: data, container: '#p0', success: function() {
-      last = first;
-    }, scrollTo: false, push: false, method: 'POST'}); 
+    $.pjax({url: 'update-n-sales', data: data, container: '#p0', scrollTo: false, push: false, method: 'POST'}); 
   });
   $('#p0').on('pjax:beforeReplace', function(e) {
     $('#nsales-modal').modal('hide');
