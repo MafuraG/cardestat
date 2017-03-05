@@ -64,8 +64,8 @@ class CsvImportController extends Controller {
             "    location, \n" .
             "    building_complex, \n" .
             "    geo_coordinates, \n" .
-            "    plot_area_m2, \n" .
-            "    built_area_m2, \n" .
+            "    plot_area_dm2, \n" .
+            "    built_area_dm2, \n" .
             "    n_bedrooms, \n" .
             "    created_at, \n" .
             "    updated_at) \n" .
@@ -78,9 +78,9 @@ class CsvImportController extends Controller {
             "    pd.location, \n" .
             "    pd.building_complex, \n" .
             "    pd.geo_coordinates, \n" .
-            "    pd.plot_area_m2, \n" .
-            "    pd.built_area_m2, \n" .
-            "    pd.n_bedrooms, \n" .
+            "    nullif(replace(pd.plot_area_m2, ',', '')::int, 0), \n" .
+            "    nullif(replace(pd.built_area_m2, ',', '')::int, 0), \n" .
+            "    nullif(substring(pd.n_bedrooms, '\d+')::smallint, 0), \n" .
             "    :arg1, \n" .
             "    :arg2 \n" .
             "from property_dump pd \n" .
@@ -100,9 +100,9 @@ class CsvImportController extends Controller {
             "    location = pd.location, \n" .
             "    building_complex = pd.building_complex, \n" .
             "    geo_coordinates = pd.geo_coordinates, \n" .
-            "    plot_area_m2 = pd.plot_area_m2, \n" .
-            "    built_area_m2 = pd.built_area_m2, \n" .
-            "    n_bedrooms = pd.n_bedrooms, \n" .
+            "    plot_area_dm2 = nullif(replace(pd.plot_area_m2, ',', '')::int, 0), \n" .
+            "    built_area_dm2 = nullif(replace(pd.built_area_m2, ',', '')::int, 0), \n" .
+            "    n_bedrooms = nullif(substring(pd.n_bedrooms, '\d+')::smallint, 0), \n" .
             "    updated_at = :arg1 \n" .
             "from property_dump pd \n" .
             "where property.updated_at < :arg2 and \n" .

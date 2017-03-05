@@ -574,3 +574,28 @@ update firmas set precio = prices
             group by f.id, s.comment, b.comment) sq1
         group by id) sq2
     where firmas.id = sq2.id;
+
+insert into transaction (option_signed_at, sale_price_euc, buyer_id, seller_id, property_id, created_at, updated_at)
+    select f.fecha_firma::date, f.precio::integer*100, b.id, s.id, p.id, now(), now()
+    from firmas f
+         join contact s on ((f.ref_vendedor::text[])[1] = s.reference)
+         join contact b on ((f.ref_comprador::text[])[1] = b.reference)
+         join property p on ((f.ref_prop::text[])[1] = p.reference)
+    where substring(f.precio, 1, 1) <> '{' and
+          array_length(f.ref_vendedor::text[], 1) = 1 and
+          array_length(f.ref_comprador::text[], 1) = 1 and
+          array_length(f.ref_prop::text[], 1) = 1 and
+          fecha_firma ~ '\d{4}\W\d{2}\W\d{2}';
+
+insert into transaction (option_signed_at, sale_price_euc, buyer_id, seller_id, property_id, created_at, updated_at)
+    select f.fecha_firma::date, (f.precio::text[])[1]::integer*100, b.id, s.id, p.id, now(), now()
+    from firmas f
+         join contact s on ((f.ref_vendedor::text[])[1] = s.reference)
+         join contact b on ((f.ref_comprador::text[])[1] = b.reference)
+         join property p on ((f.ref_prop::text[])[1] = p.reference)
+    where substring(f.precio, 1, 1) = '{' and
+          array_length(f.precio::text[], 1) = 1 and
+          array_length(f.ref_vendedor::text[], 1) = 1 and
+          array_length(f.ref_comprador::text[], 1) = 1 and
+          array_length(f.ref_prop::text[], 1) = 1 and
+          fecha_firma ~ '\d{4}\W\d{2}\W\d{2}';

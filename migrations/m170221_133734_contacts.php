@@ -53,9 +53,9 @@ class m170221_133734_contacts extends Migration
             'location' => $this->string(48),
             'building_complex' => $this->string(24),
             'geo_coordinates' => $this->string(32),
-            'plot_area_m2' => $this->string(8),
-            'built_area_m2' => $this->string(8),
-            'n_bedrooms' => $this->string(4),
+            'plot_area_dm2' => $this->integer(),
+            'built_area_dm2' => $this->integer(),
+            'n_bedrooms' => $this->smallInteger(),
             'created_at' => $this->timestamp(2)->notNull(),
             'updated_at' => $this->timestamp(2)->notNull()
         ]);
@@ -94,31 +94,31 @@ class m170221_133734_contacts extends Migration
         ], [
             'ONOFFICE_CSV2PROPERTY',
             'property_type',
-            '32',
+            '38',
         ], [
             'ONOFFICE_CSV2PROPERTY',
             'location',
-            '40',
+            '46',
         ], [
             'ONOFFICE_CSV2PROPERTY',
             'building_complex',
-            '41',
+            '47',
         ], [
             'ONOFFICE_CSV2PROPERTY',
             'geo_coordinates',
-            '45',
+            '51',
         ], [
             'ONOFFICE_CSV2PROPERTY',
             'plot_area_m2',
-            '91',
+            '97',
         ], [
             'ONOFFICE_CSV2PROPERTY',
-            '92',
+            '98',
             'built_area_m2',
         ], [
             'ONOFFICE_CSV2PROPERTY',
             'n_bedrooms',
-            '97',
+            '103',
         ], [
             'ONOFFICE_CSV2CONTACT',
             'first_name',

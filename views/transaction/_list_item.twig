@@ -1,0 +1,86 @@
+{# <?php #}
+{{ set(this, 'params', {'breadcrumbs': [t('app', 'Transactions')]}) }}
+
+<div class="row">
+  <div class="col-md-2">
+    <span class="label label-primary uppercase" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>{{ model.custom_type }}</br>{{ model.transfer_type }}</br>{{ model.development_type }}</div>">{{ model.transaction_type }} #{{ model.id}}</span> <small>{{ app.formatter.asDate(model.option_signed_at, 'dd MMM \'\'yy') }}</small>
+  </div>
+  <div class="col-md-3 uppercase">
+    <div class="ellipsis">
+      <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?modul_name=daten&datensatz=193&inhalt=grunddaten" class="onoffice-icon"></a> 
+      <a data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>{{ model.property_building_complex }}<br>{{ model.property_location }}<br>{{ t('app', 'Ref.') }} {{ model.property_reference }}</div>" href="#">{{ model.property_building_complex }}, {{ model.property_location }}</a>
+    </div>
+  </div>
+  <div class="col-md-5 uppercase">
+    <div class="row">
+      <div class="col-md-6 text-right">
+        <div class="ellipsis">
+          <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?datensatz=33297&seite=0&modul_name=adressen&inhalt=adresse-bearbeiten" class="onoffice-icon"></a> 
+          <a  data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>{{ model.seller_name }}<br>{{ t('app', 'Ref.') }} {{ model.seller_reference }}</div>" href="#">{{ model.seller_name }}</a>
+        </div>
+      </div>
+      <div class="col-md-1 text-center">
+        <span class="glyphicon glyphicon-transfer"></span>
+      </div>
+      <div class="col-md-5">
+        <div class="ellipsis">
+          <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?datensatz=33297&seite=0&modul_name=adressen&inhalt=adresse-bearbeiten" class="onoffice-icon"></a> 
+          <a data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>{{ model.buyer_name }}<br>{{ t('app', 'Ref.') }} {{ model.buyer_reference }}</div>" href="#">{{ model.buyer_name }}</a>
+        </div>
+      </div>
+    </div> 
+  </div>
+  <div class="col-md-2 text-right">
+    {{ app.formatter.asDecimal(model.sale_price_euc/100, 2) }} € &nbsp;
+    <button type="button" class="btn btn-default btn-xs pull-right dropdown-toggle" data-toggle="dropdown" role="button"><span class="glyphicon glyphicon-cog"></span></button>
+    <ul class="dropdown-menu">
+      <li><a class="details" href="#">{{ t('app', 'See details') }}</a></li>
+      <li><a class="edit" href="#">{{ t('app', 'Edit') }}</a></li>
+      <li><a class="remove" href="#">{{ t('app', 'Delete') }}</a></li>
+      <li role="separator" class="divider"></li>
+      <li><a class="validate" href="#">{{ t('app', 'Approve') }}</a></li>
+    </ul>
+  </div>
+  <div class="col-md-2">
+    {% if (model.cardenas100) %}
+      <span class="label label-default">100% Cárdenas</span>
+    {% else %}
+      <span class="label label-warning" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>50% CANARINVEST</div>">50% Cárdenas</span>
+    {% endif %}
+    {% if (model.sale_duration) %}
+      <small><span class="glyphicon glyphicon-time"></span> {{ model.sale_duration }} {{ t('app', 'days') }}</small>
+    {% endif %}
+  </div>
+  <div class="col-md-4">
+    {% if (model.advisors) %}
+      {{ model.advisors }}
+    {% else %}
+      <em>{{ t('app', 'No advisors found') }}</em>
+    {% endif %}
+  </div>
+  <div class="col-md-2">
+    <small>{{ t('app', 'Payrolled') }}
+      {% if (model.payrolled_at) %}
+        <span class="glyphicon glyphicon-ok text-success"></span> {{ (model.payrolled_at) }}
+      {% else %}
+        <span class="glyphicon glyphicon-remove text-danger"></span>
+      {% endif %}
+    </small>
+  </div>
+  <div class="col-md-2">
+    {% if (model.n_invoices) %}
+      <small class="label label-success">{{ t('app', 'Invoiced') }} {{ model.first_invoice_issued_at }}</small>
+    {% else %}
+      <small class="label label-danger">{{ t('app', 'Not invoiced') }}</small>
+    {% endif %}
+  </div>
+  <div class="col-md-2 text-right">
+    <small class="text-muted">({{ model.our_fee_bp }}%)</small> {{ app.formatter.asDecimal(model.our_fee_euc/100, 2) }} € &nbsp;
+    {% if (model.approved) %}
+      <span class="text-success glyphicon glyphicon-ok-sign"></span>&nbsp;
+    {% else %}
+      <span class="text-warning glyphicon glyphicon-alert"></span>&nbsp;
+    {% endif %}
+    </button>
+  </div>
+</div>
