@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+  
+  text {
+    font: 10px sans-serif;
+    text-anchor: middle;
+  }
+  
+  </style>
+</head>
+<body>
+  <h1>Actividad comercial enero '17</h1>
+  <svg width="880" height="880"></svg>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script>
+    
+    var svg = d3.select("svg"),
+        width = +svg.attr("width");
+    
+    var format = d3.format(",d");
+    
+    var color = d3.scaleOrdinal(d3.schemeCategory20c);
+    
+    var pack = d3.pack()
+        .size([width, width])
+        .padding(1.5);
+    
+    var csv = '"Registro De Actividades Diarias Asesor Comprador/0 Asesor","Registro De Actividades Diarias Asesor Comprador/1 Demandas Entrantes/Email In Con Fecha","Registro De Actividades Diarias Asesor Comprador/1 Demandas Entrantes/Email In Sin Fecha","Registro De Actividades Diarias Asesor Comprador/1 Demandas Entrantes/Llamada In","Registro De Actividades Diarias Asesor Comprador/1 Demandas Entrantes/Pop In","Registro De Actividades Diarias Asesor Comprador/2 Follow Ups/Fecha Próc Visita Gc/Con Fecha Próx Visita Gc","Registro De Actividades Diarias Asesor Comprador/2 Follow Ups/Fecha Próc Visita Gc/Sin Fecha Próx Visita Gc","Registro De Actividades Diarias Asesor Comprador/2 Follow Ups/Fin Drip/Follow Up Fin Drip","Registro De Actividades Diarias Asesor Comprador/2 Follow Ups/Follow Up Via/1 Por Tel","Registro De Actividades Diarias Asesor Comprador/2 Follow Ups/Follow Up Via/2 Por Email","Registro De Actividades Diarias Asesor Comprador/2 Follow Ups/Por Email","Registro De Actividades Diarias Asesor Comprador/2 Follow Ups/Por Tel","Registro De Actividades Diarias Asesor Comprador/2 Follow Ups/Tipo Searcher/Follow Up A","Registro De Actividades Diarias Asesor Comprador/2 Follow Ups/Tipo Searcher/Follow Up A+","Registro De Actividades Diarias Asesor Comprador/2 Follow Ups/Tipo Searcher/Follow Up B","Registro De Actividades Diarias Asesor Comprador/2 Follow Ups/Tipo Searcher/Follow Up B+","Registro De Actividades Diarias Asesor Comprador/2 Follow Ups/Tipo Searcher/Follow Up C + Nc","Registro De Actividades Diarias Asesor Comprador/3 Resultados Follow Ups/1 Visita Programada","Registro De Actividades Diarias Asesor Comprador/3 Resultados Follow Ups/2 Fecha Próx Visita Gc","Registro De Actividades Diarias Asesor Comprador/3 Resultados Follow Ups/3 Concretado Sigte Paso","Registro De Actividades Diarias Asesor Comprador/3 Resultados Follow Ups/4 Recalificación","Registro De Actividades Diarias Asesor Comprador/3 Resultados Follow Ups/5 Sin Avance","Registro De Actividades Diarias Asesor Comprador/3 Resultados Follow Ups/6 Ya No Interesado","Registro De Actividades Diarias Asesor Comprador/4 Visitas Con Compradores Nuestros/1 Clientes Con Visita (no Repetir Cliente)","Registro De Actividades Diarias Asesor Comprador/4 Visitas Con Compradores Nuestros/2 Visitas/2ª Visita Misma Prop","Registro De Actividades Diarias Asesor Comprador/4 Visitas Con Compradores Nuestros/2 Visitas/Propiedades Visitadas De Colab","Registro De Actividades Diarias Asesor Comprador/4 Visitas Con Compradores Nuestros/2 Visitas/Propiedades Visitadas Nuestras","Registro De Actividades Diarias Asesor Comprador/4 Visitas Con Compradores Nuestros/3 Ofertas","Registro De Actividades Diarias Asesor Comprador/4 Visitas Con Compradores Nuestros/4 Ventas/Ventas Propiedades Colaboradores","Registro De Actividades Diarias Asesor Comprador/4 Visitas Con Compradores Nuestros/4 Ventas/Ventas Prop Nuestras","Registro De Actividades Diarias Asesor Comprador/5 Visitas Con Compradores De Colaboradores/Propiedades Visitadas","Registro De Actividades Diarias Asesor Comprador/5 Visitas Con Compradores De Colaboradores/Ventas","Registro De Actividades Diarias Asesor Comprador/6 Otros/Ampliar Círculo Influencia","Registro De Actividades Diarias Asesor Comprador/6 Otros/Recomendación Recibida","From","To"\n"Stephan","6","13","1","7","","","","","","","","","","","","","","","","","","","","1","","5","","","1","","","","","2017-01-01","2017-01-31"\n"Yvonne","7","1","4","2","","","","","","","","","","","","","","","","","","","10","1","1","12","1","","1","","","1","","2017-01-01","2017-01-31"\n"Leonor","4","10","1","1","","","","","","","","","","","","","","","","","","","7","","","20","","","1","1","","2","","2017-01-01","2017-01-31"\n"Rafa","7","33","1","1","","","","","","","","","","","","","","","","","","","17","1","","34","","","","","","","","2017-01-01","2017-01-31"\n"Thomas","12","13","3","","","","","","","","","","","","","","","","","","","","22","9","","","","","2","","2","","","2017-01-01","2017-01-31"\n"Inge","","","","","","","","","","","","","","","","","","","","","","","12","","5","8","4","2","2","","","","","2017-01-01","2017-01-31"';
+    
+    var classes = [].concat.apply([], d3.csvParse(csv, function(d) {
+      var res = [];
+      var advisor = d['Registro De Actividades Diarias Asesor Comprador/0 Asesor'];
+      for (i in d) {
+        d[i] = +d[i];
+        if (d[i]) res.push({id: advisor + '/' +  i, value: d[i]});
+      }
+      return res;
+    }));
+    
+    var root = d3.hierarchy({children: classes})
+        .sum(function(d) { return d.value; })
+        .each(function(d) {
+          if (id = d.data.id) {
+            var id, i = id.lastIndexOf("/");
+            d.id = id;
+            d.package = id.slice(0, i);
+            var j = id.indexOf("/");
+            d.class = id.slice(0, j) + ':' + id.slice(i + 1);
+          }
+        });
+  
+    var node = svg.selectAll(".node")
+      .data(pack(root).leaves())
+      .enter().append("g")
+        .attr("class", "node")
+        .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+  
+    node.append("circle")
+        .attr("id", function(d) { return d.id; })
+        .attr("r", function(d) { return d.r; })
+        .style("fill", function(d) { return color(d.package); });
+  
+    node.append("clipPath")
+        .attr("id", function(d) { return "clip-" + d.id; })
+        .append("use")
+        .attr("xlink:href", function(d) { return "#" + d.id; });
+  
+    node.append("text")
+        .attr("clip-path", function(d) { return "url(#clip-" + d.id + ")"; })
+        .selectAll("tspan")
+        .data(function(d) { return d.class.split(/(?=[A-Z][^A-Z])/g); })
+        .enter().append("tspan")
+        .attr("x", 0)
+        .attr("y", function(d, i, nodes) { return 13 + (i - nodes.length / 2 - 0.5) * 10; })
+        .text(function(d) { return d; });
+  
+    node.append("title")
+        .text(function(d) { return d.id + "\n" + format(d.value); });
+  
+  </script>
+</body>
+</html>

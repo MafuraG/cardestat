@@ -1,0 +1,187 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>The HTML5 Herald</title>
+  <meta name="description" content="The HTML5 Herald">
+  <meta name="author" content="SitePoint">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.bundle.js" integrity="sha256-1qeNeAAFNi/g6PFChfXQfa6CQ8eXoHXreohinZsoJOQ=" crossorigin="anonymous"></script>
+  <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+  <![endif]-->
+  <style>
+    canvas {
+        display: inline-block;
+        border: 10px inset #600;
+        padding: 10px;
+    }
+    body {
+    }
+  </style>
+</head>
+<body>
+  <canvas id="total-ventas" style="display: inline" width="400px" height="400px"></canvas>
+  <canvas id="ventas-por-asesor" style="display: inline" width="400px" height="400px"></canvas>
+  <canvas id="ventas-por-oficina" style="display: inline" width="400px" height="400px"></canvas>
+  <script>
+    var ctx1 = document.getElementById('total-ventas');
+    var ctx2 = document.getElementById('ventas-por-asesor');
+    var ctx3 = document.getElementById('ventas-por-oficina');
+    function toEuros(value) {
+        value = value.toString();
+        value = value.split(/(?=(?:...)*$)/);
+        value = value.join('.');
+        return value + '€';
+    }
+    var data1 = {
+        labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio'],
+        datasets: [{
+            label: 'Año 2015',
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgba(255,99,132,1)',
+            borderWidth: 1,
+            data: [22500, 15900, 18000, 18100, 25600, 25500, 14000],
+        }, {
+            label: 'Año 2016',
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1,
+            data: [19560, 14900, 24000, 19100, 23600, 17500, 24500],
+        }]
+    };
+    new Chart(ctx1, {
+        type: 'bar',
+        data: data1,
+        options: {
+            title: {
+                display: true,
+                text: 'Facturación por ventas',
+            }, barValueSpacing: 90,
+            tooltips: {
+                callbacks: {
+                    label: function(tooltipItems, data) { 
+                        return data.datasets[tooltipItems.datasetIndex].label + ' ' + toEuros(tooltipItems.yLabel);
+                    }
+                }
+            },
+            responsive: false,
+            tooltipTemplate: "<%= datasetLabel %> - <%= value.toLocaleString() %>",
+            scales: {
+                xAxes: [{
+                    stacked: false
+                }], yAxes: [{
+                    stacked: false,
+                    ticks: {
+                        min: 0,
+                        callback: toEuros
+                    }, 
+                }]
+            }
+        }
+    });
+    var data2 = {
+        labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio'],
+        datasets: [{
+            label: 'Inge',
+            fill: false,
+            pointStyle: 'triangle',
+            borderColor: 'rgba(255,99,132,1)',
+            borderWidth: 1,
+            data: [20500, 13900, 19000, 17100, 15600, 17500, 19000],
+        }, {
+            label: 'Rafa',
+            fill: false,
+            pointStyle: 'rect',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1,
+            data: [21560, 14900, 21000, 22100, 22600, 17500, 14500],
+        }, {
+            label: 'Stephane',
+            fill: false,
+            pointStyle: 'rectRot',
+            borderColor: 'rgba(54, 62, 35, 1)',
+            borderWidth: 1,
+            data: [13560, 11900, 23000, 19100, 13600, 27500, 17900],
+        }, {
+            label: 'Leonor',
+            fill: false,
+            pointStyle: 'cross',
+            borderColor: 'rgba(154, 162, 235, 1)',
+            borderWidth: 1,
+            data: [9560, 14900, 23000, 17800, 23800, 18500, 25000],
+        }, {
+            label: 'Paola',
+            fill: false,
+            pointStyle: 'crossRot',
+            borderColor: 'rgba(54, 62, 235, 1)',
+            borderWidth: 1,
+            data: [16560, 24900, 14000, 9100, 23700, 11500, 21500],
+        }, {
+            label: 'Robert',
+            fill: false,
+            pointStyle: 'start',
+            borderColor: 'rgba(54, 262, 35, 1)',
+            borderWidth: 1,
+            data: [10560, 10900, 21500, 9100, 23900, 10500, 20700],
+        }]
+    };
+    var scatterChart = new Chart(ctx2, {
+        type: 'line',
+        data: data2,
+        options: {
+            responsive: false,
+            scales: {
+                xAxes: [{
+                    type: 'category',
+                    position: 'bottom',
+                }],
+                yAxes: [{
+                    ticks: {
+                        min: 0
+                    }
+                }]
+            }
+        }
+    });
+    var data3 = {
+        datasets: [{
+            data: [
+                11,
+                16,
+                7,
+                3,
+                14
+            ], backgroundColor: [
+                "#FF6384",
+                "#4BC0C0",
+                "#FFCE56",
+                "#37393D",
+                "#36A2EB"
+            ], borderColor: [
+                "#dF4364",
+                "#2Ba0a0",
+                "#dFaE36",
+                "#17191D",
+                "#1682cB"
+            ], label: 'My dataset' // for legend
+        }], labels: [
+            "Arguineguín",
+            "Pto. Rico 1",
+            "Pto. Rico 2",
+            "Pto. Mogán",
+            "Sin asignar"
+        ]
+    };
+    new Chart(ctx3, {
+        data: data3,
+        type: 'polarArea',
+        options: {
+            responsive: false
+        }
+    });
+  </script>
+</body>
+</html>

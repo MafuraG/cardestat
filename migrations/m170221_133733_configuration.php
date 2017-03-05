@@ -113,6 +113,8 @@ class m170221_133733_configuration extends Migration
     }
 
     public function safeDown() {
+        $this->delete('configuration', ['category' => 'NSALES_ACCU_ACTUAL']);
+        $this->delete('configuration', ['category' => 'NSALES_ACCU_GOAL']);
         $this->dropTable('configuration');
     }
 }

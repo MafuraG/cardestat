@@ -1,0 +1,357 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Cardestat -- Formulario de asesor</title>
+  <meta name="description" content="The HTML5 Herald">
+  <meta name="author" content="SitePoint">
+
+  <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.5.0/d3.js" integrity="sha256-Wtkm8Hhx+IcmSXStJ2R7PWrP3NBmobG5QiadDVok7rk=" crossorigin="anonymous"></script>-->
+  <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.js" integrity="sha256-gfQwA6PlkZsLqWu4bU4hXPrbTqzixm0B5MdvBLI+Oas=" crossorigin="anonymous"></script>-->
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.4/papaparse.js" integrity="sha256-5YpAdCdRDxk6QkDC7JPa/9hZWlxZAOJhMe6oLaR1qR0=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.bundle.js" integrity="sha256-1qeNeAAFNi/g6PFChfXQfa6CQ8eXoHXreohinZsoJOQ=" crossorigin="anonymous"></script>
+  <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+  <![endif]-->
+  <style>
+  </style>
+<body>
+  <div class="container">
+    <h1 class="page-header">Actividad comercial <small>1 - 31 enero '17</small></h1>
+    <div id="accordion" class="panel-group">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse1">Ventas por propiedad visitada</a></h3>
+        </div>
+        <div id="collapse1" class="panel-collapse collapse in">
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-md-4">
+                <canvas id="ctx1-1" height="300px"></canvas>
+              </div>
+              <div class="col-md-4">
+                <canvas id="ctx1-2" height="300px"></canvas>
+              </div>
+              <div class="col-md-4">
+                <canvas id="ctx1-3" height="300px"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title"><a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse2">Clientes con visita por demanda</a></h3>
+        </div>
+        <div id="collapse2" class="panel-collapse collapse">
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-md-4">
+                <canvas id="ctx2-1" height="300px"></canvas>
+              </div>
+              <div class="col-md-4">
+                <canvas id="ctx2-2" height="300px"></canvas>
+              </div>
+              <div class="col-md-4">
+                <canvas id="ctx2-3" height="300px"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title"><h3 class="panel-title"><a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse3">Ventas por clientes con visita</a></h3>
+        </div>
+        <div id="collapse3" class="panel-collapse collapse">
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-md-4">
+                <canvas id="ctx3-1" height="300px"></canvas>
+              </div>
+              <div class="col-md-4">
+                <canvas id="ctx3-2" height="300px"></canvas>
+              </div>
+              <div class="col-md-4">
+                <canvas id="ctx3-3" height="300px"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title"><a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse4">Propiedades visitadas por cliente</a></h3>
+        </div>
+        <div id="collapse4" class="panel-collapse collapse">
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-md-4">
+                <canvas id="ctx4-1" height="300px"></canvas>
+              </div>
+              <div class="col-md-4">
+                <canvas id="ctx4-2" height="300px"></canvas>
+              </div>
+              <div class="col-md-4">
+                <canvas id="ctx4-3" height="300px"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title"><a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse5">Ofertas por propiedades visitadas</a></h3>
+        </div>
+        <div id="collapse5" class="panel-collapse collapse">
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-md-4">
+                <canvas id="ctx5-1" height="300px"></canvas>
+              </div>
+              <div class="col-md-4">
+                <canvas id="ctx5-2" height="300px"></canvas>
+              </div>
+              <div class="col-md-4">
+                <canvas id="ctx5-3" height="300px"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+ var csv = '"Registro De Actividades Diarias Asesor Comprador/0 Asesor","Registro De Actividades Diarias Asesor Comprador/1 Demandas Entrantes/Email In Con Fecha","Registro De Actividades Diarias Asesor Comprador/1 Demandas Entrantes/Email In Sin Fecha","Registro De Actividades Diarias Asesor Comprador/1 Demandas Entrantes/Llamada In","Registro De Actividades Diarias Asesor Comprador/1 Demandas Entrantes/Pop In","Registro De Actividades Diarias Asesor Comprador/2 Follow Ups/Fecha Próc Visita Gc/Con Fecha Próx Visita Gc","Registro De Actividades Diarias Asesor Comprador/2 Follow Ups/Fecha Próc Visita Gc/Sin Fecha Próx Visita Gc","Registro De Actividades Diarias Asesor Comprador/2 Follow Ups/Fin Drip/Follow Up Fin Drip","Registro De Actividades Diarias Asesor Comprador/2 Follow Ups/Follow Up Via/1 Por Tel","Registro De Actividades Diarias Asesor Comprador/2 Follow Ups/Follow Up Via/2 Por Email","Registro De Actividades Diarias Asesor Comprador/2 Follow Ups/Por Email","Registro De Actividades Diarias Asesor Comprador/2 Follow Ups/Por Tel","Registro De Actividades Diarias Asesor Comprador/2 Follow Ups/Tipo Searcher/Follow Up A","Registro De Actividades Diarias Asesor Comprador/2 Follow Ups/Tipo Searcher/Follow Up A+","Registro De Actividades Diarias Asesor Comprador/2 Follow Ups/Tipo Searcher/Follow Up B","Registro De Actividades Diarias Asesor Comprador/2 Follow Ups/Tipo Searcher/Follow Up B+","Registro De Actividades Diarias Asesor Comprador/2 Follow Ups/Tipo Searcher/Follow Up C + Nc","Registro De Actividades Diarias Asesor Comprador/3 Resultados Follow Ups/1 Visita Programada","Registro De Actividades Diarias Asesor Comprador/3 Resultados Follow Ups/2 Fecha Próx Visita Gc","Registro De Actividades Diarias Asesor Comprador/3 Resultados Follow Ups/3 Concretado Sigte Paso","Registro De Actividades Diarias Asesor Comprador/3 Resultados Follow Ups/4 Recalificación","Registro De Actividades Diarias Asesor Comprador/3 Resultados Follow Ups/5 Sin Avance","Registro De Actividades Diarias Asesor Comprador/3 Resultados Follow Ups/6 Ya No Interesado","Registro De Actividades Diarias Asesor Comprador/4 Visitas Con Compradores Nuestros/1 Clientes Con Visita (no Repetir Cliente)","Registro De Actividades Diarias Asesor Comprador/4 Visitas Con Compradores Nuestros/2 Visitas/2ª Visita Misma Prop","Registro De Actividades Diarias Asesor Comprador/4 Visitas Con Compradores Nuestros/2 Visitas/Propiedades Visitadas De Colab","Registro De Actividades Diarias Asesor Comprador/4 Visitas Con Compradores Nuestros/2 Visitas/Propiedades Visitadas Nuestras","Registro De Actividades Diarias Asesor Comprador/4 Visitas Con Compradores Nuestros/3 Ofertas","Registro De Actividades Diarias Asesor Comprador/4 Visitas Con Compradores Nuestros/4 Ventas/Ventas Propiedades Colaboradores","Registro De Actividades Diarias Asesor Comprador/4 Visitas Con Compradores Nuestros/4 Ventas/Ventas Prop Nuestras","Registro De Actividades Diarias Asesor Comprador/5 Visitas Con Compradores De Colaboradores/Propiedades Visitadas","Registro De Actividades Diarias Asesor Comprador/5 Visitas Con Compradores De Colaboradores/Ventas","Registro De Actividades Diarias Asesor Comprador/6 Otros/Ampliar Círculo Influencia","Registro De Actividades Diarias Asesor Comprador/6 Otros/Recomendación Recibida","From","To"\n"Stephan","6","13","1","7","","","","","","","","","","","","","","","","","","","","1","","5","","","1","","","","","2017-01-01","2017-01-31"\n"Yvonne","7","1","4","2","","","","","","","","","","","","","","","","","","","10","1","1","12","1","","1","","","1","","2017-01-01","2017-01-31"\n"Leonor","4","10","1","1","","","","","","","","","","","","","","","","","","","7","","","20","","","1","1","","2","","2017-01-01","2017-01-31"\n"Rafa","7","33","1","1","","","","","","","","","","","","","","","","","","","17","1","","34","","","","","","","","2017-01-01","2017-01-31"\n"Thomas","12","13","3","","","","","","","","","","","","","","","","","","","","22","9","","","","","2","","2","","","2017-01-01","2017-01-31"\n"Inge","","","","","","","","","","","","","","","","","","","","","","","12","","5","8","4","2","2","","","","","2017-01-01","2017-01-31"';
+
+    var parsed = Papa.parse(csv, {
+        header: true,
+        dynamicTyping: true
+    });
+
+    function sumByField(sumFields, byField, data) {
+      var dataset = {data: [], backgroundColor: [], borderColor: []}, labels = [];
+      data.forEach(function(d, i) {
+        dataset.data[i] = 0;
+        sumFields.forEach(function(f, i2) {
+          dataset.data[i] += parseInt(d[f]) || 0;
+        });
+        var r = Math.round(360 / data.length * i);
+        dataset.backgroundColor[i] = 'hsl(' + r + ',80%,50%)';
+        dataset.borderColor[i] = 'hsl(' + r + ',80%,42%)';
+        labels[i] = d[byField];
+      });
+      return {datasets: [dataset], labels: labels};
+    }
+    function rateByField(dividendFields, divisorFields, byField, data) {
+      var dataset = {data: [], backgroundColor: [], borderColor: []}, labels = [];
+      data.forEach(function(d, i) {
+        var dividend = 0;
+        dividendFields.forEach(function(f, i2) {
+          dividend += parseInt(d[f]) || 0;
+        });
+        var divisor = 0;
+        divisorFields.forEach(function(f, i2) {
+          divisor += parseInt(d[f]) || 0;
+        });
+        if (divisor !== 0) dataset.data[i] = (dividend / divisor).toFixed(2);
+        else dataset.data[i] = NaN;
+        var r = Math.round(360 / data.length * i);
+        dataset.backgroundColor[i] = 'hsl(' + r + ',80%,50%)';
+        dataset.borderColor[i] = 'hsl(' + r + ',80%,42%)';
+        labels[i] = d[byField];
+      });
+      return {datasets: [dataset], labels: labels};
+    }
+    var advisorField = "Registro De Actividades Diarias Asesor Comprador/0 Asesor";
+    var nVisitsFields = ["Registro De Actividades Diarias Asesor Comprador/4 Visitas Con Compradores Nuestros/2 Visitas/2ª Visita Misma Prop", "Registro De Actividades Diarias Asesor Comprador/4 Visitas Con Compradores Nuestros/2 Visitas/Propiedades Visitadas De Colab", "Registro De Actividades Diarias Asesor Comprador/4 Visitas Con Compradores Nuestros/2 Visitas/Propiedades Visitadas Nuestras", "Registro De Actividades Diarias Asesor Comprador/5 Visitas Con Compradores De Colaboradores/Propiedades Visitadas"];
+    charData1_1 = sumByField(nVisitsFields, advisorField, parsed.data);
+    var ctx1_1 = document.getElementById('ctx1-1');
+    new Chart(ctx1_1, {
+        data: charData1_1,
+        type: 'pie',
+        options: {
+            title: {
+                display: true,
+                text: 'Todas las visitas'
+            }
+        }
+    });
+    var nSalesFields = ["Registro De Actividades Diarias Asesor Comprador/4 Visitas Con Compradores Nuestros/4 Ventas/Ventas Propiedades Colaboradores" ,"Registro De Actividades Diarias Asesor Comprador/4 Visitas Con Compradores Nuestros/4 Ventas/Ventas Prop Nuestras","Registro De Actividades Diarias Asesor Comprador/5 Visitas Con Compradores De Colaboradores/Ventas"];
+    charData1_2 = sumByField(nSalesFields, "Registro De Actividades Diarias Asesor Comprador/0 Asesor", parsed.data);
+    console.log(parsed.data);
+    console.log(charData1_2);
+    var ctx1_2 = document.getElementById('ctx1-2');
+    new Chart(ctx1_2, {
+        data: charData1_2,
+        type: 'pie',
+        options: {
+            title: {
+                display: true,
+                text: 'Todas las ventas'
+            }
+        }
+    });
+    charData1_3 = rateByField(nSalesFields, nVisitsFields, advisorField, parsed.data);
+    var ctx1_3 = document.getElementById('ctx1-3');
+    new Chart(ctx1_3, {
+        data: charData1_3,
+        type: 'pie',
+        options: {
+            title: {
+                display: true,
+                text: 'Ratio Ventas/Visita'
+            }
+        }
+    });
+    var nDemandsFields = ["Registro De Actividades Diarias Asesor Comprador/1 Demandas Entrantes/Email In Con Fecha","Registro De Actividades Diarias Asesor Comprador/1 Demandas Entrantes/Email In Sin Fecha","Registro De Actividades Diarias Asesor Comprador/1 Demandas Entrantes/Llamada In","Registro De Actividades Diarias Asesor Comprador/1 Demandas Entrantes/Pop In"];
+    charData2_1 = sumByField(nDemandsFields, advisorField, parsed.data);
+    var ctx2_1 = document.getElementById('ctx2-1');
+    new Chart(ctx2_1, {
+        data: charData2_1,
+        type: 'pie',
+        options: {
+            title: {
+                display: true,
+                text: 'Demandas'
+            }
+        }
+    });
+    var nClientsFields = ["Registro De Actividades Diarias Asesor Comprador/4 Visitas Con Compradores Nuestros/1 Clientes Con Visita (no Repetir Cliente)"];
+    charData2_2 = sumByField(nClientsFields, advisorField, parsed.data);
+    var ctx2_2 = document.getElementById('ctx2-2');
+    new Chart(ctx2_2, {
+        data: charData2_2,
+        type: 'pie',
+        options: {
+            title: {
+                display: true,
+                text: 'Clientes con visita'
+            }
+        }
+    });
+    charData2_3 = rateByField(nClientsFields, nDemandsFields, advisorField, parsed.data);
+    var ctx2_3 = document.getElementById('ctx2-3');
+    new Chart(ctx2_3, {
+        data: charData2_3,
+        type: 'pie',
+        options: {
+            title: {
+                display: true,
+                text: 'Ratio Clientes con visita/Demandas'
+            }
+        }
+    });
+    var ctx3_1 = document.getElementById('ctx3-1');
+    new Chart(ctx3_1, {
+        data: charData2_2,
+        type: 'pie',
+        options: {
+            title: {
+                display: true,
+                text: 'Clientes con visita'
+            }
+        }
+    });
+    var ctx3_2 = document.getElementById('ctx3-2');
+    new Chart(ctx3_2, {
+        data: charData1_2,
+        type: 'pie',
+        options: {
+            title: {
+                display: true,
+                text: 'Todas las ventas'
+            }
+        }
+    });
+    charData3_3 = rateByField(nSalesFields, nClientsFields, advisorField, parsed.data);
+    var ctx3_3 = document.getElementById('ctx3-3');
+    new Chart(ctx3_3, {
+        data: charData3_3,
+        type: 'pie',
+        options: {
+            title: {
+                display: true,
+                text: 'Ratio ventas/Clientes con visita'
+            }
+        }
+    });
+    var ctx4_1 = document.getElementById('ctx4-1');
+    new Chart(ctx4_1, {
+        data: charData2_2,
+        type: 'pie',
+        options: {
+            title: {
+                display: true,
+                text: 'Clientes con visita'
+            }
+        }
+    });
+    var ctx4_2 = document.getElementById('ctx4-2');
+    new Chart(ctx4_2, {
+        data: charData1_1,
+        type: 'pie',
+        options: {
+            title: {
+                display: true,
+                text: 'Todas las visitas'
+            }
+        }
+    });
+    charData4_3 = rateByField(nVisitsFields, nClientsFields, advisorField, parsed.data);
+    var ctx4_3 = document.getElementById('ctx4-3');
+    new Chart(ctx4_3, {
+        data: charData4_3,
+        type: 'pie',
+        options: {
+            title: {
+                display: true,
+                text: 'Ratio visitas/Clientes con visita'
+            }
+        }
+    });
+    var ctx5_1 = document.getElementById('ctx5-1');
+    new Chart(ctx5_1, {
+        data: charData1_1,
+        type: 'pie',
+        options: {
+            title: {
+                display: true,
+                text: 'Todas las visitas'
+            }
+        }
+    });
+    var nOffersFields = ["Registro De Actividades Diarias Asesor Comprador/4 Visitas Con Compradores Nuestros/3 Ofertas"];
+    charData5_2 = sumByField(nOffersFields, advisorField, parsed.data);
+    var ctx5_2 = document.getElementById('ctx5-2');
+    new Chart(ctx5_2, {
+        data: charData5_2,
+        type: 'pie',
+        options: {
+            title: {
+                display: true,
+                text: 'Ofertas recibidas'
+            }
+        }
+    });
+    charData5_3 = rateByField(nOffersFields, nVisitsFields, advisorField, parsed.data);
+    var ctx5_3 = document.getElementById('ctx5-3');
+    new Chart(ctx5_3, {
+        data: charData5_3,
+        type: 'pie',
+        options: {
+            title: {
+                display: true,
+                text: 'Ratio Ofertas/visitas'
+            }
+        }
+    });
+  </script>
+</body>
+</html>

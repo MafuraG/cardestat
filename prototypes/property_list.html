@@ -1,0 +1,144 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Cardestat -- Listado de propiedades</title>
+  <meta name="description" content="The HTML5 Herald">
+  <meta name="author" content="SitePoint">
+
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+  <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+  <![endif]-->
+  <style>
+    .transaction {
+      padding: 8px 0;
+      border-bottom: 1px solid #ccc;
+      position: relative;
+    }
+    .transaction.first {
+      border-top: 1px solid #ccc;
+    }
+    .onoffice-icon {
+      width: 16px;
+      height: 16px;
+      margin-bottom: -1px;
+      display: inline-block;
+      position: relative;
+      top: 3px;
+      background-repeat: no-repeat;
+      background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4QEUCw8GkXnd5AAAAh5JREFUOMuNk81OU0EUx39zO0UG0VJpaaExJBoCJuxM1EdwL8/Awg07Vyxd+QK8hE/g1p2YoAkJSEyQRgRpgdKv296Pc1z03kvriklOTiaZ8/U7/zH7+/tTvu9/ADaMMTXucFT1FPjonHtnfd9/X6lUtqrVKtbmAUVHr9CRQ1XTQBQIgqDWbDS2LpuNwDPGbC4uLmGtRdEsQBKfmiSmolhrKZfLGGM2LVDwct4oEIXE65i/7ea2AJ4HULBpaygEUcynL6d8+3nJi9V5Xq0v4KbzqCpRrOwdNfn8/ZycMbx98wwALxkXUaXTDzn+06FSdKw/fUQ+nyMWIRbBAJWi4+F9yyCMMy5e2oGoUP/bJQqF1y9rlOam8QyoJBxQqvOOx+VZpqyHJAksjKpHkXBy1mVlucBC0RHHMgGVZD/GUxaK97IEWQf+MOamF1ArO0RlRF3G6KvS6QV0eyGLJYfKWAIRpTsY0h+EFB7kJ9aXjiAqNG+GtLoB5YKbHEFV+X3h0+mF5IzJKqdrA4hEOKpfMxhGFB/mJyGKKgfHV7T7A36ddTLBSLL/KI7ZO2zw9bBBpeSYnZnKEmQQl0ozDAPhtNFnad5RLrpEGxE/6jccnLRZW57j+WoJGCkVwOzu7naerKzNGs9MKG1ceYwpM1WqiHBeP+56wM5l84IwDDPiMg7xv7uoEkcxndYVwI51zm23W9eu3breAKrc7Zwn33n7HyA+r3XcoM9zAAAAAElFTkSuQmCC);
+    }
+  </style>
+</head>
+<body>
+  <div class="edit-modal modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Editar propiedad</h4>
+        </div>
+        <div class="modal-body">
+          <div class="container-fluid">
+            <div class="row">
+              <fieldset>
+              </fieldset>
+              <div class="form-group col-md-12">
+                <button class="btn btn-lg btn-primary" type="button">Guardar</button>
+              </div>
+            </div>
+            <p class="small text-right">Última actualización el 20 ene '17 por <a href="#">clapas</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <h1 class="page-header">Prototipo <small>Listado de propiedades</small></h1>
+    <div class="well well-sm">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="input-group">
+            <div style="position: relative">
+              <input type="text" class="form-control" placeholder="Buscar">
+              <!--<a id="advanced-search-caret" href="#" style="padding: 6px; position: absolute; right: 2px; z-index: 3"><span class="caret" ></span></a>-->
+            </div>
+            <div class="input-group-btn">
+              <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="pagination-info text-right"><em>Mostrando 1-20 de 127 resultados</em></p>
+    <div class="transaction first">
+      <div class="row">
+        <div class="col-md-6">
+          <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?modul_name=daten&datensatz=193&inhalt=grunddaten" class="onoffice-icon"></a> 
+          <a href="#"><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span></a>
+          Vista Marina 12, Avda. de los Guayres 20, Patalavaca
+        </div>
+        <div class="col-md-3">
+          MOGÁN, 35129 LAS PALMAS
+        </div>
+        <div class="col-md-3">
+          <span class="label label-info">APARTMENT</span>
+          <div class="pull-right">
+            <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" role="button"><span class="glyphicon glyphicon-cog"></span></button>
+            <ul class="dropdown-menu">
+              <li><a class="details" href="#">Ver detalles</a></li>
+              <li><a class="edit" href="#">Editar</a></li>
+              <li><a class="remove" href="#">Eliminar</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <span class="label label-default">RESIDENTIAL</span>
+          <small><span class="glyphicon glyphicon-certificate text-warning"></span> <span class="text-primary">EXCELLENT</span></small>
+        </div>
+        <div class="col-md-3">
+          Construido <span class="badge">59,3m<sup>2</sup></span>
+        </div>
+        <div class="col-md-3">
+          Habitaciones <span class="badge">2</span>
+        </div>
+        <div class="col-md-3">
+          <small><span class="glyphicon glyphicon-screenshot"></span> <span class="text-primary">SUROESTE</span></small>
+        </div>
+      </div>
+    </div>
+    <br>
+    <nav class="text-center" aria-label="...">
+      <ul class="pagination pagination-lg">
+        <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">«</span></a></li>
+        <li class="active"><a href="#">1</a></li>
+        <li><a href="#">2</a></li>
+        <li><a href="#">3</a></li>
+        <li><a href="#">4</a></li>
+        <li><a href="#">5</a></li>
+        <li><a href="#" aria-label="Next"><span aria-hidden="true">»</span></a></li>
+      </ul>
+    </nav>
+  </div>
+  <script>
+    $('.edit').on('click', function() {
+      $('.edit-modal').find('.modal-header h4').html('Editar propiedad');
+      $('.edit-modal').find('.btn-primary, .edit-mode').removeClass('hidden');
+      $('.edit-modal').find('input, select, textarea, checkbox, .btn-danger').attr('disabled', false);
+      $('.edit-modal').modal('show');
+      return false;
+    });
+    $('.details').on('click', function() {
+      $('.edit-modal').find('.modal-header h4').html('Detalles de la propiedad');
+      $('.edit-modal').find('.btn-primary, .edit-mode').addClass('hidden');
+      $('.edit-modal').find('input, select, textarea, checkbox, .btn-danger').attr('disabled', true);
+      $('.edit-modal').modal('show');
+      return false;
+    });
+  </script>
+</body>

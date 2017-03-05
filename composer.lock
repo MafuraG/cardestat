@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "7c35bbd29dc4bff42cff7777639f5b88",
-    "content-hash": "f0588efad192736287604fa86c4cee39",
+    "hash": "e07daebd7d10206d04b387eaff41e7be",
+    "content-hash": "43062470b0def5b6a4cac5c7e6d00c92",
     "packages": [
         {
             "name": "bower-asset/bootstrap",
@@ -924,6 +924,48 @@
             "time": "2017-01-11 14:05:47"
         },
         {
+            "name": "ruskid/yii2-csv-importer",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ruskid/yii2-csv-importer.git",
+                "reference": "6130955dd229e9df858a143e9eb989a6cc00255a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ruskid/yii2-csv-importer/zipball/6130955dd229e9df858a143e9eb989a6cc00255a",
+                "reference": "6130955dd229e9df858a143e9eb989a6cc00255a",
+                "shasum": ""
+            },
+            "require": {
+                "yiisoft/yii2": "*"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "ruskid\\csvimporter\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Victor Demin",
+                    "email": "demin@trabeja.com"
+                }
+            ],
+            "description": "Helper to import csv files into database",
+            "keywords": [
+                "csv",
+                "excel",
+                "importer",
+                "yii2"
+            ],
+            "time": "2017-02-17 11:58:19"
+        },
+        {
             "name": "setasign/fpdi",
             "version": "1.6.1",
             "source": {
@@ -974,16 +1016,16 @@
         },
         {
             "name": "swiftmailer/swiftmailer",
-            "version": "v5.4.5",
+            "version": "v5.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/swiftmailer/swiftmailer.git",
-                "reference": "cd142238a339459b10da3d8234220963f392540c"
+                "reference": "81fdccfaf8bdc5d5d7a1ef6bb3a61bbb1a6c4a3e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/cd142238a339459b10da3d8234220963f392540c",
-                "reference": "cd142238a339459b10da3d8234220963f392540c",
+                "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/81fdccfaf8bdc5d5d7a1ef6bb3a61bbb1a6c4a3e",
+                "reference": "81fdccfaf8bdc5d5d7a1ef6bb3a61bbb1a6c4a3e",
                 "shasum": ""
             },
             "require": {
@@ -1024,7 +1066,7 @@
                 "mail",
                 "mailer"
             ],
-            "time": "2016-12-29 10:02:40"
+            "time": "2017-02-13 07:52:53"
         },
         {
             "name": "twig/twig",
@@ -1089,16 +1131,16 @@
         },
         {
             "name": "yiisoft/yii2",
-            "version": "2.0.11.1",
+            "version": "2.0.11.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-framework.git",
-                "reference": "5c9c894b1d20bc1a39814063adf8a1aeb7c86f77"
+                "reference": "ee996adec1dfd7babb67bd0c604f5bd6425fe5ab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/5c9c894b1d20bc1a39814063adf8a1aeb7c86f77",
-                "reference": "5c9c894b1d20bc1a39814063adf8a1aeb7c86f77",
+                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/ee996adec1dfd7babb67bd0c604f5bd6425fe5ab",
+                "reference": "ee996adec1dfd7babb67bd0c604f5bd6425fe5ab",
                 "shasum": ""
             },
             "require": {
@@ -1185,7 +1227,7 @@
                 "framework",
                 "yii2"
             ],
-            "time": "2017-02-02 18:53:16"
+            "time": "2017-02-08 09:04:32"
         },
         {
             "name": "yiisoft/yii2-bootstrap",
@@ -1551,20 +1593,20 @@
         },
         {
             "name": "yiisoft/yii2-debug",
-            "version": "2.0.7",
+            "version": "2.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-debug.git",
-                "reference": "a74a2433ad1dfda30a253a92f6db52c131807432"
+                "reference": "0c4d7a1085bf3aacfad9bcba48e053d36c2c498a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-debug/zipball/a74a2433ad1dfda30a253a92f6db52c131807432",
-                "reference": "a74a2433ad1dfda30a253a92f6db52c131807432",
+                "url": "https://api.github.com/repos/yiisoft/yii2-debug/zipball/0c4d7a1085bf3aacfad9bcba48e053d36c2c498a",
+                "reference": "0c4d7a1085bf3aacfad9bcba48e053d36c2c498a",
                 "shasum": ""
             },
             "require": {
-                "yiisoft/yii2": "~2.0.4",
+                "yiisoft/yii2": "~2.0.11",
                 "yiisoft/yii2-bootstrap": "~2.0.0"
             },
             "type": "yii2-extension",
@@ -1594,7 +1636,7 @@
                 "debugger",
                 "yii2"
             ],
-            "time": "2016-11-24 09:42:29"
+            "time": "2017-02-19 16:48:01"
         },
         {
             "name": "yiisoft/yii2-faker",
@@ -1699,7 +1741,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "ruskid/yii2-csv-importer": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

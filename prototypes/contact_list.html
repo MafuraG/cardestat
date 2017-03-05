@@ -1,0 +1,413 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Cardestat -- Listado de contactos</title>
+  <meta name="description" content="The HTML5 Herald">
+  <meta name="author" content="SitePoint">
+
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+  <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+  <![endif]-->
+  <style>
+    .transaction {
+      padding: 8px 0;
+      border-bottom: 1px solid #ccc;
+      position: relative;
+    }
+    .transaction.first {
+      border-top: 1px solid #ccc;
+    }
+    p.pagination-info {
+      margin-bottom: 2px;
+    }
+    .modal-header {
+      background:#f1f1f1;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+    }
+    .onoffice-icon {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      position: relative;
+      top: 3px;
+      background-repeat: no-repeat;
+      background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4QEUCw8GkXnd5AAAAh5JREFUOMuNk81OU0EUx39zO0UG0VJpaaExJBoCJuxM1EdwL8/Awg07Vyxd+QK8hE/g1p2YoAkJSEyQRgRpgdKv296Pc1z03kvriklOTiaZ8/U7/zH7+/tTvu9/ADaMMTXucFT1FPjonHtnfd9/X6lUtqrVKtbmAUVHr9CRQ1XTQBQIgqDWbDS2LpuNwDPGbC4uLmGtRdEsQBKfmiSmolhrKZfLGGM2LVDwct4oEIXE65i/7ea2AJ4HULBpaygEUcynL6d8+3nJi9V5Xq0v4KbzqCpRrOwdNfn8/ZycMbx98wwALxkXUaXTDzn+06FSdKw/fUQ+nyMWIRbBAJWi4+F9yyCMMy5e2oGoUP/bJQqF1y9rlOam8QyoJBxQqvOOx+VZpqyHJAksjKpHkXBy1mVlucBC0RHHMgGVZD/GUxaK97IEWQf+MOamF1ArO0RlRF3G6KvS6QV0eyGLJYfKWAIRpTsY0h+EFB7kJ9aXjiAqNG+GtLoB5YKbHEFV+X3h0+mF5IzJKqdrA4hEOKpfMxhGFB/mJyGKKgfHV7T7A36ddTLBSLL/KI7ZO2zw9bBBpeSYnZnKEmQQl0ozDAPhtNFnad5RLrpEGxE/6jccnLRZW57j+WoJGCkVwOzu7naerKzNGs9MKG1ceYwpM1WqiHBeP+56wM5l84IwDDPiMg7xv7uoEkcxndYVwI51zm23W9eu3breAKrc7Zwn33n7HyA+r3XcoM9zAAAAAElFTkSuQmCC);
+    }
+  </style>
+</head>
+<body>
+  <div class="edit-modal modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Editar contacto</h4>
+        </div>
+        <div class="modal-body">
+          <div class="container-fluid">
+            <div class="row">
+              <fieldset>
+                <legend class="col-md-12">Datos personales</legend>
+                <div class="form-group col-md-6">
+                  <label>Título y nombre</label>
+                  <div class="input-group">
+                    <span class="input-group-addon"></span>
+                    <span class="input-group-btn">
+                      <select class="input-sm form-control">
+                        <option selected>Mr.</option>
+                        <option>Ms.</option>
+                        <option>Sr.</option>
+                        <option>Sra.</option>
+                      </select>
+                    </span>
+                    <input class="input-sm form-control" value="Warren E.">
+                  </div>
+                </div>
+                <div class="form-group col-md-6">
+                  <label>Apellidos</label>
+                  <input class="input-sm form-control" value="Buffett">
+                </div>
+                <div class="form-group col-md-6">
+                  <label>Fecha de nacimiento</label>
+                  <div class="input-group">
+                    <input class="input-sm form-control" value="04/02/2016">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></span>
+                  </div>
+                </div>
+                <div class="form-group col-md-6">
+                  <label>Nacionalidad</label>
+                  <select class="input-sm form-control">
+                    <option selected>NORTEAMERICANA</option>
+                  </select>
+                </div>
+                <div class="form-group col-md-6">
+                  <label>NIF</label>
+                  <input class="input-sm form-control" value="X32424340L">
+                </div>
+                <div class="form-group col-md-6">
+                  <label>Idioma</label>
+                  <select class="input-sm form-control">
+                    <option>ESPAÑOL</option>
+                    <option selected>INGLÉS</option>
+                    <option>ALEMÁN</option>
+                  </select>
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend class="col-md-12">Datos de contacto</legend>
+                <div class="form-group col-md-6">
+                  <label>Referencia</label>
+                  <input class="input-sm form-control" value="1043-CO-ct">
+                </div>
+                <div class="form-group col-md-6">
+                  <label>Estado</label>
+                  <select class="input-sm form-control">
+                    <option selected>ACTIVO</option>
+                    <option selected>INACTIVO</option>
+                  </select>
+                </div>
+                <div class="col-md-12">
+                  <div class="panel panel-default">
+                    <div class="panel-heading"><h4 class="panel-title">Vías de contacto</h4></div>
+                    <div class="panel-body">
+                      <table class="table table-condensed">
+                        <thead><tr><th>Tipo de red</th><th>Identificador</th><th>Observaciones</th></tr></thead>
+                        <tbody>
+                          <tr><td>Teléfono</td><td>0031 643 432 532</td><td>Móvil de Holanda</td></tr> 
+                          <tr><td>Teléfono</td><td>0035 928 432 532</td><td>Fijo de España</td></tr>
+                          <tr><td>Fax</td><td>0035 928 432 533</td><td>Fax de empresa</td></tr>
+                          <tr><td>Email</td><td>wbuffett@berkshire.com</td><td>Correo de empresa</td></tr>
+                          <tr><td>Twitter</td><td>@WarrenBuffett</td><td></td></tr>
+                        </tbody>
+                      </table>
+                      <div class="edit-mode">
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#add-via">+ Añadir vía</button>
+                        <div id="add-via" class="collapse">
+                          <div class="form-group col-md-6">
+                            <label>Tipo de red</label>
+                            <select class="input-sm form-control">
+                              <option selected></option>
+                              <option>EMAIL</option>
+                              <option>TELÉFONO</option>
+                              <option>FAX</option>
+                              <option>TWITTER</option>
+                              <option>FACEBOOK</option>
+                            </select>
+                          </div>
+                          <div class="form-group col-md-6">
+                            <label>Identificador</label>
+                            <input class="input-sm form-control" value="">
+                          </div>
+                          <div class="form-group col-md-6">
+                            <label>Observaciones</label>
+                            <input class="input-sm form-control" value="">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend class="col-md-12">Domicilio habitual</legend>
+                <div class="form-group col-md-6">
+                  <label>Dirección de la calle</label>
+                  <input class="input-sm form-control" value="5505 Farnam St.">
+                </div>
+                <div class="form-group col-md-6">
+                  <label>Localidad</label>
+                  <input class="input-sm form-control" value="Omaha">
+                </div>
+                <div class="form-group col-md-6">
+                  <label>Código postal</label>
+                  <input class="input-sm form-control" value="68131">
+                </div>
+                <div class="form-group col-md-6">
+                  <label>Provincia/estado</label>
+                  <input class="input-sm form-control" value="Nebraska">
+                </div>
+                <div class="form-group col-md-6">
+                  <label>País</label>
+                  <select class="input-sm form-control">
+                    <option>ECUADOR</option>
+                    <option selected>EE.UU.</option>
+                    <option>ESPAÑA</option>
+                  </select>
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend class="col-md-12">Datos bancarios</legend>
+                <div class="form-group col-md-6">
+                  <label>Titular</label>
+                  <input class="input-sm form-control" value="WARREN E. BUFFETT">
+                </div>
+                <div class="form-group col-md-6">
+                  <label>Entidad bancaria</label>
+                  <input class="input-sm form-control" value="WELLS FARGO">
+                </div>
+                <div class="form-group col-md-12">
+                  <label>Dirección de la entidad bancaria</label>
+                  <input class="input-sm form-control" value="4425 CENTER ST. OMAHA NE 68105">
+                </div>
+                <div class="form-group col-md-6">
+                  <label>Código swift</label>
+                  <input class="input-sm form-control" value="">
+                </div>
+                <div class="form-group col-md-6">
+                  <label>Código de cuenta</label>
+                  <input class="input-sm form-control" value="XXXX XX XXXX XXXXXXXXX">
+                </div>
+              </fieldset>
+              <div class="form-group col-md-12">
+                <button class="btn btn-lg btn-primary" type="button">Guardar</button>
+              </div>
+            </div>
+            <p class="small text-right">Última actualización el 20 ene '17 por <a href="#">clapas</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <h1 class="page-header">Prototipo <small>Listado de contactos</small></h1>
+    <div class="well well-sm">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="input-group">
+            <div style="position: relative">
+              <input type="text" class="form-control" placeholder="Buscar">
+              <!--<a id="advanced-search-caret" href="#" style="padding: 6px; position: absolute; right: 2px; z-index: 3"><span class="caret" ></span></a>-->
+            </div>
+            <div class="input-group-btn">
+              <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="pagination-info text-right"><em>Mostrando 1-20 de 127 resultados</em></p>
+    <div class="transaction first">
+      <div class="row">
+        <div class="col-md-3">
+          <strong>WARREN E. BUFFETT</strong> <small><span class="label label-success">activo</span></small>
+        </div>
+        <div class="col-md-3">
+          <span class="glyphicon glyphicon-envelope"></span> wbuffett@berkshire.com
+        </div>
+        <div class="col-md-3">
+          <span class="glyphicon glyphicon-earphone"></span> 0034 650 800 900
+        </div>
+        <div class="col-md-3">
+          <span class="glyphicon glyphicon-home"></span> Omaha, Nebraska (U.S.A.)
+          <div class="pull-right">
+            <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" role="button"><span class="glyphicon glyphicon-cog"></span></button>
+            <ul class="dropdown-menu">
+              <li><a class="details" href="#">Ver detalles</a></li>
+              <li><a class="edit" href="#">Editar</a></li>
+              <li><a class="remove" href="#">Eliminar</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?modul_name=daten&datensatz=193&inhalt=grunddaten" class="onoffice-icon"></a> 
+          2342-CO-ct
+        </div>
+        <div class="col-md-3">
+          Transacciones <span class="badge">2</span>
+        </div>
+        <div class="col-md-3">
+          Facturación <span class="badge">12.000,00 €</span>
+        </div>
+        <div class="col-md-3">
+          <span class="text-warning glyphicon glyphicon-gift"></span> 12 ago '30
+        </div>
+      </div>
+    </div>
+    <div class="transaction">
+      <div class="row">
+        <div class="col-md-3">
+          <strong>FRANCISCO GARCÍA PARAMÉS</strong> <small><span class="label label-success">activo</span></small>
+        </div>
+        <div class="col-md-3">
+          <span class="glyphicon glyphicon-envelope"></span> fgarcia@bestinver.com
+        </div>
+        <div class="col-md-3">
+          <span class="glyphicon glyphicon-earphone"></span> 0034 626 119 553
+        </div>
+        <div class="col-md-3">
+          <span class="glyphicon glyphicon-home"></span> Madrid, Madrid (España)
+          <div class="pull-right">
+            <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" role="button"><span class="glyphicon glyphicon-cog"></span></button>
+            <ul class="dropdown-menu">
+              <li><a class="details" href="#">Ver detalles</a></li>
+              <li><a class="edit" href="#">Editar</a></li>
+              <li><a class="remove" href="#">Eliminar</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?modul_name=daten&datensatz=193&inhalt=grunddaten" class="onoffice-icon"></a> 
+          0036-CB-ct
+        </div>
+        <div class="col-md-3">
+          Transacciones <span class="badge">3</span>
+        </div>
+        <div class="col-md-3">
+          Facturación <span class="badge">9.800,00 €</span>
+        </div>
+        <div class="col-md-3">
+          <span class="text-warning glyphicon glyphicon-gift"></span> 22 feb '63
+        </div>
+      </div>
+    </div>
+    <div class="transaction">
+      <div class="row">
+        <div class="col-md-3">
+          <strong>CHARLES T. MUNGER</strong> <small><span class="label label-success">activo</span></small>
+        </div>
+        <div class="col-md-3">
+          <span class="glyphicon glyphicon-envelope"></span> cmunger@berkshire.com
+        </div>
+        <div class="col-md-3">
+          <span class="glyphicon glyphicon-earphone"></span> 0034 649 880 990
+        </div>
+        <div class="col-md-3">
+          <span class="glyphicon glyphicon-home"></span> Pasadena, California (U.S.A.)
+          <div class="pull-right">
+            <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" role="button"><span class="glyphicon glyphicon-cog"></span></button>
+            <ul class="dropdown-menu">
+              <li><a class="details" href="#">Ver detalles</a></li>
+              <li><a class="edit" href="#">Editar</a></li>
+              <li><a class="remove" href="#">Eliminar</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?modul_name=daten&datensatz=193&inhalt=grunddaten" class="onoffice-icon"></a> 
+          7302-CO-ct
+        </div>
+        <div class="col-md-3">
+          Transacciones <span class="badge">1</span>
+        </div>
+        <div class="col-md-3">
+          Facturación <span class="badge">7.000,00 €</span>
+        </div>
+        <div class="col-md-3">
+          <span class="text-warning glyphicon glyphicon-gift"></span> 10 nov '25
+        </div>
+      </div>
+    </div>
+    <div class="transaction">
+      <div class="row">
+        <div class="col-md-3">
+          <strong>MONISH PABRAI</strong> <small><span class="label label-default">inactivo</span></small>
+        </div>
+        <div class="col-md-3">
+          <span class="glyphicon glyphicon-envelope"></span> mprabai@pabraifunds.com
+        </div>
+        <div class="col-md-3">
+          <span class="glyphicon glyphicon-earphone"></span> 0029 709 081 172
+        </div>
+        <div class="col-md-3">
+          <span class="glyphicon glyphicon-home"></span> Irvine, California (U.S.A.)
+          <div class="pull-right">
+            <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" role="button"><span class="glyphicon glyphicon-cog"></span></button>
+            <ul class="dropdown-menu">
+              <li><a class="details" href="#">Ver detalles</a></li>
+              <li><a class="edit" href="#">Editar</a></li>
+              <li><a class="remove" href="#">Eliminar</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?modul_name=daten&datensatz=193&inhalt=grunddaten" class="onoffice-icon"></a> 
+          9423-HO-ct
+        </div>
+        <div class="col-md-3">
+          Transacciones <span class="badge">1</span>
+        </div>
+        <div class="col-md-3">
+          Facturación <span class="badge">4.000,00 €</span>
+        </div>
+        <div class="col-md-3">
+          <span class="text-warning glyphicon glyphicon-gift"></span> 02 jul '68
+        </div>
+      </div>
+    </div>
+    <br>
+    <nav class="text-center" aria-label="...">
+      <ul class="pagination pagination-lg">
+        <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">«</span></a></li>
+        <li class="active"><a href="#">1</a></li>
+        <li><a href="#">2</a></li>
+        <li><a href="#">3</a></li>
+        <li><a href="#">4</a></li>
+        <li><a href="#">5</a></li>
+        <li><a href="#" aria-label="Next"><span aria-hidden="true">»</span></a></li>
+      </ul>
+    </nav>
+  </div>
+  <script>
+    $('.edit').on('click', function() {
+      $('.edit-modal').find('.modal-header h4').html('Editar contacto');
+      $('.edit-modal').find('.btn-primary, .edit-mode').removeClass('hidden');
+      $('.edit-modal').find('input, select, textarea, checkbox, .btn-danger').attr('disabled', false);
+      $('.edit-modal').modal('show');
+      return false;
+    });
+    $('.details').on('click', function() {
+      $('.edit-modal').find('.modal-header h4').html('Detalles de la contacto');
+      $('.edit-modal').find('.btn-primary, .edit-mode').addClass('hidden');
+      $('.edit-modal').find('input, select, textarea, checkbox, .btn-danger').attr('disabled', true);
+      $('.edit-modal').modal('show');
+      return false;
+    });
+  </script>
+</body>

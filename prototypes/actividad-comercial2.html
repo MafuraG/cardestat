@@ -1,0 +1,88 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Cardestat -- Formulario de asesor</title>
+  <meta name="description" content="The HTML5 Herald">
+  <meta name="author" content="SitePoint">
+
+  <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.5.0/d3.js" integrity="sha256-Wtkm8Hhx+IcmSXStJ2R7PWrP3NBmobG5QiadDVok7rk=" crossorigin="anonymous"></script>-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.js" integrity="sha256-gfQwA6PlkZsLqWu4bU4hXPrbTqzixm0B5MdvBLI+Oas=" crossorigin="anonymous"></script>
+  <!--
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+  -->
+  <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+  <![endif]-->
+  <style>
+    .arc text {
+      font: 10px sans-serif;
+      text-anchor: middle;
+    }
+  
+    .arc path {
+      stroke: #fff;
+    }
+  </style>
+<body>
+  <script>
+    var csv = '"Registro De Actividades Diarias  Asesor Comprador\0  Asesor","Registro De Actividades Diarias  Asesor Comprador\1  Demandas Entrantes\ Email  In Con Fecha","Registro De Actividades Diarias  Asesor Comprador\1  Demandas Entrantes\ Email  In Sin Fecha","Registro De Actividades Diarias  Asesor Comprador\1  Demandas Entrantes\ Llamada  In","Registro De Actividades Diarias  Asesor Comprador\1  Demandas Entrantes\ Pop  In","Registro De Actividades Diarias  Asesor Comprador\2  Follow Ups\ Fecha Próc   Visita  Gc\  Con Fecha Próx  Visita  Gc","Registro De Actividades Diarias  Asesor Comprador\2  Follow Ups\ Fecha Próc   Visita  Gc\  Sin Fecha Próx   Visita  Gc","Registro De Actividades Diarias  Asesor Comprador\2  Follow Ups\ Fin Drip\ Follow Up Fin Drip","Registro De Actividades Diarias  Asesor Comprador\2  Follow Ups\ Follow Up Via\1  Por Tel","Registro De Actividades Diarias  Asesor Comprador\2  Follow Ups\ Follow Up Via\2  Por Email","Registro De Actividades Diarias  Asesor Comprador\2  Follow Ups\  Por Email","Registro De Actividades Diarias  Asesor Comprador\2  Follow Ups\  Por Tel","Registro De Actividades Diarias  Asesor Comprador\2  Follow Ups\ Tipo  Searcher\ Follow Up  A","Registro De Actividades Diarias  Asesor Comprador\2  Follow Ups\ Tipo  Searcher\ Follow Up  A+","Registro De Actividades Diarias  Asesor Comprador\2  Follow Ups\ Tipo  Searcher\ Follow Up  B","Registro De Actividades Diarias  Asesor Comprador\2  Follow Ups\ Tipo  Searcher\ Follow Up  B+","Registro De Actividades Diarias  Asesor Comprador\2  Follow Ups\ Tipo  Searcher\ Follow  Up  C +  Nc","Registro De Actividades Diarias  Asesor Comprador\3  Resultados Follow Ups\1  Visita Programada","Registro De Actividades Diarias  Asesor Comprador\3  Resultados Follow Ups\2  Fecha Próx  Visita  Gc","Registro De Actividades Diarias  Asesor Comprador\3  Resultados Follow Ups\3  Concretado Sigte  Paso","Registro De Actividades Diarias  Asesor Comprador\3  Resultados Follow Ups\4  Recalificación","Registro De Actividades Diarias  Asesor Comprador\3  Resultados Follow Ups\5  Sin Avance","Registro De Actividades Diarias  Asesor Comprador\3  Resultados Follow Ups\6  Ya No Interesado","Registro De Actividades Diarias  Asesor Comprador\4  Visitas Con Compradores Nuestros\1  Clientes Con Visita (no Repetir Cliente)","Registro De Actividades Diarias  Asesor Comprador\4  Visitas Con Compradores Nuestros\2  Visitas\2ª Visita Misma Prop","Registro De Actividades Diarias  Asesor Comprador\4  Visitas Con Compradores Nuestros\2  Visitas\ Propiedades Visitadas De Colab","Registro De Actividades Diarias  Asesor Comprador\4  Visitas Con Compradores Nuestros\2  Visitas\ Propiedades Visitadas Nuestras","Registro De Actividades Diarias  Asesor Comprador\4  Visitas Con Compradores Nuestros\3  Ofertas","Registro De Actividades Diarias  Asesor Comprador\4  Visitas Con Compradores Nuestros\4  Ventas	\ Ventas Propiedades Colaboradores","Registro De Actividades Diarias  Asesor Comprador\4  Visitas Con Compradores Nuestros\4  Ventas	\ Ventas Prop  Nuestras","Registro De Actividades Diarias  Asesor Comprador\5  Visitas Con Compradores De Colaboradores	\ Propiedades Visitadas","Registro De Actividades Diarias  Asesor Comprador\5  Visitas Con Compradores De Colaboradores	\ Ventas","Registro De Actividades Diarias  Asesor Comprador\6  Otros\ Ampliar Círculo Influencia","Registro De Actividades Diarias  Asesor Comprador\6  Otros\ Recomendación Recibida","From","To"\n"Yvonne","1","2","1","","","","","","","","","","","","","","","","","","","","9","1","1","10","2","","3","4","","","1","2016-12-01","2016-12-31"\n"Stephan","3","18","4","7","","","","","","","","","","","","","","","","","","","5","1","4","1","","","","","","","1","2016-12-01","2016-12-31"\n"Rafa","2","10","1","7","","","","","","","","","","","","","","","","","","","20","1","2","31","","","1","15","","","","2016-12-01","2016-12-31"\n"Leonor","4","10","","1","","","","","","","","","","","","","","","","","","","14","","1","23","3","","2","","","","2","2016-12-01","2016-12-31"\n"Stephan","6","13","1","7","","","","","","","","","","","","","","","","","","","","1","","5","","","1","","","","","2017-01-01","2017-01-31"\n"Yvonne","7","1","4","2","","","","","","","","","","","","","","","","","","","10","1","1","12","1","","1","","","1","","2017-01-01","2017-01-31"\n"Leonor","4","10","1","1","","","","","","","","","","","","","","","","","","","7","","","20","","","1","1","","2","","2017-01-01","2017-01-31"\n"Rafa","7","33","1","1","","","","","","","","","","","","","","","","","","","17","1","","34","","","","","","","","2017-01-01","2017-01-31"';
+    var data = d3.csv.parse(csv, function(d) {
+      if (!d["Registro De Actividades Diarias  Asesor Comprador\4  Visitas Con Compradores Nuestros\1  Clientes Con Visita (no Repetir Cliente)"])
+        d["Registro De Actividades Diarias  Asesor Comprador\4  Visitas Con Compradores Nuestros\1  Clientes Con Visita (no Repetir Cliente)"] = 0.0;
+      return d;
+    });
+    data = data.filter(function(d) { return d.From == "2017-01-01"; });
+    console.log(data);
+    var width = 960,
+        height = 500,
+        radius = Math.min(width, height) / 2;
+    
+    var color = d3.scale.ordinal()
+        .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+    
+    var arc = d3.svg.arc()
+        .outerRadius(radius - 10)
+        .innerRadius(0);
+    
+    var labelArc = d3.svg.arc()
+        .outerRadius(radius - 40)
+        .innerRadius(radius - 40);
+    
+    var pie = d3.layout.pie()
+        .sort(null)
+        .value(function(d) { return d["Registro De Actividades Diarias  Asesor Comprador\4  Visitas Con Compradores Nuestros\1  Clientes Con Visita (no Repetir Cliente)"]; });
+    
+    var svg = d3.select("body").append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .append("g")
+        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+    
+    var g = svg.selectAll(".arc")
+        .data(pie(data))
+        .enter().append("g")
+        .attr("class", "arc");
+  
+    g.append("path")
+        .attr("d", arc)
+        .style("fill", function(d) { return color(d.data["Registro De Actividades Diarias  Asesor Comprador\0  Asesor"]); });
+  
+    g.append("text")
+        .attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; })
+        .attr("dy", ".35em")
+        .text(function(d) { return d.data["Registro De Actividades Diarias  Asesor Comprador\0  Asesor"]; });
+    
+    function type(d) {
+      d.population = +d.population;
+      return d;
+    }
+  </script>
+  <div class="container">
+  </div>
+</body>
+</html>

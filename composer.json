@@ -24,6 +24,7 @@
         "kartik-v/yii2-date-range": "~1.6",
         "rmrevin/yii2-fontawesome": "*",
         "kartik-v/yii2-export": "*",
+        "ruskid/yii2-csv-importer": "@dev",
         "mpdf/mpdf": "*"
     },
     "require-dev": {
