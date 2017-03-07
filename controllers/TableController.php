@@ -27,10 +27,6 @@ class TableController extends Controller {
                     'actions' => ['ajax-delete-group', 'ajax-delete-item', 'action-create-table', 'ajax-update-item'],
                     'roles' => ['admin']
                 ], [
-                    'allow' => false,
-                    'actions' => ['ajax-delete-group', 'ajax-delete-item', 'action-create-table', 'ajax-update-item'],
-                    'roles' => ['@']
-                ], [
                     'allow' => true,
                     'roles' => ['@']
                 ]]

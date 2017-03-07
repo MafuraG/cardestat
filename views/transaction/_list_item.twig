@@ -51,13 +51,13 @@
       <small><span class="glyphicon glyphicon-time"></span> {{ model.sale_duration }} {{ t('app', 'days') }}</small>
     {% endif %}
   </div>
-  <div class="col-md-4">
+  <small class="col-md-4 text-warning">
     {% if (model.advisors) %}
       {{ model.advisors }}
     {% else %}
-      <em>{{ t('app', 'No advisors found') }}</em>
+      <em class="text-danger">{{ t('app', 'No advisors found') }}</em>
     {% endif %}
-  </div>
+  </small>
   <div class="col-md-2">
     <small>{{ t('app', 'Payrolled') }}
       {% if (model.payrolled_at) %}

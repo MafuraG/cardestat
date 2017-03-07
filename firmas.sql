@@ -54,9 +54,10 @@ $f$ language sql immutable;
 --
 
 select load_csv_file('firmas', '/home/claudio/Downloads/Firmas_incompleto.csv', 12);
-select load_csv_file('sellers', '/home/claudio/Downloads/Agents Book - Buyers a 070217.csv', 10);
-select load_csv_file('buyers', '/home/claudio/Downloads/Agents Book - Sellers a 070217.csv', 10);
-alter table firmas add column step integer;
+select load_csv_file('buyers', '/home/claudio/Downloads/Agents Book - Buyers a 070217.csv', 10);
+select load_csv_file('sellers', '/home/claudio/Downloads/Agents Book - Sellers a 070217.csv', 10);
+alter table firmas add column step_s integer;
+alter table firmas add column step_b integer;
 alter table firmas add column fill_price boolean not null default false;
 update firmas set precio = null::text[] where trim(precio) = '';
 update firmas set fill_price = true where precio is null;
@@ -83,12 +84,12 @@ update firmas set vendedor = 'Malibú' where id = '210';
 
 --CREATE EXTENSION unaccent;
 
--------------
+-----------
 -- vendedor
--------------
+-----------
 
 update firmas 
-    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step = 0
+    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step_s = -1
     from (
         select f.vendedor, f.comprador, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -105,7 +106,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_vendedor is null;
 
 update firmas 
-    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step = 1
+    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step_s = 0
     from (
         select f.vendedor, f.comprador, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -121,7 +122,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_vendedor is null;
 
 update firmas 
-    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step = 2
+    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step_s = 1
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -137,7 +138,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_vendedor is null;
 
 update firmas 
-    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step = 2
+    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step_s = 2
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -152,7 +153,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_vendedor is null;
 
 update firmas 
-    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step = 3
+    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step_s = 3
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -166,7 +167,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_vendedor is null;
 
 update firmas 
-    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step = 4
+    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step_s = 4
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -181,7 +182,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_vendedor is null;
 
 update firmas 
-    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step = 4
+    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step_s = 5
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -195,7 +196,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_vendedor is null;
 
 update firmas 
-    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step = 5
+    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step_s = 6
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -209,7 +210,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_vendedor is null;
 
 update firmas 
-    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step = 6
+    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step_s = 7
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -222,20 +223,21 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_vendedor is null;
 
 update firmas 
-    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step = 7
+    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step_s = 8
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
                 select contact_name, contact_number, string_agg(comment, ' ') as comment, external_property_number
                 from sellers 
+                where contact_number in ('1662', '18187')
                 group by contact_name, contact_number, external_property_number) v, 
                 firmas f 
-            where unaccent(v.comment) ~* ('Vendedor[^\r\w][^\r]*' || replace(unaccent(f.comprador), ' ', '.') || '\W')
+            where unaccent(v.comment) ~* ('Vendedor[^\r\w][^\r]*' || replace(unaccent(f.vendedor), ' ', '.') || '\W')
             group by f.comprador, f.vendedor, f.vivienda) t
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_vendedor is null;
 
 update firmas 
-    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step = 9
+    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step_s = 9
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -248,7 +250,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_vendedor is null;
 
 update firmas 
-    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step = 10
+    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step_s = 10
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -261,7 +263,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_vendedor is null;
 
 update firmas 
-    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step = 11
+    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step_s = 11
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -274,7 +276,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_vendedor is null;
 
 update firmas 
-    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step = 12
+    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step_s = 12
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -287,7 +289,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_vendedor is null;
 
 update firmas 
-    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step = 13
+    set ref_vendedor = array_distinct(contact_number_agg), ref_prop = array_distinct(ref_prop_agg), step_s = 13
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -304,7 +306,7 @@ update firmas
 -------------
 
 update firmas 
-    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step = 101
+    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step_b = 99
     from (
         select f.vendedor, f.comprador, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -321,7 +323,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_comprador is null;
 
 update firmas 
-    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step = 101
+    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step_b = 100
     from (
         select f.vendedor, f.comprador, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -337,7 +339,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_comprador is null;
 
 update firmas 
-    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step = 102
+    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step_b = 101
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -353,7 +355,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_comprador is null;
 
 update firmas 
-    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step = 102
+    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step_b = 102
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -368,7 +370,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_comprador is null;
 
 update firmas 
-    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step = 103
+    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step_b = 103
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -382,7 +384,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_comprador is null;
 
 update firmas 
-    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step = 104
+    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step_b = 104
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -397,7 +399,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_comprador is null;
 
 update firmas 
-    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step = 104
+    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step_b = 105
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -411,7 +413,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_comprador is null;
 
 update firmas 
-    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step = 105
+    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step_b = 106
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -425,7 +427,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_comprador is null;
 
 update firmas 
-    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step = 106
+    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step_b = 107
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -438,7 +440,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_comprador is null;
 
 update firmas 
-    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step = 107
+    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step_b = 108
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -451,7 +453,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_comprador is null;
 
 update firmas 
-    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step = 109
+    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step_b = 109
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -464,7 +466,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_comprador is null;
 
 update firmas 
-    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step = 110
+    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step_b = 110
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -477,7 +479,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_comprador is null;
 
 update firmas 
-    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step = 111
+    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step_b = 111
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -490,7 +492,7 @@ update firmas
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_comprador is null;
 
 update firmas 
-    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step = 112
+    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step_b = 112
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -498,12 +500,12 @@ update firmas
                 from buyers 
                 group by contact_name, contact_number, external_property_number) v, 
                 firmas f 
-            where unaccent(v.comment) ~* ('Vendedor[^\r\w][^\r]*' || substring(unaccent(f.vendedor), '(\w{4,})') || '\W')
+            where unaccent(v.comment) ~* ('Comprador[^\r\w][^\r]*' || substring(unaccent(f.comprador), '(\w{4,})') || '\W')
             group by f.comprador, f.vendedor, f.vivienda) t
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_comprador is null;
 
 update firmas 
-    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step = 113
+    set ref_comprador = array_distinct(contact_number_agg), ref_prop = array_distinct(array_cat(ref_prop::text[], ref_prop_agg)), step_b = 113
     from (
         select f.comprador, f.vendedor, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg
             from (
@@ -511,22 +513,9 @@ update firmas
                 from buyers 
                 group by contact_name, contact_number, external_property_number) v, 
                 firmas f 
-            where unaccent(v.comment) ~* ('Vendedor[^\r\w][^\r]*' || substring(unaccent(f.vendedor), '\w{4,}\W+(\w{4,})') || '\W')
+            where unaccent(v.comment) ~* ('Comprador[^\r\w][^\r]*' || substring(unaccent(f.comprador), '\w{4,}\W+(\w{4,})') || '\W')
             group by f.comprador, f.vendedor, f.vivienda) t
     where t.comprador = firmas.comprador and t.vendedor = firmas.vendedor and t.vivienda = firmas.vivienda and ref_comprador is null;
-
-select f.vendedor, f.comprador, f.vivienda, array_agg(v.contact_number) contact_number_agg, array_agg(v.external_property_number) as ref_prop_agg,
-    (select array_agg(p) from (select regexp_replace((regexp_matches(string_agg(comment, ' '), 'Precio[^\r\d]+([\d,.]+)\W', 'ig'))[1], '[.,]', '', 'g') p) x) as prices
-            from (
-                select property_adress, contact_name, contact_number, string_agg(comment, ' ') as comment, external_property_number
-                from sellers
-                group by property_adress, contact_name, contact_number, external_property_number) v, 
-                firmas f 
-            where unaccent(v.contact_name) ~* ('(^|\W)' || replace(unaccent(f.vendedor), ' ', '.') || '($|\W)') and
-                  unaccent(v.comment) ~* ('Comprador[^\r\w][^\r]*' || replace(unaccent(f.comprador), ' ', '.') || '\W') and
-                  unaccent(v.comment) ~* ('Vendedor[^\r\w][^\r]*' || replace(unaccent(f.vendedor), ' ', '.') || '\W') and
-                  unaccent(v.property_adress) ~* ('\W' || replace(unaccent(f.vivienda), ' ', '.') || '\W')
-            group by f.comprador, f.vendedor, f.vivienda;
 
 ----------
 -- precio
@@ -575,8 +564,8 @@ update firmas set precio = prices
         group by id) sq2
     where firmas.id = sq2.id;
 
-insert into transaction (option_signed_at, sale_price_euc, buyer_id, seller_id, property_id, created_at, updated_at)
-    select f.fecha_firma::date, f.precio::integer*100, b.id, s.id, p.id, now(), now()
+insert into transaction (external_id, option_signed_at, sale_price_euc, buyer_id, seller_id, property_id, created_at, updated_at)
+    select f.id, f.fecha_firma::date, f.precio::integer*100, b.id, s.id, p.id, now(), now()
     from firmas f
          join contact s on ((f.ref_vendedor::text[])[1] = s.reference)
          join contact b on ((f.ref_comprador::text[])[1] = b.reference)
@@ -587,8 +576,8 @@ insert into transaction (option_signed_at, sale_price_euc, buyer_id, seller_id, 
           array_length(f.ref_prop::text[], 1) = 1 and
           fecha_firma ~ '\d{4}\W\d{2}\W\d{2}';
 
-insert into transaction (option_signed_at, sale_price_euc, buyer_id, seller_id, property_id, created_at, updated_at)
-    select f.fecha_firma::date, (f.precio::text[])[1]::integer*100, b.id, s.id, p.id, now(), now()
+insert into transaction (external_id, option_signed_at, sale_price_euc, buyer_id, seller_id, property_id, created_at, updated_at)
+    select f.id, f.fecha_firma::date, (f.precio::text[])[1]::integer*100, b.id, s.id, p.id, now(), now()
     from firmas f
          join contact s on ((f.ref_vendedor::text[])[1] = s.reference)
          join contact b on ((f.ref_comprador::text[])[1] = b.reference)
@@ -599,3 +588,26 @@ insert into transaction (option_signed_at, sale_price_euc, buyer_id, seller_id, 
           array_length(f.ref_comprador::text[], 1) = 1 and
           array_length(f.ref_prop::text[], 1) = 1 and
           fecha_firma ~ '\d{4}\W\d{2}\W\d{2}';
+
+insert into attribution (advisor_id, attribution_type_id, attribution_euc, transaction_id)
+    select ad.id, at.id, 0, t.id
+    from firmas f
+         join transaction t on (t.external_id = f.id)
+         join attribution_type at on (at.name = 'UNKNOWN' and attribution_bp = 0),
+         advisor ad
+    where 'RA' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'RAFAEL ALZOLA' or
+          'GG' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'GILBERTO GIL' or
+          'LL' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'LONNIE LINDQUIST' or
+          'LM' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'LEONOR MARTÍN' or
+          'CG' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'CAROLINA GARCÍA' or
+          'AK' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'AXEL KUBISCH' or
+          'DG' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'DANIEL GARCÍA' or
+          'SB' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'STEPHAN BERGONJE' or
+          'CM' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'CARINA MAEHLE' or
+          'KB' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'KENT BERGSTEN' or
+          'IH' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'INGE HILDEBRANDT' or
+          'DT' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'DEBORAH TESCH' or
+          'YW' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'YVONNE WEERTS' or
+          'TB' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'THERESA BONA' or
+          'TE' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'THOMAS EKBLOM' or
+          'CC' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'CRISTINA CARUSO'

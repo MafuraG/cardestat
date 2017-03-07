@@ -4,6 +4,8 @@ namespace app\models;
 
 use Yii;
 
+use yii\helpers\ArrayHelper;
+
 /**
  * This is the model class for table "advisor".
  *
@@ -95,5 +97,12 @@ class Advisor extends \yii\db\ActiveRecord
     public function getTransactions()
     {
         return $this->hasMany(Transaction::className(), ['passed_to_sales_by' => 'id']);
+    }
+
+    /**
+     */
+    public static function listAll()
+    {
+        return ArrayHelper::map(static::find()->all(), 'id', 'name');
     }
 }

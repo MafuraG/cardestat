@@ -39,9 +39,9 @@ class m170303_154953_transactions extends Migration
             'attribution_bp' => $this->integer()->notNull(),
         ]);
         $this->batchInsert('attribution_type', ['name', 'attribution_bp'], [[
-            'ATTRACTION', 3000
+            'UNKNOWN', 0
         ], [
-            'PUERTO DE MOGÁN', 7000 
+            'ATTRACTION', 3000
         ]]);
         $this->createIndex('attribution_type-name-attribution_bp-uidx', 'attribution_type', ['name', 'attribution_bp'], true);
         $this->createTable('advisor', [
@@ -50,11 +50,39 @@ class m170303_154953_transactions extends Migration
             'default_office' => $this->string(18) . ' references office(name)',
             'default_attribution_type_id' => $this->integer() . ' references attribution_type(id)',
         ]);
-        $attraction3000_id = Yii::$app->db->createCommand('select id from attribution_type where name = \'ATTRACTION\' and attribution_bp = 3000')->execute();
+        $unknown0_id = Yii::$app->db->createCommand('select id from attribution_type where attribution_bp = 0')->execute();
         $this->batchInsert('advisor', ['name', 'default_office', 'default_attribution_type_id'], [[
-            'RAFA', 'PUERTO DE MOGÁN', $attraction3000_id
+            'RAFAEL ALZOLA', 'ARGUINEGUÍN', $unknown0_id
         ], [
-            'ROBERT', 'PUERTO RICO', $attraction3000_id + 1
+            'GILBERTO GIL', 'ARGUINEGUÍN', $unknown0_id
+        ], [
+            'LONNIE LINDQUIST', 'ARGUINEGUÍN', $unknown0_id
+        ], [
+            'LEONOR MARTÍN', 'ARGUINEGUÍN', $unknown0_id
+        ], [
+            'CAROLINA GARCÍA', 'ARGUINEGUÍN', $unknown0_id
+        ], [
+            'AXEL KUBISCH', 'ARGUINEGUÍN', $unknown0_id
+        ], [
+            'DANIEL GARCÍA', 'ARGUINEGUÍN', $unknown0_id
+        ], [
+            'STEPHAN BERGONJE', 'ARGUINEGUÍN', $unknown0_id
+        ], [
+            'CARINA MAEHLE', 'ARGUINEGUÍN', $unknown0_id
+        ], [
+            'KENT BERGSTEN', 'ARGUINEGUÍN', $unknown0_id
+        ], [
+            'INGE HILDEBRANDT', 'ARGUINEGUÍN', $unknown0_id
+        ], [
+            'DEBORAH TESCH', 'ARGUINEGUÍN', $unknown0_id
+        ], [
+            'YVONNE WEERTS', 'ARGUINEGUÍN', $unknown0_id
+        ], [
+            'THERESA BONA', 'ARGUINEGUÍN', $unknown0_id
+        ], [
+            'THOMAS EKBLOM', 'ARGUINEGUÍN', $unknown0_id
+        ], [
+            'CRISTINA CARUSO', 'ARGUINEGUÍN', $unknown0_id
         ]]);
         $this->createTable('advisor_tranche', [
             'id' => $this->primaryKey(),
@@ -63,7 +91,7 @@ class m170303_154953_transactions extends Migration
             'advisor_id' => $this->integer()->notNull() . ' references advisor(id)'
         ]);
         $this->createIndex('advisor_tranche-from_euc-advisor_id-uidx', 'advisor_tranche', ['from_euc', 'advisor_id'], true);
-        $rafa_id = Yii::$app->db->createCommand('select id from advisor where name = \'RAFA\'')->execute();
+        $rafa_id = Yii::$app->db->createCommand('select id from advisor where name = \'RAFAEL ALZOLA\'')->execute();
         $this->batchInsert('advisor_tranche', ['from_euc', 'commission_bp', 'advisor_id'], [[
             0, 2000, $rafa_id
         ], [
@@ -77,6 +105,7 @@ class m170303_154953_transactions extends Migration
         $this->batchInsert('recipient_category', ['name'], [['BUYER'], ['SELLER'], ['COLLABORATOR']]);
         $this->createTable('transaction', [
             'id' => $this->primaryKey(),
+            'external_id' => $this->string(12)->unique(),
             'transaction_type' => $this->string(18)->notNull()->defaultValue('TRADING') . ' references transaction_type(name)',
             'custom_type' => $this->string(32) . ' references custom_type(name)',
             'transfer_type' => $this->string(32) . ' references transfer_type(name)',
@@ -117,7 +146,7 @@ class m170303_154953_transactions extends Migration
         $this->createTable('attribution', [
             'id' => $this->primaryKey(),
             'advisor_id' => $this->integer()->notNull() . ' references advisor(id)',
-            'office' => $this->string(18) . ' references office(name)',
+            'office' => $this->string(18) . ' references office(name)', // null means all/no offices
             'attribution_type_id' => $this->integer()->notNull() . ' references attribution_type(id)',
             'attribution_euc' => $this->integer()->notNull(),
             'transaction_id' => $this->integer()->notNull() . ' references transaction(id)',
@@ -139,8 +168,11 @@ class m170303_154953_transactions extends Migration
                        buyer_provider is null and seller_provider is null as cardenas100,
                        string_agg(ad.name, \', \') as advisors,
                        i.count as n_invoices,
-                       fi.first_issued_at as first_invoice_issued_at,
-                       sale_price_euc::float / our_fee_euc as our_fee_bp
+                       fi.first_issued_at as first_invoiced_at,
+                       sale_price_euc::float / our_fee_euc as our_fee_bp,
+                       t.buyer_provider is not null or t.seller_provider is not null as with_collaborator,
+                       i.count is not null as invoiced,
+                       payrolled_at is not null as payrolled
                 from transaction t
                      join property p on (p.id = t.property_id)
                      join contact b on (b.id = t.buyer_id)
@@ -153,7 +185,7 @@ class m170303_154953_transactions extends Migration
                      left join (select transaction_id, min(issued_at) as first_issued_at
                            from invoice
                            group by transaction_id) fi on (fi.transaction_id = t.id)
-                group by t.id, p.reference, p.location, p.building_complex, s.reference, s.first_name, s.last_name, b.reference, b.first_name, b.last_name, i.count, fi.first_issued_at');
+                group by t.id, p.reference, p.location, p.building_complex, s.reference, s.first_name, s.last_name, b.reference, b.first_name, b.last_name, i.count, fi.first_issued_at, t.buyer_provider, t.seller_provider');
     }
 
     public function safeDown() {

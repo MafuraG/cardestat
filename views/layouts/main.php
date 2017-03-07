@@ -40,6 +40,7 @@ AppAsset::register($this);
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
             ['label' => \Yii::t('app', 'Home'), 'url' => ['/table/index']],
+            ['label' => \Yii::t('app', 'Transactions'), 'url' => ['/transaction/index']],
             ['label' => \Yii::t('app', 'Presentations'), 'items' => [
                 ['label' => \Yii::t('app', 'Salesmeter'), 'url' => ['/presentation/n-sales']],
             ]],
@@ -72,7 +73,7 @@ AppAsset::register($this);
 
 <footer class="footer">
     <div class="container-fluid">
-        <p class="text-center">&copy; Inmobiliaria Cárdenas <?= date('Y') ?></p>
+        <p>&copy; Inmobiliaria Cárdenas <?= date('Y') ?></p>
     </div>
 </footer>
 

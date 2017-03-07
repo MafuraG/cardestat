@@ -266,6 +266,17 @@ td .btn .glyphicon {
   text-transform: uppercase;
 
 }
-.text-warning {
+.glyphicon.text-warning {
   color: #ffc000;
+}
+.advanced-input {
+  padding: 12px;
+  position: absolute;
+  width: 100%;
+  border: 1px solid #ccc;
+  background: white;
+  z-index: 4;
+  -webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  -webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
