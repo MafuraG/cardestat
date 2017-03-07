@@ -79,8 +79,11 @@ $yesno = [true => Yii::t('app', 'Yes'), false => Yii::t('app', 'No')]
                 ]); ?>
               </div>
               <div class="col-md-6">
-                <?= $form->field($model, 'advisors')
-                    ->dropDownList(Advisor::listAll(), ['prompt' => '', 'class' => 'form-control input-sm']) ?>
+                <?php 
+                    $advisors = Advisor::listAll();
+                    $advisors = array_combine(array_values($advisors), array_values($advisors));
+                    echo $form->field($model, 'advisors')
+                        ->dropDownList($advisors, ['prompt' => '', 'class' => 'form-control input-sm']) ?>
               </div>
               <div class="clearfix"></div>
               <div class="col-md-3">
