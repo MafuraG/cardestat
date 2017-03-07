@@ -113,7 +113,7 @@ $yesno = [true => Yii::t('app', 'Yes'), false => Yii::t('app', 'No')]
                       </select>
                     </div>
                     <select name="direction" class="input-sm form-control">
-                      <option><?= Yii::t('app', 'Asc') ?></option>
+                      <option value=""><?= Yii::t('app', 'Asc') ?></option>
                       <option selected value="-"><?= Yii::t('app', 'Desc') ?></option>
                     </select>
                   </div>
