@@ -3,9 +3,17 @@
 use yii\widgets\ListView;
 use yii\bootstrap\BootstrapAsset;
 use yii\widgets\Pjax;
+use yii\bootstrap\Modal;
+use yii\helpers\Html;
+use yii\helpers\Url;
 BootstrapAsset::register($this);
 ?>
 <h1 class="page-header"><?= Yii::t('app', 'Transactions')?></h1>
+<p>
+<?= Html::a(Yii::t('app', 'Create'), ['transaction/create'], [
+    'class' => 'btn btn-primary',
+]) ?>
+</p>
 <?= $this->render('_search', [
     'model' => $searchModel
 ]) ?>
@@ -19,8 +27,21 @@ BootstrapAsset::register($this);
         }
 ]); ?>
 <?php Pjax::end() ?>
+<?php Modal::begin([
+    'header' => '<h4 class="modal-title">Hello world</h4>',
+    'size' => Modal::SIZE_LARGE,
+    'id' => 'transaction-modal'
+]) ?>
+  <div class="container-fluid">
+  <?php Pjax::begin() ?>
+  <?php Pjax::end() ?>
+  </div>
+<?php Modal::end() ?>
 <?php
+$tranDetailsLbl = Yii::t('app', 'Transaction details');
+$tranFormUrl = Url::to(['transaction/update', 'id' => '_id_']);
 $script = <<< JS
+  var detailsUrl = '$tranFormUrl';
   $.pjax.defaults.timeout = 6000;
   $('.transaction-list-item-search form').on('submit', function(e) {
       $.pjax.submit(e, '#p0', {scrollTo: false})
@@ -58,6 +79,14 @@ $script = <<< JS
       $(document).off('click', closeAdvancedSearch);
     }
   }
+  $('a.transaction-details').on('click', function() {
+    $('#transaction-modal').find('.modal-header h4').html('$tranDetailsLbl');
+    $('#transaction-modal').find('.btn-primary, .edit-mode').addClass('hidden');
+    $('#transaction-modal').find('input, select, textarea, checkbox, .btn-danger').attr('disabled', true);
+    var id = $(this).closest('.transaction').data('key');
+    $.pjax({container: '#p1', url: detailsUrl.replace('_id_', id), scrollTo: false, push: false});
+    $('#transaction-modal').modal('show');
+  });
 JS;
 $this->registerJs($script);
 ?>

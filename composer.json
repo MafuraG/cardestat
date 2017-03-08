@@ -25,6 +25,7 @@
         "kartik-v/yii2-widget-datepicker": "*",
         "rmrevin/yii2-fontawesome": "*",
         "kartik-v/yii2-export": "*",
+        "kartik-v/yii2-widget-select2": "@dev",
         "ruskid/yii2-csv-importer": "@dev",
         "mpdf/mpdf": "*"
     },

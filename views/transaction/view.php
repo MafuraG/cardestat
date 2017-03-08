@@ -6,8 +6,8 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model app\models\TransactionListItem */
 
-$this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Transaction List Items'), 'url' => ['index']];
+$this->title = Yii::t('app', 'Transaction #{id}', ['id' => $model->id]);
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Transactions'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="transaction-list-item-view">
@@ -69,7 +69,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'cardenas100:boolean',
             'advisors:ntext',
             'n_invoices',
-            'first_invoice_issued_at',
+            'first_invoiced_at',
             'our_fee_bp',
         ],
     ]) ?>

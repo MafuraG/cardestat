@@ -3,6 +3,8 @@
 namespace app\controllers;
 
 use Yii;
+use app\models\Invoice;
+use app\models\Transaction;
 use app\models\TransactionListItem;
 use app\models\TransactionListItemSearch;
 use yii\web\Controller;
@@ -60,7 +62,7 @@ class TransactionController extends Controller
     public function actionView($id)
     {
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $this->findListModel($id),
         ]);
     }
 
@@ -71,7 +73,7 @@ class TransactionController extends Controller
      */
     public function actionCreate()
     {
-        $model = new TransactionListItem();
+        $model = new Transaction();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -90,10 +92,16 @@ class TransactionController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        $model = $this->findModel($id, true);
+        $invoice = new Invoice();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
+        } elseif (Yii::$app->request->isAjax) {
+            return $this->renderAjax('_form', [
+                'model' => $model,
+                'invoice' => $invoice
+            ]);
         } else {
             return $this->render('update', [
                 'model' => $model,
@@ -121,9 +129,24 @@ class TransactionController extends Controller
      * @return TransactionListItem the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected function findListModel($id)
     {
         if (($model = TransactionListItem::findOne($id)) !== null) {
+            return $model;
+        } else {
+            throw new NotFoundHttpException('The requested page does not exist.');
+        }
+    }
+
+    protected function findModel($id, $with_related = false)
+    {
+        if ($with_related) {
+            if (($model = Transaction::find()
+                ->with(['invoices', 'attributions.advisor', 'attributions.attributionType'])
+                ->where(['id' => $id]) 
+                ->one()) !== null) return $model;
+            else throw new NotFoundHttpException('The requested page does not exist.');
+        } else if (($model = Transaction::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

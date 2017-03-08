@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "transfer_type".
@@ -48,5 +49,10 @@ class TransferType extends \yii\db\ActiveRecord
     public function getTransactions()
     {
         return $this->hasMany(Transaction::className(), ['transfer_type' => 'name']);
+    }
+
+    public static function listAll()
+    {
+        return ArrayHelper::map(static::find()->all(), 'name', 'name');
     }
 }

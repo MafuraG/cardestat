@@ -3,6 +3,15 @@
 namespace app\models;
 
 use Yii;
+use app\models\Contact;
+use app\models\Advisor;
+use app\models\CustomType;
+use app\models\DevelopmentType;
+use app\models\LeadType;
+use app\models\Invoice;
+use app\models\Partner;
+use app\models\Property;
+use app\models\TransactionType;
 
 /**
  * This is the model class for table "transaction".
@@ -53,6 +62,7 @@ use Yii;
  */
 class Transaction extends \yii\db\ActiveRecord
 {
+    public $sale_price_eu;
     /**
      * @inheritdoc
      */
@@ -69,7 +79,7 @@ class Transaction extends \yii\db\ActiveRecord
         return [
             [['first_published_at', 'last_published_at', 'option_signed_at', 'search_started_at', 'payrolled_at'], 'safe'],
             [['first_published_price_euc', 'last_published_price_euc', 'sale_price_euc', 'buyer_id', 'seller_id', 'suggested_sale_price_euc', 'passed_to_sales_by', 'property_id', 'our_fee_euc', 'their_fee_euc'], 'integer'],
-            [['option_signed_at', 'buyer_id', 'seller_id', 'property_id', 'created_at', 'updated_at'], 'required'],
+            [['transaction_type', 'option_signed_at', 'buyer_id', 'seller_id', 'property_id', 'created_at', 'updated_at'], 'required'],
             [['is_new_buyer', 'is_new_seller', 'is_home_staged', 'approved'], 'boolean'],
             [['comments'], 'string'],
             [['transaction_type', 'lead_type'], 'string', 'max' => 18],
@@ -85,6 +95,7 @@ class Transaction extends \yii\db\ActiveRecord
             [['property_id'], 'exist', 'skipOnError' => true, 'targetClass' => Property::className(), 'targetAttribute' => ['property_id' => 'id']],
             [['transaction_type'], 'exist', 'skipOnError' => true, 'targetClass' => TransactionType::className(), 'targetAttribute' => ['transaction_type' => 'name']],
             [['transfer_type'], 'exist', 'skipOnError' => true, 'targetClass' => TransferType::className(), 'targetAttribute' => ['transfer_type' => 'name']],
+            [['lead_type', 'custom_type', 'transfer_type', 'transaction_type', 'development_type', 'seller_provider', 'buyer_provider'], 'default', 'value' => null],
         ];
     }
 
@@ -105,6 +116,7 @@ class Transaction extends \yii\db\ActiveRecord
             'last_published_price_euc' => Yii::t('app', 'Last Published Price'),
             'option_signed_at' => Yii::t('app', 'Option Signed Date'),
             'sale_price_euc' => Yii::t('app', 'Sale Price'),
+            'sale_price_eu' => Yii::t('app', 'Sale Price'),
             'buyer_id' => Yii::t('app', 'Buyer ID'),
             'is_new_buyer' => Yii::t('app', 'Is New Buyer'),
             'buyer_provider' => Yii::t('app', 'Buyer Provider'),
@@ -125,6 +137,14 @@ class Transaction extends \yii\db\ActiveRecord
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getInvoices()
+    {
+        return $this->hasMany(Invoice::className(), ['transaction_id' => 'id']);
     }
 
     /**
@@ -221,5 +241,10 @@ class Transaction extends \yii\db\ActiveRecord
     public function getTransferType()
     {
         return $this->hasOne(TransferType::className(), ['name' => 'transfer_type']);
+    }
+
+    public function afterFind() {
+        parent::afterFind();
+        $this->sale_price_eu = Yii::$app->formatter->asDecimal($this->sale_price_euc / 100.);
     }
 }

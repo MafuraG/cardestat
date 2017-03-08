@@ -30,7 +30,8 @@ class Invoice extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['code', 'recipient_category'], 'required'],
+            ['transaction_id', 'exist', 'skipOnError' => true, 'targetClass' => Transaction::className(), 'targetAttribute' => ['transaction_id' => 'id']],
+            [['code', 'recipient_category', 'issued_at', 'amount_euc'], 'required'],
             [['issued_at'], 'safe'],
             [['amount_euc'], 'integer'],
             [['code', 'recipient_category'], 'string', 'max' => 18],
@@ -49,6 +50,14 @@ class Invoice extends \yii\db\ActiveRecord
             'amount_euc' => Yii::t('app', 'Amount Euc'),
             'recipient_category' => Yii::t('app', 'Recipient Category'),
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTransaction()
+    {
+        return $this->hasOne(Transaction::className(), ['id' => 'transaction_id']);
     }
 
     /**

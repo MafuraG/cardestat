@@ -6,21 +6,20 @@ use Yii;
 use yii\helpers\ArrayHelper;
 
 /**
- * This is the model class for table "partner".
+ * This is the model class for table "custom_type".
  *
  * @property string $name
  *
  * @property Transaction[] $transactions
- * @property Transaction[] $transactions0
  */
-class Partner extends \yii\db\ActiveRecord
+class CustomType extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'partner';
+        return 'custom_type';
     }
 
     /**
@@ -49,17 +48,10 @@ class Partner extends \yii\db\ActiveRecord
      */
     public function getTransactions()
     {
-        return $this->hasMany(Transaction::className(), ['buyer_provider' => 'name']);
+        return $this->hasMany(Transaction::className(), ['custom_type' => 'name']);
     }
-
     /**
-     * @return \yii\db\ActiveQuery
      */
-    public function getTransactions0()
-    {
-        return $this->hasMany(Transaction::className(), ['seller_provider' => 'name']);
-    }
-
     public static function listAll()
     {
         return ArrayHelper::map(static::find()->all(), 'name', 'name');

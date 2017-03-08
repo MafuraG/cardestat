@@ -11,7 +11,7 @@ use Yii;
  * @property integer $advisor_id
  * @property string $office
  * @property integer $attribution_type_id
- * @property integer $attribution_euc
+ * @property integer $amount_euc
  * @property integer $transaction_id
  * @property string $comments
  *
@@ -36,8 +36,8 @@ class Attribution extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['advisor_id', 'attribution_type_id', 'attribution_euc', 'transaction_id'], 'required'],
-            [['advisor_id', 'attribution_type_id', 'attribution_euc', 'transaction_id'], 'integer'],
+            [['advisor_id', 'attribution_type_id', 'amount_euc', 'transaction_id'], 'required'],
+            [['advisor_id', 'attribution_type_id', 'amount_euc', 'transaction_id'], 'integer'],
             [['comments'], 'string'],
             [['office'], 'string', 'max' => 18],
             [['advisor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Advisor::className(), 'targetAttribute' => ['advisor_id' => 'id']],
@@ -57,7 +57,7 @@ class Attribution extends \yii\db\ActiveRecord
             'advisor_id' => Yii::t('app', 'Advisor ID'),
             'office' => Yii::t('app', 'Office'),
             'attribution_type_id' => Yii::t('app', 'Attribution Type ID'),
-            'attribution_euc' => Yii::t('app', 'Attribution Euc'),
+            'amount_euc' => Yii::t('app', 'Amount Euc'),
             'transaction_id' => Yii::t('app', 'Transaction ID'),
             'comments' => Yii::t('app', 'Comments'),
         ];

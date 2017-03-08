@@ -1,6 +1,7 @@
 <?php
 
 namespace app\models;
+use yii\helpers\ArrayHelper;
 
 use Yii;
 
@@ -48,5 +49,10 @@ class RecipientCategory extends \yii\db\ActiveRecord
     public function getInvoices()
     {
         return $this->hasMany(Invoice::className(), ['recipient_category' => 'name']);
+    }
+
+    public static function listAll()
+    {
+        return ArrayHelper::map(static::find()->all(), 'name', 'name');
     }
 }

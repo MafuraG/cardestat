@@ -91,11 +91,7 @@ a.desc:after {
     margin: 0 0 15px 0;
 }
 
-.table th {
-    background-color: whitesmoke;
-}
-
-.table.text-center th {
+thead.text-center th {
     text-align: center;
 }
 
@@ -122,6 +118,7 @@ a.desc:after {
 .navbar .navbar-header a {
     width: 336px;
     color: transparent;
+    font-size: 0;
     background-image: url(../images/cardenas_logo_white.jpeg);
     background-repeat: no-repeat;
 }
@@ -280,3 +277,21 @@ td .btn .glyphicon {
   -webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
+
+.modal-header {
+  background: #f1f1f1;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+legend {
+  background-color: #f5f5f5;
+  margin-top: 6px;
+  padding: 0 6px;
+}
+
+form div.required label.control-label:after {
+    content:" * ";
+    color:red;
+}
+

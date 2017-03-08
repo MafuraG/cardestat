@@ -122,7 +122,7 @@ class m170303_154953_transactions extends Migration
             'seller_id' => $this->integer()->notNull() . ' references contact(id)',
             'is_new_seller' => $this->boolean(),
             'seller_provider' => $this->string(32) . ' references partner(name)',
-            'lead_type' => $this->string(18) . ' references lead_type(name)',
+            'lead_type' => $this->string(18)->notNull()->defaultValue('NC') . ' references lead_type(name)',
             'search_started_at' => $this->date(),
             'suggested_sale_price_euc' => $this->integer(),
             'passed_to_sales_by' => $this->integer() . ' references advisor(id)',
@@ -137,9 +137,10 @@ class m170303_154953_transactions extends Migration
             'updated_at' => $this->timestamp(2)->notNull()
         ]);
         $this->createTable('invoice', [
-            'code' => $this->string(18)->notNull(),
-            'issued_at' => $this->date(),
-            'amount_euc' => $this->integer(),
+            'id' => $this->primaryKey(),
+            'code' => $this->string(18)()->notNull()->unique,
+            'issued_at' => $this->date()->notNull(),
+            'amount_euc' => $this->integer()->notNull(),
             'transaction_id' => $this->integer()->notNull() . ' references transaction(id)',
             'recipient_category' => $this->string(18)->notNull() . ' references recipient_category(name)'
         ]);
@@ -148,7 +149,7 @@ class m170303_154953_transactions extends Migration
             'advisor_id' => $this->integer()->notNull() . ' references advisor(id)',
             'office' => $this->string(18) . ' references office(name)', // null means all/no offices
             'attribution_type_id' => $this->integer()->notNull() . ' references attribution_type(id)',
-            'attribution_euc' => $this->integer()->notNull(),
+            'amount_euc' => $this->integer()->notNull(),
             'transaction_id' => $this->integer()->notNull() . ' references transaction(id)',
             'comments' => $this->text()
         ]);

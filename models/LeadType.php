@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "lead_type".
@@ -48,5 +49,10 @@ class LeadType extends \yii\db\ActiveRecord
     public function getTransactions()
     {
         return $this->hasMany(Transaction::className(), ['lead_type' => 'name']);
+    }
+
+    public static function listAll()
+    {
+        return ArrayHelper::map(static::find()->all(), 'name', 'name');
     }
 }
