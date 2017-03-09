@@ -23,9 +23,12 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
 <div class="transaction-form">
 
   <?php $form = ActiveForm::begin([
-        'enableClientValidation' => true,
+      'id' => 'transaction-form',
+      'action' => $model->isNewRecord ?
+          ['transaction/create'] : ['transaction/update', 'id' => $model->id],
   ]); ?>
-  <?= $form->field($model, 'id')->hiddenInput()->label(false) ?>
+  <?php ActiveForm::end(); ?>
+  <?= $form->field($model, 'id')->hiddenInput(['form' => $form->id])->label(false) ?>
   <div class="row">
     <fieldset>
       <div class="col-md-12">
@@ -33,25 +36,26 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
       </div>
       <div class="col-md-6">
         <?= $form->field($model, 'transaction_type')
-            ->dropDownList(TransactionType::listAll(), ['prompt' => '', 'class' => 'form-control input-sm']) ?>
+            ->dropDownList(TransactionType::listAll(), ['prompt' => '', 'class' => 'form-control input-sm', 'form' => $form->id]) ?>
       </div>
       <div class="col-md-6">
         <?= $form->field($model, 'custom_type')
-            ->dropDownList(CustomType::listAll(), ['prompt' => '', 'class' => 'form-control input-sm']) ?>
+            ->dropDownList(CustomType::listAll(), ['prompt' => '', 'class' => 'form-control input-sm', 'form' => $form->id]) ?>
       </div>
       <div class="col-md-6">
         <?= $form->field($model, 'transfer_type')
-            ->dropDownList(TransferType::listAll(), ['prompt' => '', 'class' => 'form-control input-sm']) ?>
+            ->dropDownList(TransferType::listAll(), ['prompt' => '', 'class' => 'form-control input-sm', 'form' => $form->id]) ?>
       </div>
       <div class="col-md-6">
         <?= $form->field($model, 'development_type')
-            ->dropDownList(DevelopmentType::listAll(), ['prompt' => '', 'class' => 'form-control input-sm']) ?>
+            ->dropDownList(DevelopmentType::listAll(), ['prompt' => '', 'class' => 'form-control input-sm', 'form' => $form->id]) ?>
       </div>
       <div class="col-md-12">
         <legend><?= Yii::t('app', 'Evolution') ?></legend>
       </div>
       <div class="col-md-6">
         <?= $form->field($model, 'first_published_at')->widget(DatePicker::classname(), [
+            'options' => ['form' => $form->id],
             'size' => 'sm',
             'pluginOptions' => [
                 'autoclose' => true,
@@ -63,10 +67,12 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
         <?= $form->field($model, 'first_published_price_euc', ['template' => $euTpl]) ->textInput([
             'class' => 'form-control input-sm text-right',
             'maxlength' => true,
+            'form' => $form->id
         ]) ?>
       </div>
       <div class="col-md-6">
         <?= $form->field($model, 'last_published_at')->widget(DatePicker::classname(), [
+            'options' => ['form' => $form->id],
             'size' => 'sm',
             'pluginOptions' => [
                 'autoclose' => true,
@@ -78,10 +84,12 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
         <?= $form->field($model, 'last_published_price_euc', ['template' => $euTpl]) ->textInput([
             'class' => 'form-control input-sm text-right',
             'maxlength' => true,
+            'form' => $form->id
         ]) ?>
       </div>
       <div class="col-md-6">
         <?= $form->field($model, 'option_signed_at')->widget(DatePicker::classname(), [
+            'options' => ['form' => $form->id],
             'size' => 'sm',
             'pluginOptions' => [
                 'autoclose' => true,
@@ -93,6 +101,7 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
         <?= $form->field($model, 'sale_price_eu', ['template' => $euTpl]) ->textInput([
             'class' => 'form-control input-sm text-right',
             'maxlength' => true,
+            'form' => $form->id
         ]) ?>
       </div>
       <div class="col-md-12">
@@ -106,8 +115,10 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
           echo $form->field($model, 'seller_id')->widget(Select2::classname(), [
               'initValueText' => $initValue,
               'size' => 'sm',
-              'options' => ['placeholder' => Yii::t('app', 'Search for a contact...')],
-              'language' => Yii::$app->language,
+              'options' => [
+                  'placeholder' => Yii::t('app', 'Search for a contact...'),
+                  'form' => $form->id
+              ], 'language' => Yii::$app->language,
               'pluginOptions' => [
                   'allowClear' => true,
                   'minimumInputLength' => 3,
@@ -116,17 +127,19 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
                       'dataType' => 'json'
                   ],
           ]]); ?>
-          <?= $form->field($model, 'is_new_seller')->checkbox() ?>
+          <?= $form->field($model, 'is_new_seller')->checkbox(['form' => $form->id]) ?>
           <?= $form->field($model, 'seller_provider')->dropDownList(
-              $partners, ['prompt' => Yii::$app->params['company'], 'class' => 'form-control input-sm']) ?>
+              $partners, ['prompt' => Yii::$app->params['company'], 'class' => 'form-control input-sm', 'form' => $form->id]) ?>
         <div class="row">
           <label class="col-md-12"><?= Yii::t('app', 'Initial search type and date') ?></label>
           <?= $form->field($model, 'lead_type', ['options' => [
-              'class' => 'col-md-5'
+              'class' => 'col-md-5',
           ]])->dropDownList(LeadType::listAll(), [
-              'class' => 'form-control input-sm'
+              'class' => 'form-control input-sm',
+              'form' => $form->id
           ])->label(false) ?>
           <?= $form->field($model, 'search_started_at', ['options' => ['class' => 'col-md-7']])->widget(DatePicker::classname(), [
+              'options' => ['form' => $form->id],
               'size' => 'sm',
               'pluginOptions' => [
                   'autoclose' => true,
@@ -135,7 +148,7 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
           ])->label(false); ?>
         </div>
         <?= $form->field($model, 'passed_to_sales_by')->dropDownList(
-              Advisor::listAll(), ['prompt' => '', 'class' => 'form-control input-sm']) ?>
+              Advisor::listAll(), ['prompt' => '', 'class' => 'form-control input-sm', 'form' => $form->id]) ?>
       </div>
       <div class="col-md-6">
         <?php
@@ -144,8 +157,10 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
           echo $form->field($model, 'buyer_id')->widget(Select2::classname(), [
               'initValueText' => $initValue,
               'size' => 'sm',
-              'options' => ['placeholder' => Yii::t('app', 'Search for a contact...')],
-              'pluginOptions' => [
+              'options' => [
+                  'placeholder' => Yii::t('app', 'Search for a contact...'),
+                  'form' => $form->id
+              ], 'pluginOptions' => [
                   'allowClear' => true,
                   'minimumInputLength' => 3,
                   'ajax' => [
@@ -153,12 +168,13 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
                       'dataType' => 'json'
                   ],
           ]]); ?>
-          <?= $form->field($model, 'is_new_buyer')->checkbox() ?>
+          <?= $form->field($model, 'is_new_buyer')->checkbox(['form' => $form->id]) ?>
           <?= $form->field($model, 'buyer_provider')->dropDownList(
-              $partners, ['prompt' => Yii::$app->params['company'], 'class' => 'form-control input-sm']) ?>
+              $partners, ['prompt' => Yii::$app->params['company'], 'class' => 'form-control input-sm', 'form' => $form->id]) ?>
         <?= $form->field($model, 'suggested_sale_price_euc', ['template' => $euTpl]) ->textInput([
             'class' => 'form-control input-sm text-right',
             'maxlength' => true,
+            'form' => $form->id
         ]) ?>
       </div>
       <div class="col-md-12">
@@ -171,8 +187,10 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
           echo $form->field($model, 'property_id')->widget(Select2::classname(), [
               'initValueText' => $initValue,
               'size' => 'sm',
-              'options' => ['placeholder' => Yii::t('app', 'Search for a property...')],
-              'language' => Yii::$app->language,
+              'options' => [
+                  'placeholder' => Yii::t('app', 'Search for a property...'),
+                  'form' => $form->id
+              ], 'language' => Yii::$app->language,
               'pluginOptions' => [
                   'allowClear' => true,
                   'minimumInputLength' => 3,
@@ -184,7 +202,7 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
       </div>
       <div class="col-md-6">
         <label>&nbsp;</label>
-        <?= $form->field($model, 'is_home_staged')->checkbox() ?>
+        <?= $form->field($model, 'is_home_staged')->checkbox(['form' => $form->id]) ?>
       </div>
       <div class="col-md-12">
         <legend><?= Yii::t('app', 'Fees') ?></legend>
@@ -194,13 +212,15 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
           <label class="col-md-12"><?= Yii::t('app', 'Our fees') ?></label>
           <div class="col-md-5">
             <?= Html::dropDownList('our_fee_pct', null, range(0.1, 10, 0.1), [
-                'class' => 'form-control input-sm'
+                'class' => 'form-control input-sm',
+                'form' => $form->id
             ]) ?>
           </div>
           <div class="col-md-7">
             <?= $form->field($model, 'our_fee_euc', ['template' => $euTpl]) ->textInput([
                 'class' => 'form-control input-sm text-right',
                 'maxlength' => true,
+                'form' => $form->id
             ])->label(false) ?>
           </div>
         </div>
@@ -210,13 +230,15 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
           <label class="col-md-12"><?= Yii::t('app', 'Our partner\'s fees') ?></label>
           <div class="col-md-5">
             <?= Html::dropDownList('their_fee_pct', null, range(0.1, 10, 0.1), [
-                'class' => 'form-control input-sm'
+                'class' => 'form-control input-sm',
+                'form' => $form->id
             ]) ?>
           </div>
           <div class="col-md-7">
             <?= $form->field($model, 'their_fee_euc', ['template' => $euTpl]) ->textInput([
                 'class' => 'form-control input-sm text-right',
                 'maxlength' => true,
+                'form' => $form->id
             ])->label(false) ?>
           </div>
         </div>
@@ -259,6 +281,7 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
       </div>
       <div class="col-md-6">
         <?= $form->field($model, 'payrolled_at')->widget(DatePicker::classname(), [
+            'options' => ['form' => $form->id],
             'size' => 'sm',
             'pluginOptions' => [
                 'autoclose' => true,
@@ -298,8 +321,8 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
       </div>
       <div class="col-md-12">
         <hr style="border-top: 1px solid #ddd">
-        <?= $form->field($model, 'comments')->textarea(['rows' => 6]) ?>
-        <?= $form->field($model, 'approved')->checkbox() ?>
+        <?= $form->field($model, 'comments')->textarea(['rows' => 6, 'form' => $form->id]) ?>
+        <?= $form->field($model, 'approved')->checkbox(['form' => $form->id]) ?>
       </div>
     </fieldset>
   </div>
@@ -311,10 +334,18 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
   </small>
 
   <div class="form-group">
-      <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-lg btn-success' : 'btn btn-lg btn-primary']) ?>
+      <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['form' => $form->id, 'class' => $model->isNewRecord ? 'btn btn-lg btn-success' : 'btn btn-lg btn-primary']) ?>
   </div>
 
-  <?php ActiveForm::end(); ?>
-
-
 </div>
+<?php
+$script = <<< JS
+  // workaround until new release of yii includes commit github.com/yiisoft/yii2/commit/f47b6c
+  $('.transaction-form input[type="checkbox"]').each(function(i) {
+      $('.transaction-form')
+          .find('input[type="hidden"][name="{name}"]'.replace('{name}', $(this).attr('name')))
+          .attr('form', '{$form->id}');
+  });
+JS;
+$this->registerJs($script);
+?>

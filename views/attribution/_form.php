@@ -1,3 +1,4 @@
+<!--
 <div class="edit-mode">
   <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#add-advisor">+ Añadir atribución</button>
   <div id="add-advisor" class="collapse">
@@ -42,3 +43,4 @@
     </div>
   </div>
 </div>
+-->

@@ -290,8 +290,7 @@ legend {
   padding: 0 6px;
 }
 
-form div.required label.control-label:after {
-    content:" * ";
-    color:red;
+div.required label.control-label:after {
+    content: " * ";
+    color: red;
 }
-

@@ -66,8 +66,13 @@ class InvoiceController extends Controller
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->actionIndex($model->transaction_id);
         } else {
+            $dataProvider = new ActiveDataProvider([
+                'query' => Invoice::find()->where(['transaction_id' => $model->transaction_id])
+            ]);
             return $this->render('index', [
                 'model' => $model,
+                'dataProvider' => $dataProvider,
+                'formExpanded' => true
             ]);
         }
     }

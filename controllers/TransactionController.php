@@ -96,7 +96,9 @@ class TransactionController extends Controller
         $invoice = new Invoice();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            if (Yii::$app->request->isAjax)
+                return $this->actionView($model->id);
+            else return $this->redirect(['view', 'id' => $model->id]);
         } elseif (Yii::$app->request->isAjax) {
             return $this->renderAjax('_form', [
                 'model' => $model,
