@@ -17,6 +17,7 @@ use app\models\TransactionType;
  * This is the model class for table "transaction".
  *
  * @property integer $id
+ * @property string $external_id
  * @property string $transaction_type
  * @property string $custom_type
  * @property string $transfer_type
@@ -83,6 +84,7 @@ class Transaction extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            ['external_id', 'unique'],
             [['first_published_at', 'last_published_at', 'option_signed_at', 'search_started_at', 'payrolled_at'], 'safe'],
             [['first_published_price_eu', 'last_published_price_eu', 'sale_price_eu', 'suggested_sale_price_eu', 'our_fee_eu', 'their_fee_eu'], 'number'],
             [['buyer_id', 'seller_id', 'passed_to_sales_by', 'property_id'], 'integer'],
@@ -102,7 +104,7 @@ class Transaction extends \yii\db\ActiveRecord
             [['property_id'], 'exist', 'skipOnError' => true, 'targetClass' => Property::className(), 'targetAttribute' => ['property_id' => 'id']],
             [['transaction_type'], 'exist', 'skipOnError' => true, 'targetClass' => TransactionType::className(), 'targetAttribute' => ['transaction_type' => 'name']],
             [['transfer_type'], 'exist', 'skipOnError' => true, 'targetClass' => TransferType::className(), 'targetAttribute' => ['transfer_type' => 'name']],
-            [['lead_type', 'custom_type', 'transfer_type', 'transaction_type', 'development_type', 'seller_provider', 'buyer_provider'], 'default', 'value' => null],
+            [['lead_type', 'custom_type', 'transfer_type', 'transaction_type', 'development_type', 'seller_provider', 'buyer_provider', 'external_id'], 'default', 'value' => null],
         ];
     }
 
@@ -113,6 +115,7 @@ class Transaction extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
+            'external_id' => Yii::t('app', 'External ID'),
             'transaction_type' => Yii::t('app', 'Transaction Type'),
             'custom_type' => Yii::t('app', 'Custom Type'),
             'transfer_type' => Yii::t('app', 'Transfer Type'),

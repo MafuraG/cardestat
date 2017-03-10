@@ -29,7 +29,7 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
   <div class="edit-mode">
     <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#add-attribution">+ <?= Yii::t('app', 'Add attribution') ?></button>
   
-    <div id="add-attribution" class="collapse <?= isset($formExpanded) and $formExpanded ? 'in' : ''?>">
+    <div id="add-attribution" class="collapse <?= (isset($formExpanded) and $formExpanded) ? 'in' : ''?>">
       <div class="col-md-6">
         <?= $form->field($model, 'advisor_id')->dropDownList(
             Advisor::listAll(), [
@@ -55,6 +55,13 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
                 'class' => 'form-control input-sm',
                 'form' => $form->id
             ]) ?>
+      </div>
+      <div class="col-md-12">
+        <?= $form->field($model, 'comments')->textArea([
+            'class' => 'form-control input-sm',
+            'maxlength' => true,
+            'form' => $form->id
+        ]); ?>
       </div>
   
       <div class="col-md-12">

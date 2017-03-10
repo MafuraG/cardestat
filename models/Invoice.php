@@ -36,6 +36,7 @@ class Invoice extends \yii\db\ActiveRecord
             [['issued_at'], 'safe'],
             [['amount_eu'], 'number'],
             [['code', 'recipient_category'], 'string', 'max' => 18],
+            ['code', 'unique'],
             [['recipient_category'], 'exist', 'skipOnError' => true, 'targetClass' => RecipientCategory::className(), 'targetAttribute' => ['recipient_category' => 'name']],
         ];
     }

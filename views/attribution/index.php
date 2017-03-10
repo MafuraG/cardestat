@@ -27,7 +27,7 @@ if (!isset($formExpanded)) $formExpanded = false;
           //['attribute' => 'attribution_type', 'value' => '$model->attribution_type->name'],
           'attributionType.name',
           ['attribute' => 'amount_eu', 'format' => ['currency', 'EUR']],
-          'comments:text',
+          'comments:ntext',
           ['class' => 'yii\grid\ActionColumn', 'buttons' => [
               'view' => function ($url, $model) {},
               'update' => function ($url, $model) {},

@@ -27,7 +27,7 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
   <div class="edit-mode">
     <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#add-invoice">+ <?= Yii::t('app', 'Add invoice') ?></button>
   
-    <div id="add-invoice" class="collapse <?= isset($formExpanded) and $formExpanded ? 'in' : ''?>">
+    <div id="add-invoice" class="collapse <?= (isset($formExpanded) and $formExpanded) ? 'in' : ''?>">
       <div class="col-md-6">
         <?= $form->field($model, 'code')->textInput([
             'class' => 'form-control input-sm',
