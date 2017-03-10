@@ -4,10 +4,11 @@ namespace app\controllers;
 
 use Yii;
 use app\models\Invoice;
+use app\models\Attribution;
 use app\models\Transaction;
 use app\models\TransactionListItem;
 use app\models\TransactionListItemSearch;
-use yii\web\Controller;
+use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -93,21 +94,29 @@ class TransactionController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id, true);
-        $invoice = new Invoice();
+        $invoice = new Invoice(['transaction_id' => $id]);
+        $invoiceDataProvider = new ActiveDataProvider([
+            'query' => $invoice->find()->where(['transaction_id' => $id])
+        ]);
+        $attribution = new Attribution(['transaction_id' => $id]);
+        $attributionDataProvider = new ActiveDataProvider([
+            'query' => $attribution->find()->where(['transaction_id' => $id])
+        ]);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             if (Yii::$app->request->isAjax)
                 return $this->actionView($model->id);
             else return $this->redirect(['view', 'id' => $model->id]);
-        } elseif (Yii::$app->request->isAjax) {
-            return $this->renderAjax('_form', [
-                'model' => $model,
-                'invoice' => $invoice
-            ]);
         } else {
-            return $this->render('update', [
+            $data = [
                 'model' => $model,
-            ]);
+                'invoice' => $invoice,
+                'attribution' => $attribution,
+                'invoiceDataProvider' => $invoiceDataProvider,
+                'attributionDataProvider' => $attributionDataProvider
+            ];
+            if (Yii::$app->request->isAjax) return $this->renderAjax('_form', $data);
+            else return $this->render('update', $data);
         }
     }
 

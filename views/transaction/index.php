@@ -46,6 +46,7 @@ $transactionLbl = Yii::t('app', 'Transaction');
 $tranFormUrl = Url::to(['transaction/update', 'id' => '_id_']);
 $script = <<< JS
   var detailsUrl = '$tranFormUrl';
+  var \$transactionModal = $('#transaction-modal');
   $.pjax.defaults.timeout = 6000;
   $('.transaction-index').on('submit', '.transaction-list-item-search form', function(e) {
       $.pjax.submit(e, '#p0', {scrollTo: false})
@@ -58,14 +59,14 @@ $script = <<< JS
           $(this).val(d + $(this).data('value'));
       });
   });
-  $('.transaction-index').on('submit', '#transaction-modal .transaction-form form', function() {
+  \$transactionModal.on('submit', '.transaction-form form', function() {
       var \$form = $(this);
       $.ajax({
           url: \$form.attr('action'),
           type: \$form.attr('method'),
           data: \$form.serialize(),
           success: function (response) {                  
-              $('#transaction-modal').modal('hide');
+              \$transactionModal.modal('hide');
               $.pjax.reload('#p0');
           }, error: function () {
               console.log('internal server error');
@@ -87,12 +88,13 @@ $script = <<< JS
   var editing = false;
   var last_id = -1;
   function modalDataLoaded() {
-      $('#transaction-modal').find('.modal-header h4').html('{$transactionLbl} #' + last_id);
-      if (editing) $('#transaction-modal').find('.btn-primary, .edit-mode').removeClass('hidden');
-      else $('#transaction-modal').find('.btn-primary, .edit-mode').addClass('hidden');
-      $('#transaction-modal').find('input, select, textarea, checkbox, .btn-danger')
+      \$transactionModal.find('.modal-header h4').html('{$transactionLbl} #' + last_id);
+      if (editing) \$transactionModal.find('.btn-primary, .edit-mode').removeClass('hidden');
+      else \$transactionModal.find('.btn-primary, .edit-mode').addClass('hidden');
+      \$transactionModal.find('input, select, textarea, checkbox, .btn-danger')
           .attr('disabled', !editing);
-      $('#transaction-modal').modal('show');
+      \$transactionModal.find('.kv-date-remove').toggleClass('hidden', !editing);
+      \$transactionModal.modal('show');
   }
   $('[data-toggle="tooltip"]').tooltip()
   $('#advanced-search-caret').on('click', function() {

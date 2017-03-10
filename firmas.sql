@@ -589,7 +589,7 @@ insert into transaction (external_id, option_signed_at, sale_price_euc, buyer_id
           array_length(f.ref_prop::text[], 1) = 1 and
           fecha_firma ~ '\d{4}\W\d{2}\W\d{2}';
 
-insert into attribution (advisor_id, attribution_type_id, attribution_euc, transaction_id)
+insert into attribution (advisor_id, attribution_type_id, amount_euc, transaction_id)
     select ad.id, at.id, 0, t.id
     from firmas f
          join transaction t on (t.external_id = f.id)

@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "attribution_type".
@@ -63,5 +64,10 @@ class AttributionType extends \yii\db\ActiveRecord
     public function getAttributions()
     {
         return $this->hasMany(Attribution::className(), ['attribution_type_id' => 'id']);
+    }
+
+    public static function listAll()
+    {
+        return ArrayHelper::map(static::find()->all(), 'id', 'name');
     }
 }

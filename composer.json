@@ -23,6 +23,7 @@
         "yiisoft/yii2-twig": "^2.0",
         "kartik-v/yii2-date-range": "~1.6",
         "kartik-v/yii2-widget-datepicker": "*",
+        "kartik-v/yii2-money": "*",
         "rmrevin/yii2-fontawesome": "*",
         "kartik-v/yii2-export": "*",
         "kartik-v/yii2-widget-select2": "@dev",

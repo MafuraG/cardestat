@@ -8,7 +8,7 @@ use yii\web\Response;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 
-class PropertyController extends \yii\web\Controller
+class PropertyController extends Controller
 {
     /**
      * @inheritdoc

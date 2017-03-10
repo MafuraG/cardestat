@@ -62,7 +62,13 @@ use app\models\TransactionType;
  */
 class Transaction extends \yii\db\ActiveRecord
 {
+    public $first_published_price_eu;
+    public $last_published_price_eu;
     public $sale_price_eu;
+    public $suggested_sale_price_eu;
+    public $our_fee_eu;
+    public $their_fee_eu;
+    
     /**
      * @inheritdoc
      */
@@ -78,7 +84,8 @@ class Transaction extends \yii\db\ActiveRecord
     {
         return [
             [['first_published_at', 'last_published_at', 'option_signed_at', 'search_started_at', 'payrolled_at'], 'safe'],
-            [['first_published_price_euc', 'last_published_price_euc', 'sale_price_euc', 'buyer_id', 'seller_id', 'suggested_sale_price_euc', 'passed_to_sales_by', 'property_id', 'our_fee_euc', 'their_fee_euc'], 'integer'],
+            [['first_published_price_eu', 'last_published_price_eu', 'sale_price_eu', 'suggested_sale_price_eu', 'our_fee_eu', 'their_fee_eu'], 'number'],
+            [['buyer_id', 'seller_id', 'passed_to_sales_by', 'property_id'], 'integer'],
             [['transaction_type', 'option_signed_at', 'buyer_id', 'seller_id', 'property_id', 'created_at', 'updated_at'], 'required'],
             [['is_new_buyer', 'is_new_seller', 'is_home_staged', 'approved'], 'boolean'],
             [['comments'], 'string'],
@@ -111,26 +118,25 @@ class Transaction extends \yii\db\ActiveRecord
             'transfer_type' => Yii::t('app', 'Transfer Type'),
             'development_type' => Yii::t('app', 'Development Type'),
             'first_published_at' => Yii::t('app', 'First Published Date'),
-            'first_published_price_euc' => Yii::t('app', 'First Published Price'),
+            'first_published_price_eu' => Yii::t('app', 'First Published Price'),
             'last_published_at' => Yii::t('app', 'Last Published Date'),
-            'last_published_price_euc' => Yii::t('app', 'Last Published Price'),
+            'last_published_price_eu' => Yii::t('app', 'Last Published Price'),
             'option_signed_at' => Yii::t('app', 'Option Signed Date'),
-            'sale_price_euc' => Yii::t('app', 'Sale Price'),
             'sale_price_eu' => Yii::t('app', 'Sale Price'),
-            'buyer_id' => Yii::t('app', 'Buyer ID'),
-            'is_new_buyer' => Yii::t('app', 'Is New Buyer'),
-            'buyer_provider' => Yii::t('app', 'Buyer Provider'),
-            'seller_id' => Yii::t('app', 'Seller ID'),
-            'is_new_seller' => Yii::t('app', 'Is New Seller'),
-            'seller_provider' => Yii::t('app', 'Seller Provider'),
+            'buyer_id' => Yii::t('app', 'Buyer'),
+            'is_new_buyer' => Yii::t('app', 'The Buyer Is A New Client'),
+            'buyer_provider' => Yii::t('app', 'Who Brings Buyer'),
+            'seller_id' => Yii::t('app', 'Seller'),
+            'is_new_seller' => Yii::t('app', 'The Seller Is A New Client'),
+            'seller_provider' => Yii::t('app', 'Who Brings Seller'),
             'lead_type' => Yii::t('app', 'Lead Type'),
             'search_started_at' => Yii::t('app', 'Search Started Date'),
-            'suggested_sale_price_euc' => Yii::t('app', 'Suggested Sale Price'),
+            'suggested_sale_price_eu' => Yii::t('app', 'Suggested Sale Price'),
             'passed_to_sales_by' => Yii::t('app', 'Passed To Sales By'),
-            'property_id' => Yii::t('app', 'Property ID'),
-            'is_home_staged' => Yii::t('app', 'Is Home Staged'),
-            'our_fee_euc' => Yii::t('app', 'Our Fee'),
-            'their_fee_euc' => Yii::t('app', 'Their Fee'),
+            'property_id' => Yii::t('app', 'Property'),
+            'is_home_staged' => Yii::t('app', 'The Home Is Staged'),
+            'our_fee_eu' => Yii::t('app', 'Our Fee'),
+            'their_fee_eu' => Yii::t('app', 'Their Fee'),
             'payrolled_at' => Yii::t('app', 'Payrolled Date'),
             'comments' => Yii::t('app', 'Comments'),
             'approved' => Yii::t('app', 'Approved'),
@@ -245,6 +251,41 @@ class Transaction extends \yii\db\ActiveRecord
 
     public function afterFind() {
         parent::afterFind();
-        $this->sale_price_eu = Yii::$app->formatter->asDecimal($this->sale_price_euc / 100.);
+        $formatter = Yii::$app->formatter;
+        $this->sale_price_eu = round($this->sale_price_euc / 100., 2);
+        $this->first_published_price_eu = round($this->first_published_price_euc / 100., 2);
+        $this->last_published_price_eu = round($this->last_published_price_euc / 100., 2);
+        $this->sale_price_eu = round($this->sale_price_euc / 100., 2);
+        $this->suggested_sale_price_eu = round($this->suggested_sale_price_euc / 100., 2);
+        $this->our_fee_eu = round($this->our_fee_euc / 100., 2);
+        $this->their_fee_eu = round($this->their_fee_euc / 100., 2);
+        
+    }
+    public function beforeValidate() {
+        $tr = [
+            Yii::$app->formatter->thousandSeparator => '',
+            Yii::$app->formatter->decimalSeparator => '.'
+        ];
+        $this->sale_price_eu = strtr($this->sale_price_eu, $tr);
+        $this->first_published_price_eu = strtr($this->first_published_price_eu, $tr);
+        $this->last_published_price_eu = strtr($this->last_published_price_eu, $tr);
+        $this->suggested_sale_price_eu = strtr($this->suggested_sale_price_eu, $tr);
+        $this->our_fee_eu = strtr($this->our_fee_eu, $tr);
+        $this->their_fee_eu = strtr($this->their_fee_eu, $tr);
+        return parent::beforeValidate();
+    }
+    public function beforeSave($insert) {
+        $this->sale_price_euc = round($this->sale_price_eu * 100.);
+        $this->first_published_price_euc = round($this->first_published_price_eu * 100.);
+        if (!$this->first_published_price_euc ) $this->first_published_price_euc = null;
+        $this->last_published_price_euc = round($this->last_published_price_eu * 100.);
+        if (!$this->last_published_price_euc) $this->last_published_price_euc = null;
+        $this->suggested_sale_price_euc = round($this->suggested_sale_price_eu * 100.);
+        if (!$this->suggested_sale_price_euc ) $this->suggested_sale_price_euc = null;
+        $this->our_fee_euc = round($this->our_fee_eu * 100.);
+        $this->their_fee_euc = round($this->their_fee_eu * 100.);
+        $this->updated_at = date('Y-m-d H:i:s');
+        if ($insert) $this->created_at = $this->updated_at;
+        return parent::beforeSave($insert);
     }
 }

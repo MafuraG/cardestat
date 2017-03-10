@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "office".
@@ -57,5 +58,10 @@ class Office extends \yii\db\ActiveRecord
     public function getAttributions()
     {
         return $this->hasMany(Attribution::className(), ['office' => 'name']);
+    }
+
+    public static function listAll()
+    {
+        return ArrayHelper::map(static::find()->all(), 'name', 'name');
     }
 }

@@ -8,7 +8,7 @@ use app\models\Contact;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 
-class ContactController extends \yii\web\Controller
+class ContactController extends Controller
 {
     /**
      * @inheritdoc

@@ -13,6 +13,7 @@ use yii\helpers\Url;
 use yii\web\JsExpression;
 use kartik\date\DatePicker;
 use kartik\select2\Select2;
+use kartik\money\MaskMoney;
 
 $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-addon\">€</span></div>\n{hint}\n{error}";
 /* @var $this yii\web\View */
@@ -64,11 +65,10 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
         ]); ?>
       </div>
       <div class="col-md-6">
-        <?= $form->field($model, 'first_published_price_euc', ['template' => $euTpl]) ->textInput([
-            'class' => 'form-control input-sm text-right',
-            'maxlength' => true,
-            'form' => $form->id
-        ]) ?>
+        <?= $form->field($model, 'first_published_price_eu', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
+                'class' => 'text-right input-sm currency',
+                'form' => $form->id
+            ]]); ?>
       </div>
       <div class="col-md-6">
         <?= $form->field($model, 'last_published_at')->widget(DatePicker::classname(), [
@@ -81,11 +81,10 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
         ]); ?>
       </div>
       <div class="col-md-6">
-        <?= $form->field($model, 'last_published_price_euc', ['template' => $euTpl]) ->textInput([
-            'class' => 'form-control input-sm text-right',
-            'maxlength' => true,
-            'form' => $form->id
-        ]) ?>
+        <?= $form->field($model, 'last_published_price_eu', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
+                'class' => 'text-right input-sm currency',
+                'form' => $form->id
+            ]]); ?>
       </div>
       <div class="col-md-6">
         <?= $form->field($model, 'option_signed_at')->widget(DatePicker::classname(), [
@@ -98,11 +97,10 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
         ]); ?>
       </div>
       <div class="col-md-6">
-        <?= $form->field($model, 'sale_price_eu', ['template' => $euTpl]) ->textInput([
-            'class' => 'form-control input-sm text-right',
-            'maxlength' => true,
-            'form' => $form->id
-        ]) ?>
+        <?= $form->field($model, 'sale_price_eu', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
+                'class' => 'text-right input-sm currency',
+                'form' => $form->id
+            ]]); ?>
       </div>
       <div class="col-md-12">
         <legend><?= Yii::t('app', 'Participants') ?></legend>
@@ -131,13 +129,7 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
           <?= $form->field($model, 'seller_provider')->dropDownList(
               $partners, ['prompt' => Yii::$app->params['company'], 'class' => 'form-control input-sm', 'form' => $form->id]) ?>
         <div class="row">
-          <label class="col-md-12"><?= Yii::t('app', 'Initial search type and date') ?></label>
-          <?= $form->field($model, 'lead_type', ['options' => [
-              'class' => 'col-md-5',
-          ]])->dropDownList(LeadType::listAll(), [
-              'class' => 'form-control input-sm',
-              'form' => $form->id
-          ])->label(false) ?>
+          <label class="col-md-12"><?= Yii::t('app', 'Initial Search Date And Class') ?></label>
           <?= $form->field($model, 'search_started_at', ['options' => ['class' => 'col-md-7']])->widget(DatePicker::classname(), [
               'options' => ['form' => $form->id],
               'size' => 'sm',
@@ -146,6 +138,12 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
                   'format' => 'yyyy-mm-dd',
               ]
           ])->label(false); ?>
+          <?= $form->field($model, 'lead_type', ['options' => [
+              'class' => 'col-md-5',
+          ]])->dropDownList(LeadType::listAll(), [
+              'class' => 'form-control input-sm',
+              'form' => $form->id
+          ])->label(false) ?>
         </div>
         <?= $form->field($model, 'passed_to_sales_by')->dropDownList(
               Advisor::listAll(), ['prompt' => '', 'class' => 'form-control input-sm', 'form' => $form->id]) ?>
@@ -171,11 +169,10 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
           <?= $form->field($model, 'is_new_buyer')->checkbox(['form' => $form->id]) ?>
           <?= $form->field($model, 'buyer_provider')->dropDownList(
               $partners, ['prompt' => Yii::$app->params['company'], 'class' => 'form-control input-sm', 'form' => $form->id]) ?>
-        <?= $form->field($model, 'suggested_sale_price_euc', ['template' => $euTpl]) ->textInput([
-            'class' => 'form-control input-sm text-right',
-            'maxlength' => true,
-            'form' => $form->id
-        ]) ?>
+        <?= $form->field($model, 'suggested_sale_price_eu', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
+                'class' => 'text-right input-sm currency',
+                'form' => $form->id
+            ]]); ?>
       </div>
       <div class="col-md-12">
         <legend><?= Yii::t('app', 'Property') ?></legend>
@@ -217,11 +214,10 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
             ]) ?>
           </div>
           <div class="col-md-7">
-            <?= $form->field($model, 'our_fee_euc', ['template' => $euTpl]) ->textInput([
-                'class' => 'form-control input-sm text-right',
-                'maxlength' => true,
-                'form' => $form->id
-            ])->label(false) ?>
+            <?= $form->field($model, 'our_fee_eu', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
+                    'class' => 'text-right input-sm currency',
+                    'form' => $form->id
+                ]])->label(false); ?>
           </div>
         </div>
       </div>
@@ -235,11 +231,10 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
             ]) ?>
           </div>
           <div class="col-md-7">
-            <?= $form->field($model, 'their_fee_euc', ['template' => $euTpl]) ->textInput([
-                'class' => 'form-control input-sm text-right',
-                'maxlength' => true,
-                'form' => $form->id
-            ])->label(false) ?>
+            <?= $form->field($model, 'their_fee_eu', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
+                    'class' => 'text-right input-sm currency',
+                    'form' => $form->id
+                ]])->label(false); ?>
           </div>
         </div>
       </div>
@@ -247,30 +242,8 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
         <div class="panel panel-default">
           <div class="panel-heading"><h4 class="panel-title"><?= Yii::t('app', 'Invoices') ?></h4></div>
           <div class="panel-body">
-            <?php if (count($model->invoices) > 0): ?>
-            <table class="table table-condensed table-striped">
-              <thead class="text-center"><tr>
-                <th><?= Yii::t('app', 'Code') ?></th>
-                <th><?= Yii::t('app', 'Date') ?></th>
-                <th><?= Yii::t('app', 'Amount') ?></th>
-                <th><?= Yii::t('app', 'Recipient') ?></th>
-                <th></th>
-              </tr></thead>
-              <tbody>
-                <?php foreach($model->invoices as $invoice): ?>
-                  <tr>
-                    <td><?= $invoice->code ?></td>
-                    <td><?= Yii::$app->formatter->asDate($invoice->issued_at, 'medium') ?></td>
-                    <td class="text-right"><?= Yii::$app->formatter->asDecimal($invoice->amount_euc/100., 2) ?> €</td>
-                    <td class="text-center"><?= $invoice->recipient_category ?></td>
-                    <td class="text-center"><button class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span></td></tr> 
-                <?php endforeach; ?>
-              </tbody>
-            </table>
-            <?php else: ?>
-              <p class="text-warning"><em><?= Yii::t('app', 'No invoices found') ?></em></p>
-            <?php endif; ?>
-            <?= $this->render('/invoice/_form', [
+            <?= $this->render('/invoice/index', [
+                'dataProvider' => $invoiceDataProvider,
                 'model' => $invoice
             ]) ?>
           </div>
@@ -293,29 +266,10 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
         <div class="panel panel-default">
           <div class="panel-heading"><h4 class="panel-title"><?= Yii::t('app', 'Attributions') ?></h4></div>
           <div class="panel-body">
-            <table class="table table-condensed">
-              <thead class="text-center"><tr>
-                <th><?= Yii::t('app', 'Advisor') ?></th>
-                <th><?= Yii::t('app', 'Office') ?></th>
-                <th><?= Yii::t('app', 'Attribution type') ?></th>
-                <th><?= Yii::t('app', 'Attribution') ?></th>
-                <th><?= Yii::t('app', 'Comments') ?></th>
-                <th></th>
-              </tr></thead>
-              <tbody>
-                <?php foreach($model->attributions as $attribution): ?>
-                  <tr>
-                    <td><?= $attribution->advisor->name ?></td>
-                    <td><?= $attribution->office ?></td>
-                    <?php $at = $attribution->attributionType ?>
-                    <td class="text-center"><?= $at->name . ' ' . Yii::$app->formatter->asDecimal($at->attribution_bp / 100, 2) . '%'?></td>
-                    <td class="text-right"><?= Yii::$app->formatter->asDecimal($attribution->amount_euc / 100., 2)?> €</td>
-                    <td class="text-center"><small><?= $attribution->comments ?></small></td>
-                    <td><button class="btn btn-xs btn-danger"><span class="glyphicon glyphicon-trash"></span></td></tr> 
-                <?php endforeach; ?>
-              </body>
-            </table>
-            <?= $this->render('/attribution/_form') ?>
+            <?= $this->render('/attribution/index', [
+                'dataProvider' => $attributionDataProvider,
+                'model' => $attribution
+            ]) ?>
           </div>
         </div>
       </div>
@@ -327,10 +281,11 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
     </fieldset>
   </div>
 
-  <small class="text-info pull-right">
-    <strong><?= Yii::t('app', 'Created at') ?></strong> <?= Yii::$app->formatter->asDate($model->created_at, 'full') ?>
-    <br>
-    <strong><?= Yii::t('app', 'Last updated at') ?></strong> <?= Yii::$app->formatter->asDate($model->updated_at, 'full') ?>
+  <small>
+    <dl class="text-info pull-right dl-horizontal">
+      <dt><?= Yii::t('app', 'Created at') ?></dt> <dd><?= Yii::$app->formatter->asDatetime($model->created_at, 'long') ?></dd>
+      <dt><?= Yii::t('app', 'Last updated at') ?></dt> <dd><?= Yii::$app->formatter->asDatetime($model->updated_at, 'long') ?></dd>
+    </dl>
   </small>
 
   <div class="form-group">
@@ -345,6 +300,11 @@ $script = <<< JS
       $('.transaction-form')
           .find('input[type="hidden"][name="{name}"]'.replace('{name}', $(this).attr('name')))
           .attr('form', '{$form->id}');
+  });
+  $('.currency').on('keydown', function(e) {
+      if(e.keyCode == 13) {
+          return false;
+      }
   });
 JS;
 $this->registerJs($script);

@@ -10,9 +10,9 @@ $dataProvider->sort = false;
 if (!isset($formExpanded)) $formExpanded = false;
 ?>
 <?php Pjax::begin([
-    'id' => 'invoice-index-p0'
+    'id' => 'attribution-index-p0'
 ]) ?>
-<div class="invoice-index">
+<div class="attribution-index">
 
   <?= GridView::widget([
       'dataProvider' => $dataProvider,
@@ -21,10 +21,13 @@ if (!isset($formExpanded)) $formExpanded = false;
           'class' => 'table table-condensed table-striped'
       ], 'columns' => [
           //'id',
-          'code',
-          'issued_at:date',
+          //['attribute' => 'code', 'value' => '$model->advisor->name'],
+          'advisor.name',
+          'office',
+          //['attribute' => 'attribution_type', 'value' => '$model->attribution_type->name'],
+          'attributionType.name',
           ['attribute' => 'amount_euc', 'format' => ['currency', 'EUR']],
-          'recipient_category',
+          'comments:text',
           ['class' => 'yii\grid\ActionColumn', 'buttons' => [
               'view' => function ($url, $model) {},
               'update' => function ($url, $model) {},
@@ -39,3 +42,4 @@ if (!isset($formExpanded)) $formExpanded = false;
 </div>
 
 <?php Pjax::end() ?>
+

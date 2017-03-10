@@ -138,7 +138,7 @@ class m170303_154953_transactions extends Migration
         ]);
         $this->createTable('invoice', [
             'id' => $this->primaryKey(),
-            'code' => $this->string(18)()->notNull()->unique,
+            'code' => $this->string(18)->notNull()->unique(),
             'issued_at' => $this->date()->notNull(),
             'amount_euc' => $this->integer()->notNull(),
             'transaction_id' => $this->integer()->notNull() . ' references transaction(id)',
@@ -170,7 +170,7 @@ class m170303_154953_transactions extends Migration
                        string_agg(ad.name, \', \') as advisors,
                        i.count as n_invoices,
                        fi.first_issued_at as first_invoiced_at,
-                       sale_price_euc::float / our_fee_euc as our_fee_bp,
+                       coalesce(our_fee_euc*100. / sale_price_euc, 0) as our_fee_bp,
                        t.buyer_provider is not null or t.seller_provider is not null as with_collaborator,
                        i.count is not null as invoiced,
                        payrolled_at is not null as payrolled

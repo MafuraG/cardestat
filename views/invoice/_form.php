@@ -13,7 +13,8 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
 <div class="invoice-form">
 
   <?php $form = ActiveForm::begin([
-      'action' => ['create'],
+      'id' => 'invoice-form',
+      'action' => ['/invoice/create'],
       'enableClientValidation' => true,
       'options' => [
           'data-pjax' => true
@@ -60,15 +61,13 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
           <?= Html::submitButton(Yii::t('app', 'Add'), ['class' => 'btn btn-sm btn-primary', 'form' => $form->id]) ?>
         </div>
       </div>
-  
     </div>
   </div>
-
 </div>
 <?php
 $script = <<< JS
   $('.invoice-form form').on('beforeSubmit.yii', function(e) {
-      $.pjax.submit(e, '#p0', {push: false, scrollTo: false});
+      $.pjax.submit(e, '#invoice-index-p0', {push: false, scrollTo: false});
       return false;
   });
 JS;

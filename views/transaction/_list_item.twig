@@ -75,7 +75,7 @@
     {% endif %}
   </div>
   <div class="col-md-2 text-right">
-    <small class="text-muted">({{ model.our_fee_bp }}%)</small> {{ app.formatter.asDecimal(model.our_fee_euc/100, 2) }} € &nbsp;
+    <small class="text-muted">({{ app.formatter.asDecimal(model.our_fee_bp, 2) }}%)</small> {{ app.formatter.asDecimal(model.our_fee_euc/100, 2) }} € &nbsp;
     {% if (model.approved) %}
       <span class="text-success glyphicon glyphicon-ok-sign"></span>&nbsp;
     {% else %}

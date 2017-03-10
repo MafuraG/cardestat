@@ -20,8 +20,15 @@ class Controller extends YiiController {
         ];
     }
     public function beforeAction($event) {
-        if (\Yii::$app->session->get('lang') === 'es') \Yii::$app->language = 'es';
-        else \Yii::$app->language = 'en';
+        if (\Yii::$app->session->get('lang') === 'es') {
+            \Yii::$app->language = 'es';
+            \Yii::$app->formatter->thousandSeparator = '.';
+            \Yii::$app->formatter->decimalSeparator = ',';
+        } else {
+            \Yii::$app->language = 'en';
+            \Yii::$app->formatter->thousandSeparator = ',';
+            \Yii::$app->formatter->decimalSeparator = '.';
+        }
         return parent::beforeAction($event);
     }
 }

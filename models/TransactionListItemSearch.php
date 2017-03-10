@@ -109,6 +109,7 @@ class TransactionListItemSearch extends TransactionListItem
             'with_collaborator' => $this->with_collaborator
         ]);
         $query->andFilterWhere(['or', 
+            ['id' => $this->search_any],
             ['ilike', 'transaction_type', $this->search_any],
             ['ilike', 'custom_type', $this->search_any],
             ['ilike', 'transfer_type', $this->search_any],
