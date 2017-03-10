@@ -36,7 +36,7 @@ class ContactController extends Controller
         return $this->render('index');
     }
 
-    public function actionList($q = null, $id = null, $page = null)
+    public function actionList($q = null, $id = null, $page = 1)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $out = ['results' => ['id' => '', 'text' => '']];
@@ -48,7 +48,7 @@ class ContactController extends Controller
                 ->orWhere(['ilike', 'reference', $q])
                 ->asArray();
             $ntotal = $query->count();
-            $data = $query->limit(10)->offset(10 * $page)->all();
+            $data = $query->limit(10)->offset(10 * ($page - 1))->all();
             $out['results'] = array_values($data);
             $out['pagination'] = ['more' => $ntotal > 10 * $page];
         } elseif ($id > 0) {

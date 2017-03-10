@@ -31,6 +31,7 @@ BootstrapAsset::register($this);
   ]); ?>
   <?php Pjax::end() ?>
   <?php Modal::begin([
+      'options' => ['tabindex' => false],
       'header' => '<h4 class="modal-title"></h4>',
       'size' => Modal::SIZE_LARGE,
       'id' => 'transaction-modal'
