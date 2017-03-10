@@ -5,6 +5,7 @@ use yii\widgets\ActiveForm;
 use kartik\date\DatePicker;
 use app\models\RecipientCategory;
 use yii\widgets\PjaxAsset;
+use kartik\money\MaskMoney;
 PjaxAsset::register($this);
 
 $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-addon\">€</span></div>\n{hint}\n{error}";
@@ -33,11 +34,10 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
             'maxlength' => true,
             'form' => $form->id
         ]); ?>
-        <?= $form->field($model, 'amount_euc', ['template' => $euTpl])->textInput([
-            'class' => 'form-control input-sm text-right',
-            'maxlength' => true,
-            'form' => $form->id
-        ]) ?>
+        <?= $form->field($model, 'amount_eu', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
+                'class' => 'text-right input-sm currency',
+                'form' => $form->id
+            ]]); ?>
       </div>
       <div class="col-md-6">
         <?= $form->field($model, 'issued_at')->widget(DatePicker::classname(), [

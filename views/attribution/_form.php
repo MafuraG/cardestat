@@ -7,6 +7,7 @@ use app\models\Advisor;
 use app\models\AttributionType;
 use app\models\Office;
 use yii\widgets\PjaxAsset;
+use kartik\money\MaskMoney;
 PjaxAsset::register($this);
 
 $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-addon\">€</span></div>\n{hint}\n{error}";
@@ -36,11 +37,10 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
                 'class' => 'form-control input-sm',
                 'form' => $form->id
             ]) ?>
-        <?= $form->field($model, 'amount_euc', ['template' => $euTpl])->textInput([
-            'class' => 'form-control input-sm text-right',
-            'maxlength' => true,
-            'form' => $form->id
-        ]) ?>
+        <?= $form->field($model, 'amount_eu', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
+                'class' => 'text-right input-sm currency',
+                'form' => $form->id
+            ]]); ?>
       </div>
       <div class="col-md-6">
         <?= $form->field($model, 'attribution_type_id')->dropDownList(

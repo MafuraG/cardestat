@@ -262,16 +262,7 @@ class Transaction extends \yii\db\ActiveRecord
         
     }
     public function beforeValidate() {
-        $tr = [
-            Yii::$app->formatter->thousandSeparator => '',
-            Yii::$app->formatter->decimalSeparator => '.'
-        ];
-        $this->sale_price_eu = strtr($this->sale_price_eu, $tr);
-        $this->first_published_price_eu = strtr($this->first_published_price_eu, $tr);
-        $this->last_published_price_eu = strtr($this->last_published_price_eu, $tr);
-        $this->suggested_sale_price_eu = strtr($this->suggested_sale_price_eu, $tr);
-        $this->our_fee_eu = strtr($this->our_fee_eu, $tr);
-        $this->their_fee_eu = strtr($this->their_fee_eu, $tr);
+        if (!$this->sale_price_eu) $this->sale_price_eu = null;
         return parent::beforeValidate();
     }
     public function beforeSave($insert) {

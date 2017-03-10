@@ -22,6 +22,8 @@ use Yii;
  */
 class Attribution extends \yii\db\ActiveRecord
 {
+    public $amount_eu;
+
     /**
      * @inheritdoc
      */
@@ -36,14 +38,16 @@ class Attribution extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['advisor_id', 'attribution_type_id', 'amount_euc', 'transaction_id'], 'required'],
-            [['advisor_id', 'attribution_type_id', 'amount_euc', 'transaction_id'], 'integer'],
+            [['advisor_id', 'attribution_type_id', 'amount_eu', 'transaction_id'], 'required'],
+            [['advisor_id', 'attribution_type_id', 'transaction_id'], 'integer'],
+            ['amount_eu', 'number'],
             [['comments'], 'string'],
             [['office'], 'string', 'max' => 18],
             [['advisor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Advisor::className(), 'targetAttribute' => ['advisor_id' => 'id']],
             [['attribution_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => AttributionType::className(), 'targetAttribute' => ['attribution_type_id' => 'id']],
             [['office'], 'exist', 'skipOnError' => true, 'targetClass' => Office::className(), 'targetAttribute' => ['office' => 'name']],
             [['transaction_id'], 'exist', 'skipOnError' => true, 'targetClass' => Transaction::className(), 'targetAttribute' => ['transaction_id' => 'id']],
+            ['office', 'default', 'value' => null]
         ];
     }
 
@@ -54,10 +58,10 @@ class Attribution extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'advisor_id' => Yii::t('app', 'Advisor ID'),
+            'advisor_id' => Yii::t('app', 'Advisor'),
             'office' => Yii::t('app', 'Office'),
-            'attribution_type_id' => Yii::t('app', 'Attribution Type ID'),
-            'amount_euc' => Yii::t('app', 'Amount Euc'),
+            'attribution_type_id' => Yii::t('app', 'Attribution Type'),
+            'amount_eu' => Yii::t('app', 'Amount'),
             'transaction_id' => Yii::t('app', 'Transaction ID'),
             'comments' => Yii::t('app', 'Comments'),
         ];
@@ -93,5 +97,20 @@ class Attribution extends \yii\db\ActiveRecord
     public function getTransaction()
     {
         return $this->hasOne(Transaction::className(), ['id' => 'transaction_id']);
+    }
+
+    public function afterFind() {
+        parent::afterFind();
+        $formatter = Yii::$app->formatter;
+        $this->amount_eu = round($this->amount_euc / 100., 2);
+        
+    }
+    public function beforeValidate() {
+        if (!$this->amount_eu) $this->amount_eu = null;
+        return parent::beforeValidate();
+    }
+    public function beforeSave($insert) {
+        $this->amount_euc = round($this->amount_eu * 100.);
+        return parent::beforeSave($insert);
     }
 }

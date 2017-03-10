@@ -16,6 +16,7 @@ use Yii;
  */
 class Invoice extends \yii\db\ActiveRecord
 {
+    public $amount_eu;
     /**
      * @inheritdoc
      */
@@ -31,9 +32,9 @@ class Invoice extends \yii\db\ActiveRecord
     {
         return [
             ['transaction_id', 'exist', 'skipOnError' => true, 'targetClass' => Transaction::className(), 'targetAttribute' => ['transaction_id' => 'id']],
-            [['code', 'recipient_category', 'issued_at', 'amount_euc'], 'required'],
+            [['code', 'recipient_category', 'issued_at', 'amount_eu'], 'required'],
             [['issued_at'], 'safe'],
-            [['amount_euc'], 'integer'],
+            [['amount_eu'], 'number'],
             [['code', 'recipient_category'], 'string', 'max' => 18],
             [['recipient_category'], 'exist', 'skipOnError' => true, 'targetClass' => RecipientCategory::className(), 'targetAttribute' => ['recipient_category' => 'name']],
         ];
@@ -47,7 +48,7 @@ class Invoice extends \yii\db\ActiveRecord
         return [
             'code' => Yii::t('app', 'Code'),
             'issued_at' => Yii::t('app', 'Issued At'),
-            'amount_euc' => Yii::t('app', 'Amount Euc'),
+            'amount_eu' => Yii::t('app', 'Amount'),
             'recipient_category' => Yii::t('app', 'Recipient Category'),
         ];
     }
@@ -66,5 +67,20 @@ class Invoice extends \yii\db\ActiveRecord
     public function getRecipientCategory()
     {
         return $this->hasOne(RecipientCategory::className(), ['name' => 'recipient_category']);
+    }
+
+    public function afterFind() {
+        parent::afterFind();
+        $formatter = Yii::$app->formatter;
+        $this->amount_eu = round($this->amount_euc / 100., 2);
+        
+    }
+    public function beforeValidate() {
+        if (!$this->amount_eu) $this->amount_eu = null;
+        return parent::beforeValidate();
+    }
+    public function beforeSave($insert) {
+        $this->amount_euc = round($this->amount_eu * 100.);
+        return parent::beforeSave($insert);
     }
 }

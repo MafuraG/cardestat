@@ -23,7 +23,7 @@ if (!isset($formExpanded)) $formExpanded = false;
           //'id',
           'code',
           'issued_at:date',
-          ['attribute' => 'amount_euc', 'format' => ['currency', 'EUR']],
+          ['attribute' => 'amount_eu', 'format' => ['currency', 'EUR']],
           'recipient_category',
           ['class' => 'yii\grid\ActionColumn', 'buttons' => [
               'view' => function ($url, $model) {},
