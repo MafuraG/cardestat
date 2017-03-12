@@ -19,7 +19,9 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
         'invoice' => $invoice,
         'invoiceDataProvider' => $invoiceDataProvider,
         'attribution' => $attribution,
-        'attributionDataProvider' => $attributionDataProvider
+        'attributionDataProvider' => $attributionDataProvider,
+        'attribution_types' => $attribution_types,
+        'advisor_defaults' => $advisor_defaults
     ]) ?>
 
 </div>

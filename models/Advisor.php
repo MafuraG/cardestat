@@ -55,7 +55,7 @@ class Advisor extends \yii\db\ActiveRecord
             'id' => Yii::t('app', 'ID'),
             'name' => Yii::t('app', 'Name'),
             'default_office' => Yii::t('app', 'Default Office'),
-            'default_attribution_type_id' => Yii::t('app', 'Default Attribution Type ID'),
+            'default_attribution_type_id' => Yii::t('app', 'Default Attribution Type'),
         ];
     }
 
@@ -101,8 +101,22 @@ class Advisor extends \yii\db\ActiveRecord
 
     /**
      */
+    public static function listActiveHub()
+    {
+        return ArrayHelper::map(static::find()->where(['is_hub_agent' => true, 'active' => true])->orderBy('name')->all(), 'id', 'name');
+    }
+
+    /**
+     */
+    public static function listActive()
+    {
+        return ArrayHelper::map(static::find()->where(['active' => true])->orderBy('name')->all(), 'id', 'name');
+    }
+
+    /**
+     */
     public static function listAll()
     {
-        return ArrayHelper::map(static::find()->all(), 'id', 'name');
+        return ArrayHelper::map(static::find()->orderBy('name')->all(), 'id', 'name');
     }
 }

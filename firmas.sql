@@ -593,7 +593,7 @@ insert into attribution (advisor_id, attribution_type_id, amount_euc, transactio
     select ad.id, at.id, 0, t.id
     from firmas f
          join transaction t on (t.external_id = f.id)
-         join attribution_type at on (at.name = 'UNKNOWN' and attribution_bp = 0),
+         join attribution_type at on (at.name = 'DESCONOCIDO' and attribution_bp = 0),
          advisor ad
     where 'RA' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'RAFAEL ALZOLA' or
           'GG' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'GILBERTO GIL' or

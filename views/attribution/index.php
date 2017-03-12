@@ -21,12 +21,14 @@ if (!isset($formExpanded)) $formExpanded = false;
           'class' => 'table table-condensed table-striped'
       ], 'columns' => [
           //'id',
-          //['attribute' => 'code', 'value' => '$model->advisor->name'],
-          'advisor.name',
+          ['attribute' => 'advisor.name', 'label' => Yii::t('app', 'Advisor')],
           'office',
           //['attribute' => 'attribution_type', 'value' => '$model->attribution_type->name'],
-          'attributionType.name',
-          ['attribute' => 'amount_eu', 'format' => ['currency', 'EUR']],
+          ['attribute' => 'attribution_type_id', 'value' => 'attributionType.name'],
+          ['attribute' => 'attributionType.attribution_bp', 'value' => function($model) {
+              $attrPct = Yii::$app->formatter->asDecimal($model->attributionType->attribution_bp / 100., 2);
+              return "$attrPct%";
+          }], ['attribute' => 'amount_eu', 'format' => ['currency', 'EUR']],
           'comments:ntext',
           ['class' => 'yii\grid\ActionColumn', 'buttons' => [
               'view' => function ($url, $model) {},
@@ -37,7 +39,9 @@ if (!isset($formExpanded)) $formExpanded = false;
 
   <?= $this->render('_form', [
       'model' => $model,
-      'formExpanded' => $formExpanded
+      'formExpanded' => $formExpanded,
+      'attribution_types' => $attribution_types,
+      'advisor_defaults' => $advisor_defaults
   ]) ?>
 </div>
 

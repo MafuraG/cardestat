@@ -7,7 +7,10 @@ use yii\web\NotFoundHttpException;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use app\models\Advisor;
 use app\models\Attribution;
+use app\models\AttributionType;
+use yii\helpers\ArrayHelper;
 
 /**
  * AttributionController implements the CRUD actions for Attribution model.
@@ -45,12 +48,16 @@ class AttributionController extends Controller
         $dataProvider = new ActiveDataProvider([
             'query' => Attribution::find()->where(['transaction_id' => $transaction_id])
         ]);
+        $advisor_defaults = ArrayHelper::index(Advisor::find()->with('defaultAttributionType')->asArray()->all(), 'id');
+        $attribution_types = ArrayHelper::map(AttributionType::find()->all(), 'id', 'attribution_bp');
 
         return $this->render('index', [
             'dataProvider' => $dataProvider,
             'model' => new Attribution([
                 'transaction_id' => $transaction_id
-            ])
+            ]),
+            'attribution_types' => $attribution_types,
+            'advisor_defaults' => $advisor_defaults,
         ]);
     }
 

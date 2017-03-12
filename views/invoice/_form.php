@@ -34,10 +34,12 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
             'maxlength' => true,
             'form' => $form->id
         ]); ?>
-        <?= $form->field($model, 'amount_eu', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
-                'class' => 'text-right input-sm currency',
+        <?= $form->field($model, 'recipient_category')->dropDownList(
+            RecipientCategory::listAll(), [
+                'prompt' => '',
+                'class' => 'form-control input-sm',
                 'form' => $form->id
-            ]]); ?>
+            ]) ?>
       </div>
       <div class="col-md-6">
         <?= $form->field($model, 'issued_at')->widget(DatePicker::classname(), [
@@ -48,12 +50,10 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
                 'format' => 'yyyy-mm-dd',
             ]
         ]); ?>
-        <?= $form->field($model, 'recipient_category')->dropDownList(
-            RecipientCategory::listAll(), [
-                'prompt' => '',
-                'class' => 'form-control input-sm',
+        <?= $form->field($model, 'amount_eu', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
+                'class' => 'text-right input-sm currency',
                 'form' => $form->id
-            ]) ?>
+            ]]); ?>
       </div>
   
       <div class="col-md-12">

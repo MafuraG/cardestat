@@ -26,6 +26,8 @@ use Yii;
  */
 class Property extends \yii\db\ActiveRecord
 {
+    public $plot_area_m2;
+    public $built_area_m2;
     /**
      * @inheritdoc
      */
@@ -64,11 +66,11 @@ class Property extends \yii\db\ActiveRecord
             'inactive_date' => Yii::t('app', 'Inactive Date'),
             'property_type' => Yii::t('app', 'Property Type'),
             'location' => Yii::t('app', 'Location'),
-            'building_complex' => Yii::t('app', 'Building Complex'),
+            'building_complex' => Yii::t('app', 'Building/Complex'),
             'geo_coordinates' => Yii::t('app', 'Geo Coordinates'),
-            'plot_area_m2' => Yii::t('app', 'Plot Area M2'),
-            'built_area_m2' => Yii::t('app', 'Built Area M2'),
-            'n_bedrooms' => Yii::t('app', 'N Bedrooms'),
+            'plot_area_m2' => Yii::t('app', 'Plot Area'),
+            'built_area_m2' => Yii::t('app', 'Built Area'),
+            'n_bedrooms' => Yii::t('app', 'No. Bedrooms'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
@@ -80,5 +82,11 @@ class Property extends \yii\db\ActiveRecord
     public function getTransactions()
     {
         return $this->hasMany(Transaction::className(), ['property_id' => 'id']);
+    }
+
+    public function afterFind() {
+        parent::afterFind();
+        $this->plot_area_m2 = round($this->plot_area_dm2 / 100., 2);
+        $this->built_area_m2 = round($this->built_area_dm2 / 100., 2);
     }
 }

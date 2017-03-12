@@ -32,7 +32,7 @@ BootstrapAsset::register($this);
   <?php Pjax::end() ?>
   <?php Modal::begin([
       'options' => ['tabindex' => false],
-      'header' => '<h4 class="modal-title"></h4>',
+      'header' => '<h3 class="modal-title"></h3>',
       'size' => Modal::SIZE_LARGE,
       'id' => 'transaction-modal'
   ]) ?>
@@ -89,7 +89,7 @@ $script = <<< JS
   var editing = false;
   var last_id = -1;
   function modalDataLoaded() {
-      \$transactionModal.find('.modal-header h4').html('{$transactionLbl} #' + last_id);
+      \$transactionModal.find('.modal-header h3').html('{$transactionLbl} #' + last_id);
       if (editing) \$transactionModal.find('.btn-primary, .edit-mode').removeClass('hidden');
       else \$transactionModal.find('.btn-primary, .edit-mode').addClass('hidden');
       \$transactionModal.find('input, select, textarea, checkbox, .btn-danger')

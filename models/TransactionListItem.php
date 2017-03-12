@@ -89,11 +89,11 @@ class TransactionListItem extends Transaction
             'property_location' => Yii::t('app', 'Property Location'),
             'seller_name' => Yii::t('app', 'Seller Name'),
             'buyer_name' => Yii::t('app', 'Buyer Name'),
-            'cardenas100' => Yii::t('app', 'Cardenas100'),
+            'cardenas100' => Yii::t('app', '100% Cárdenas'),
             'advisors' => Yii::t('app', 'Advisors'),
             'n_invoices' => Yii::t('app', 'No. Invoices'),
             'first_invoiced_at' => Yii::t('app', 'First Invoice Date'),
-            'our_fee_bp' => Yii::t('app', 'Our Fee Bp'),
+            'our_fee_bp' => Yii::t('app', 'Our Fee'),
         ]);
     }
 }

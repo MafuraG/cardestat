@@ -8,19 +8,19 @@ class m170303_154953_transactions extends Migration
         $this->createTable('transaction_type', [
             'name' => $this->string(32) . ' primary key'
         ]);
-        $this->batchInsert('transaction_type', ['name'], [['TRADING'], ['RENTAL'], ['ADVICE']]);
+        $this->batchInsert('transaction_type', ['name'], [['COMPRAVENTA'], ['ALQUILER'], ['ASESORAMIENTO']]);
         $this->createTable('custom_type', [
             'name' => $this->string(32) . ' primary key'
         ]);
-        $this->batchInsert('custom_type', ['name'], [['NON EXCLUSIVE'], ['MULTIEXCLUSIVE'], ['EXCLUSIVE']]);
+        $this->batchInsert('custom_type', ['name'], [['NO EXCLUSIVA'], ['MULTIEXCLUSIVA'], ['EXCLUSIVA']]);
         $this->createTable('transfer_type', [
             'name' => $this->string(32) . ' primary key'
         ]);
-        $this->batchInsert('transfer_type', ['name'], [['FIRST HAND'], ['SECOND HAND']]);
+        $this->batchInsert('transfer_type', ['name'], [['NUEVA CONSTRUCCIÓN'], ['SEGUNDA MANO']]);
         $this->createTable('development_type', [
             'name' => $this->string(32) . ' primary key'
         ]);
-        $this->batchInsert('development_type', ['name'], [['PRIVATE']]);
+        $this->batchInsert('development_type', ['name'], [['UNA UNIDAD'], ['TERMINADA'], ['EN CONSTRUCCIÓN'], ['VARIAS UNIDADES EN UN COMPLEJO']]);
         $this->createTable('partner', [
             'name' => $this->string(32) . ' primary key'
         ]);
@@ -39,50 +39,64 @@ class m170303_154953_transactions extends Migration
             'attribution_bp' => $this->integer()->notNull(),
         ]);
         $this->batchInsert('attribution_type', ['name', 'attribution_bp'], [[
-            'UNKNOWN', 0
+            'DESCONOCIDO', 0
         ], [
-            'ATTRACTION', 3000
+            'GESTIÓN FIRMAS', 0
+        ], [
+            'GESTIÓN LEAD', 0
+        ], [
+            'VENTA', 7000
+        ], [
+            'CAPTACIÓN', 3000
         ]]);
         $this->createIndex('attribution_type-name-attribution_bp-uidx', 'attribution_type', ['name', 'attribution_bp'], true);
         $this->createTable('advisor', [
             'id' => $this->primaryKey(),
             'name' => $this->string(32)->notNull()->unique(),
+            'active' => $this->boolean()->notNull()->defaultValue(true),
+            'is_hub_agent' => $this->boolean()->notNull()->defaultValue(false),
             'default_office' => $this->string(18) . ' references office(name)',
             'default_attribution_type_id' => $this->integer() . ' references attribution_type(id)',
         ]);
         $unknown0_id = Yii::$app->db->createCommand('select id from attribution_type where attribution_bp = 0')->execute();
-        $this->batchInsert('advisor', ['name', 'default_office', 'default_attribution_type_id'], [[
-            'RAFAEL ALZOLA', 'ARGUINEGUÍN', $unknown0_id
+        $this->batchInsert('advisor', ['name', 'default_office', 'default_attribution_type_id', 'active', 'is_hub_agent'], [[
+            'RAFAEL ALZOLA', 'ARGUINEGUÍN', $unknown0_id, true, false
         ], [
-            'GILBERTO GIL', 'ARGUINEGUÍN', $unknown0_id
+            'TINA FREDTOFT', 'ARGUINEGUÍN', $unknown0_id, true, true
         ], [
-            'LONNIE LINDQUIST', 'ARGUINEGUÍN', $unknown0_id
+            'ANZHELA SPIRIDONOVA', 'ARGUINEGUÍN', $unknown0_id, true, true
         ], [
-            'LEONOR MARTÍN', 'ARGUINEGUÍN', $unknown0_id
+            'GILBERTO GIL', 'ARGUINEGUÍN', $unknown0_id, false, false
         ], [
-            'CAROLINA GARCÍA', 'ARGUINEGUÍN', $unknown0_id
+            'CARLOS GÓMEZ', 'ARGUINEGUÍN', $unknown0_id, true, false
         ], [
-            'AXEL KUBISCH', 'ARGUINEGUÍN', $unknown0_id
+            'LONNIE LINDQUIST', 'ARGUINEGUÍN', $unknown0_id, true, false
         ], [
-            'DANIEL GARCÍA', 'ARGUINEGUÍN', $unknown0_id
+            'LEONOR MARTÍN', 'ARGUINEGUÍN', $unknown0_id, true, false
         ], [
-            'STEPHAN BERGONJE', 'ARGUINEGUÍN', $unknown0_id
+            'CAROLINA GARCÍA', 'ARGUINEGUÍN', $unknown0_id, true, false
         ], [
-            'CARINA MAEHLE', 'ARGUINEGUÍN', $unknown0_id
+            'AXEL KUBISCH', 'ARGUINEGUÍN', $unknown0_id, false, false
         ], [
-            'KENT BERGSTEN', 'ARGUINEGUÍN', $unknown0_id
+            'DANIEL GARCÍA', 'ARGUINEGUÍN', $unknown0_id, true, false
         ], [
-            'INGE HILDEBRANDT', 'ARGUINEGUÍN', $unknown0_id
+            'STEPHAN BERGONJE', 'ARGUINEGUÍN', $unknown0_id, true, false
         ], [
-            'DEBORAH TESCH', 'ARGUINEGUÍN', $unknown0_id
+            'CARINA MAEHLE', 'ARGUINEGUÍN', $unknown0_id, false, false
         ], [
-            'YVONNE WEERTS', 'ARGUINEGUÍN', $unknown0_id
+            'KENT BERGSTEN', 'ARGUINEGUÍN', $unknown0_id, false, false
         ], [
-            'THERESA BONA', 'ARGUINEGUÍN', $unknown0_id
+            'INGE HILDEBRANDT', 'ARGUINEGUÍN', $unknown0_id, true, false
         ], [
-            'THOMAS EKBLOM', 'ARGUINEGUÍN', $unknown0_id
+            'DEBORAH TESCH', 'ARGUINEGUÍN', $unknown0_id, false, false
         ], [
-            'CRISTINA CARUSO', 'ARGUINEGUÍN', $unknown0_id
+            'YVONNE WEERTS', 'ARGUINEGUÍN', $unknown0_id, true, false
+        ], [
+            'THERESA BONA', 'ARGUINEGUÍN', $unknown0_id, false, false
+        ], [
+            'THOMAS EKBLOM', 'ARGUINEGUÍN', $unknown0_id, true, false
+        ], [
+            'CRISTINA CARUSO', 'ARGUINEGUÍN', $unknown0_id, false, false
         ]]);
         $this->createTable('advisor_tranche', [
             'id' => $this->primaryKey(),
@@ -102,11 +116,11 @@ class m170303_154953_transactions extends Migration
         $this->createTable('recipient_category', [
             'name' => $this->string(32) . ' primary key',
         ]);
-        $this->batchInsert('recipient_category', ['name'], [['BUYER'], ['SELLER'], ['COLLABORATOR']]);
+        $this->batchInsert('recipient_category', ['name'], [['COMPRADOR'], ['VENDEDOR'], ['COLABORADOR']]);
         $this->createTable('transaction', [
             'id' => $this->primaryKey(),
             'external_id' => $this->string(12)->unique(),
-            'transaction_type' => $this->string(18)->notNull()->defaultValue('TRADING') . ' references transaction_type(name)',
+            'transaction_type' => $this->string(18)->notNull()->defaultValue('COMPRAVENTA') . ' references transaction_type(name)',
             'custom_type' => $this->string(32) . ' references custom_type(name)',
             'transfer_type' => $this->string(32) . ' references transfer_type(name)',
             'development_type' => $this->string(32) . ' references development_type(name)',
@@ -149,7 +163,7 @@ class m170303_154953_transactions extends Migration
             'advisor_id' => $this->integer()->notNull() . ' references advisor(id)',
             'office' => $this->string(18) . ' references office(name)', // null means all/no offices
             'attribution_type_id' => $this->integer()->notNull() . ' references attribution_type(id)',
-            'amount_euc' => $this->integer()->notNull(),
+            'amount_euc' => $this->integer(),
             'transaction_id' => $this->integer()->notNull() . ' references transaction(id)',
             'comments' => $this->text()
         ]);

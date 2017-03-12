@@ -104,7 +104,7 @@ class Transaction extends \yii\db\ActiveRecord
             [['property_id'], 'exist', 'skipOnError' => true, 'targetClass' => Property::className(), 'targetAttribute' => ['property_id' => 'id']],
             [['transaction_type'], 'exist', 'skipOnError' => true, 'targetClass' => TransactionType::className(), 'targetAttribute' => ['transaction_type' => 'name']],
             [['transfer_type'], 'exist', 'skipOnError' => true, 'targetClass' => TransferType::className(), 'targetAttribute' => ['transfer_type' => 'name']],
-            [['lead_type', 'custom_type', 'transfer_type', 'transaction_type', 'development_type', 'seller_provider', 'buyer_provider', 'external_id'], 'default', 'value' => null],
+            [['lead_type', 'custom_type', 'transfer_type', 'transaction_type', 'development_type', 'seller_provider', 'buyer_provider', 'external_id', 'seller_id', 'buyer_id', 'property_id'], 'default', 'value' => null],
         ];
     }
 
@@ -137,10 +137,10 @@ class Transaction extends \yii\db\ActiveRecord
             'suggested_sale_price_eu' => Yii::t('app', 'Suggested Sale Price'),
             'passed_to_sales_by' => Yii::t('app', 'Passed To Sales By'),
             'property_id' => Yii::t('app', 'Property'),
-            'is_home_staged' => Yii::t('app', 'The Home Is Staged'),
+            'is_home_staged' => Yii::t('app', 'Home Staging'),
             'our_fee_eu' => Yii::t('app', 'Our Fee'),
-            'their_fee_eu' => Yii::t('app', 'Their Fee'),
-            'payrolled_at' => Yii::t('app', 'Payrolled Date'),
+            'their_fee_eu' => Yii::t('app', 'Collaborator\'s Fee'),
+            'payrolled_at' => Yii::t('app', 'Date Payrolled'),
             'comments' => Yii::t('app', 'Comments'),
             'approved' => Yii::t('app', 'Approved'),
             'created_at' => Yii::t('app', 'Created At'),

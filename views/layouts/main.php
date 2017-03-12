@@ -37,7 +37,8 @@ AppAsset::register($this);
         ]
     ]);
     echo Nav::widget([
-        'options' => ['class' => 'navbar-nav navbar-right'],
+        'options' => ['class' => 'navbar-nav'],
+        'encodeLabels' => false, 
         'items' => [
             ['label' => \Yii::t('app', 'Home'), 'url' => ['/table/index']],
             ['label' => \Yii::t('app', 'Transactions'), 'url' => ['/transaction/index']],
@@ -45,9 +46,18 @@ AppAsset::register($this);
                 ['label' => \Yii::t('app', 'Salesmeter'), 'url' => ['/presentation/n-sales']],
             ]],
             ['label' => \Yii::t('app', 'Users'), 'url' => ['/user/index'], 'visible' => \Yii::$app->user->can('admin')],
-            ['label' => (\Yii::$app->language === 'es') ? 'English' : 'Español', 'url' => ['/site/chlan']],
+    ]]);
+    echo Nav::widget([
+        'options' => ['class' => 'navbar-nav navbar-right'],
+        'items' => [[
+            'label' => (\Yii::$app->language === 'es') ? 'Español' : 'English',
+            'url' => '#',
+            'items' => [[
+                'label' => (\Yii::$app->language === 'es') ? 'English' : 'Español',
+                'url' => ['/site/chlan']
+            ]]],
             Yii::$app->user->isGuest ? (
-                ['label' => 'Login', 'url' => ['/site/login']]
+                ['label' => Yii::t('app', 'Login'), 'url' => ['/site/login']]
             ) : (
                 '<li>'
                 . Html::beginForm(['/site/logout'], 'post', ['class' => 'navbar-form'])
@@ -58,10 +68,9 @@ AppAsset::register($this);
                 . Html::endForm()
                 . '</li>'
             )
-        ],
+        ]
     ]);
-    NavBar::end();
-    ?>
+    NavBar::end(); ?>
 
     <div class="container-fluid" style="padding-top: 72px">
         <?= Breadcrumbs::widget([

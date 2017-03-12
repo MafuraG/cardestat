@@ -4,10 +4,13 @@ namespace app\controllers;
 
 use Yii;
 use app\models\Invoice;
+use app\models\Advisor;
 use app\models\Attribution;
+use app\models\AttributionType;
 use app\models\Transaction;
 use app\models\TransactionListItem;
 use app\models\TransactionListItemSearch;
+use yii\helpers\ArrayHelper;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
@@ -51,7 +54,7 @@ class TransactionController extends Controller
 
         return $this->render('index', [
             'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
+            'dataProvider' => $dataProvider
         ]);
     }
 
@@ -102,6 +105,8 @@ class TransactionController extends Controller
         $attributionDataProvider = new ActiveDataProvider([
             'query' => $attribution->find()->where(['transaction_id' => $id])
         ]);
+        $advisor_defaults = ArrayHelper::index(Advisor::find()->with('defaultAttributionType')->asArray()->all(), 'id');
+        $attribution_types = ArrayHelper::map(AttributionType::find()->all(), 'id', 'attribution_bp');
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             if (Yii::$app->request->isAjax)
@@ -113,7 +118,9 @@ class TransactionController extends Controller
                 'invoice' => $invoice,
                 'attribution' => $attribution,
                 'invoiceDataProvider' => $invoiceDataProvider,
-                'attributionDataProvider' => $attributionDataProvider
+                'attributionDataProvider' => $attributionDataProvider,
+                'attribution_types' => $attribution_types,
+                'advisor_defaults' => $advisor_defaults
             ];
             if (Yii::$app->request->isAjax) return $this->renderAjax('_form', $data);
             else return $this->render('update', $data);

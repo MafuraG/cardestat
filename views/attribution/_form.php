@@ -8,6 +8,7 @@ use app\models\AttributionType;
 use app\models\Office;
 use yii\widgets\PjaxAsset;
 use kartik\money\MaskMoney;
+use yii\helpers\Json;
 PjaxAsset::register($this);
 
 $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-addon\">€</span></div>\n{hint}\n{error}";
@@ -32,29 +33,29 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
     <div id="add-attribution" class="collapse <?= (isset($formExpanded) and $formExpanded) ? 'in' : ''?>">
       <div class="col-md-6">
         <?= $form->field($model, 'advisor_id')->dropDownList(
-            Advisor::listAll(), [
+            Advisor::listActive(), [
                 'prompt' => '',
                 'class' => 'form-control input-sm',
                 'form' => $form->id
             ]) ?>
-        <?= $form->field($model, 'amount_eu', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
-                'class' => 'text-right input-sm currency',
-                'form' => $form->id
-            ]]); ?>
-      </div>
-      <div class="col-md-6">
         <?= $form->field($model, 'attribution_type_id')->dropDownList(
             AttributionType::listAll(), [
                 'prompt' => '',
                 'class' => 'form-control input-sm',
                 'form' => $form->id
             ]) ?>
+      </div>
+      <div class="col-md-6">
         <?= $form->field($model, 'office')->dropDownList(
             Office::listAll(), [
                 'prompt' => '',
                 'class' => 'form-control input-sm',
                 'form' => $form->id
             ]) ?>
+        <?= $form->field($model, 'amount_eu', ['template' => $euTpl])->textInput([
+            'readonly' => true,
+            'class' => 'text-right form-control input-sm',
+        ]); ?>
       </div>
       <div class="col-md-12">
         <?= $form->field($model, 'comments')->textArea([
@@ -73,57 +74,33 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
   </div>
 </div>
 <?php
+$json_advisor_defaults = Json::encode($advisor_defaults);
+$json_attribution_types = Json::encode($attribution_types);
 $script = <<< JS
+  var advisor_defaults = $json_advisor_defaults;
+  var attribution_types = $json_attribution_types;
   $('.attribution-form form').on('beforeSubmit.yii', function(e) {
       $.pjax.submit(e, '#attribution-index-p0', {push: false, scrollTo: false});
       return false;
   });
+  var \$advisorId = $('select[name="Attribution[advisor_id]"]');
+  var \$office = $('select[name="Attribution[office]"]');
+  var \$attributionTypeId = $('select[name="Attribution[attribution_type_id]"]');
+  var \$ourFeeEu = $('input[name="Transaction[our_fee_eu]"]');
+  var \$amountEu = $('input[name="Attribution[amount_eu]"]');
+  \$advisorId.on('change', function() {
+      var advisorId = $(this).val();
+      \$office.val(advisor_defaults[advisorId].default_office);
+      \$attributionTypeId.val(advisor_defaults[advisorId].default_attribution_type_id);
+      \$attributionTypeId.change();
+      
+  });
+  \$attributionTypeId.on('change', function() {
+      var attribution_type_id = $(this).val();
+      var advisorId = \$advisorId.val();
+      var amount_eu = (\$ourFeeEu.val() * attribution_types[attribution_type_id] / 10000.).toFixed(2);
+      \$amountEu.val(amount_eu);
+  });
 JS;
 $this->registerJs($script);
 ?>
-<!--
-<div class="edit-mode">
-  <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#add-advisor">+ Añadir atribución</button>
-  <div id="add-advisor" class="collapse">
-    <div class="form-group col-md-6">
-      <label>Asesor</label>
-      <select class="input-sm form-control">
-        <option selected>TOMAS</option>
-      </select>
-    </div>
-    <div class="form-group col-md-6">
-      <label>Oficina</label>
-      <select class="input-sm form-control">
-        <option>-- SIN ESTABLECER --</option>
-        <option selected>ARGUINEGUÍN</option>
-      </select>
-    </div>
-    <div class="form-group col-md-6">
-      <label>Tipo de atribución</label>
-      <select class="input-sm form-control">
-        <option selected>CAPTACIÓN 30%</option>
-      </select>
-    </div>
-    <div class="form-group col-md-6">
-      <label>Atribución</label>
-      <div class="input-group">
-        <span class="input-group-addon"></span>
-        <div class="input-group-btn">
-          <select class="input-sm form-control">
-            <option selected>AUTOMÁTICA</option>
-          </select>
-        </div>
-        <input class="input-sm form-control text-right" disabled>
-        <span class="input-group-addon">€</span>
-      </div>
-    </div>
-    <div class="form-group col-md-12">
-      <label>Comentarios para el asesor</label>
-      <textarea class="form-control" rows="3"></textarea>
-    </div>
-    <div class="form-group col-md-12">
-      <button class="btn btn-sm btn-primary" type="button">Añadir</button>
-    </div>
-  </div>
-</div>
--->

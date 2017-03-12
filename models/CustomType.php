@@ -54,6 +54,6 @@ class CustomType extends \yii\db\ActiveRecord
      */
     public static function listAll()
     {
-        return ArrayHelper::map(static::find()->all(), 'name', 'name');
+        return ArrayHelper::map(static::find()->orderBy('name')->all(), 'name', 'name');
     }
 }

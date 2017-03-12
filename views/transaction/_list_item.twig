@@ -3,7 +3,7 @@
 
 <div class="row">
   <div class="col-md-2">
-    <span class="label label-primary uppercase" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>{{ model.custom_type }}</br>{{ model.transfer_type }}</br>{{ model.development_type }}</div>">{{ model.transaction_type }} #{{ model.id}}</span> <small>{{ app.formatter.asDate(model.option_signed_at, 'dd MMM \'\'yy') }}</small>
+    <span class="label label-primary uppercase" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>ID #{{ model.id}}</br>{{ model.custom_type }}</br>{{ model.transfer_type }}</br>{{ model.development_type }}</div>">{{ model.transaction_type }}</span> <small>{{ app.formatter.asDate(model.option_signed_at, 'dd MMM \'\'yy') }}</small>
   </div>
   <div class="col-md-3 uppercase">
     <div class="ellipsis">

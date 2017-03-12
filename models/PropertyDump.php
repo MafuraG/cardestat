@@ -56,11 +56,11 @@ class PropertyDump extends \yii\db\ActiveRecord
             'inactive_date' => Yii::t('app', 'Inactive Date'),
             'property_type' => Yii::t('app', 'Property Type'),
             'location' => Yii::t('app', 'Location'),
-            'building_complex' => Yii::t('app', 'Building Complex'),
+            'building_complex' => Yii::t('app', 'Building/Complex'),
             'geo_coordinates' => Yii::t('app', 'Geo Coordinates'),
-            'plot_area_m2' => Yii::t('app', 'Plot Area M2'),
-            'built_area_m2' => Yii::t('app', 'Built Area M2'),
-            'n_bedrooms' => Yii::t('app', 'N Bedrooms'),
+            'plot_area_m2' => Yii::t('app', 'Plot Area'),
+            'built_area_m2' => Yii::t('app', 'Built Area'),
+            'n_bedrooms' => Yii::t('app', 'No. Bedrooms'),
         ];
     }
 }

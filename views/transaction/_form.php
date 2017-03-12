@@ -16,6 +16,7 @@ use kartik\select2\Select2;
 use kartik\money\MaskMoney;
 
 $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-addon\">€</span></div>\n{hint}\n{error}";
+$pctTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-addon\">%</span></div>\n{hint}\n{error}";
 /* @var $this yii\web\View */
 /* @var $model app\models\Transaction */
 /* @var $form yii\widgets\ActiveForm */
@@ -33,7 +34,7 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
   <div class="row">
     <fieldset>
       <div class="col-md-12">
-        <legend><?= Yii::t('app', 'Clasification') ?></legend>
+        <legend class="bg-primary"><?= Yii::t('app', 'Clasification') ?></legend>
       </div>
       <div class="col-md-6">
         <?= $form->field($model, 'transaction_type')
@@ -52,7 +53,7 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
             ->dropDownList(DevelopmentType::listAll(), ['prompt' => '', 'class' => 'form-control input-sm', 'form' => $form->id]) ?>
       </div>
       <div class="col-md-12">
-        <legend><?= Yii::t('app', 'Evolution') ?></legend>
+        <legend class="bg-primary"><?= Yii::t('app', 'Evolution') ?></legend>
       </div>
       <div class="col-md-6">
         <?= $form->field($model, 'first_published_at')->widget(DatePicker::classname(), [
@@ -66,7 +67,7 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
       </div>
       <div class="col-md-6">
         <?= $form->field($model, 'first_published_price_eu', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
-                'class' => 'text-right input-sm currency',
+                'class' => 'text-right input-sm mask-money',
                 'form' => $form->id
             ]]); ?>
       </div>
@@ -82,7 +83,7 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
       </div>
       <div class="col-md-6">
         <?= $form->field($model, 'last_published_price_eu', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
-                'class' => 'text-right input-sm currency',
+                'class' => 'text-right input-sm mask-money',
                 'form' => $form->id
             ]]); ?>
       </div>
@@ -98,18 +99,21 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
       </div>
       <div class="col-md-6">
         <?= $form->field($model, 'sale_price_eu', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
-                'class' => 'text-right input-sm currency',
+                'class' => 'text-right input-sm mask-money',
                 'form' => $form->id
             ]]); ?>
       </div>
       <div class="col-md-12">
-        <legend><?= Yii::t('app', 'Participants') ?></legend>
+        <legend class="bg-primary"><?= Yii::t('app', 'Participants') ?></legend>
       </div>
       <div class="col-md-6">
         <?php
           $partners = Partner::listAll();
-          $seller = $model->seller;
-          $initValue = "{$seller->last_name}, {$seller->first_name} (ref. {$seller->reference})";
+          $initValue = null;
+          if ($model->seller_id) {
+              $seller = $model->seller;
+              $initValue = "{$seller->last_name}, {$seller->first_name} (ref. {$seller->reference})";
+          }
           echo $form->field($model, 'seller_id')->widget(Select2::classname(), [
               'initValueText' => $initValue,
               'size' => 'sm',
@@ -117,17 +121,71 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
                   'placeholder' => Yii::t('app', 'Search for a contact...'),
                   'form' => $form->id
               ], 'language' => Yii::$app->language,
-              'pluginOptions' => [
+              'addon' => [
+                  'prepend' => [
+                      'content' => Html::button('', [
+                          'class' => 'btn btn-toggle btn-default collapsed',
+                          'data-toggle' => 'collapse',
+                          'href' => '#seller-collapse'
+                      ]),
+                      'asButton' => true
+                  ] 
+              ], 'pluginOptions' => [
                   'allowClear' => true,
                   'minimumInputLength' => 3,
                   'ajax' => [
                       'url' => Url::to(['/contact/list']),
                       'dataType' => 'json'
                   ],
+        ]]); ?>
+        <div id="seller-collapse" class="collapse well well-sm">
+          <? if (isset($seller)) echo  $this->render('/contact/_view', ['model' => $seller]) ?>
+        </div>
+        <?= $form->field($model, 'is_new_seller')->checkbox(['form' => $form->id]) ?>
+        <?= $form->field($model, 'seller_provider')->dropDownList(
+            $partners, ['prompt' => Yii::$app->params['company'], 'class' => 'form-control input-sm', 'form' => $form->id]) ?>
+        <?= $form->field($model, 'suggested_sale_price_eu', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
+              'class' => 'text-right input-sm mask-money',
+              'form' => $form->id
           ]]); ?>
-          <?= $form->field($model, 'is_new_seller')->checkbox(['form' => $form->id]) ?>
-          <?= $form->field($model, 'seller_provider')->dropDownList(
-              $partners, ['prompt' => Yii::$app->params['company'], 'class' => 'form-control input-sm', 'form' => $form->id]) ?>
+      </div>
+      <div class="col-md-6">
+        <?php
+          $initValue = null;
+          if ($model->buyer_id) {
+              $buyer = $model->buyer;
+              $initValue = "{$buyer->last_name}, {$buyer->first_name} (ref. {$buyer->reference})";
+          }
+          echo $form->field($model, 'buyer_id')->widget(Select2::classname(), [
+              'initValueText' => $initValue,
+              'size' => 'sm',
+              'options' => [
+                  'placeholder' => Yii::t('app', 'Search for a contact...'),
+                  'form' => $form->id
+              ],
+              'addon' => [
+                  'prepend' => [
+                      'content' => Html::button('', [
+                          'class' => 'btn btn-toggle btn-default collapsed',
+                          'data-toggle' => 'collapse',
+                          'href' => '#buyer-collapse'
+                      ]),
+                      'asButton' => true
+                  ] 
+              ], 'pluginOptions' => [
+                  'allowClear' => true,
+                  'minimumInputLength' => 3,
+                  'ajax' => [
+                      'url' => Url::to(['/contact/list']),
+                      'dataType' => 'json'
+                  ],
+        ]]); ?>
+        <div id="buyer-collapse" class="collapse well well-sm">
+          <? if (isset($buyer)) echo  $this->render('/contact/_view', ['model' => $buyer]) ?>
+        </div>
+        <?= $form->field($model, 'is_new_buyer')->checkbox(['form' => $form->id]) ?>
+        <?= $form->field($model, 'buyer_provider')->dropDownList(
+            $partners, ['prompt' => Yii::$app->params['company'], 'class' => 'form-control input-sm', 'form' => $form->id]) ?>
         <div class="row">
           <label class="col-md-12"><?= Yii::t('app', 'Initial Search Date And Class') ?></label>
           <?= $form->field($model, 'search_started_at', ['options' => ['class' => 'col-md-7']])->widget(DatePicker::classname(), [
@@ -146,47 +204,33 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
           ])->label(false) ?>
         </div>
         <?= $form->field($model, 'passed_to_sales_by')->dropDownList(
-              Advisor::listAll(), ['prompt' => '', 'class' => 'form-control input-sm', 'form' => $form->id]) ?>
-      </div>
-      <div class="col-md-6">
-        <?php
-          $buyer = $model->buyer;
-          $initValue = "{$buyer->last_name}, {$buyer->first_name} (ref. {$buyer->reference})";
-          echo $form->field($model, 'buyer_id')->widget(Select2::classname(), [
-              'initValueText' => $initValue,
-              'size' => 'sm',
-              'options' => [
-                  'placeholder' => Yii::t('app', 'Search for a contact...'),
-                  'form' => $form->id
-              ], 'pluginOptions' => [
-                  'allowClear' => true,
-                  'minimumInputLength' => 3,
-                  'ajax' => [
-                      'url' => Url::to(['/contact/list']),
-                      'dataType' => 'json'
-                  ],
-          ]]); ?>
-          <?= $form->field($model, 'is_new_buyer')->checkbox(['form' => $form->id]) ?>
-          <?= $form->field($model, 'buyer_provider')->dropDownList(
-              $partners, ['prompt' => Yii::$app->params['company'], 'class' => 'form-control input-sm', 'form' => $form->id]) ?>
-        <?= $form->field($model, 'suggested_sale_price_eu', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
-                'class' => 'text-right input-sm currency',
-                'form' => $form->id
-            ]]); ?>
+              Advisor::listActiveHub(), ['prompt' => '', 'class' => 'form-control input-sm', 'form' => $form->id]) ?>
       </div>
       <div class="col-md-12">
-        <legend><?= Yii::t('app', 'Property') ?></legend>
+        <legend class="bg-primary"><?= Yii::t('app', 'Property') ?></legend>
       </div>
       <div class="col-md-6">
         <?php
-          $property = $model->property;
-          $initValue = "{$property->location}, {$property->building_complex} (ref. {$property->reference})";
+          $initValue = null;
+          if ($model->property_id) {
+              $property = $model->property;
+              $initValue = "{$property->location}, {$property->building_complex} (ref. {$property->reference})";
+          }
           echo $form->field($model, 'property_id')->widget(Select2::classname(), [
               'initValueText' => $initValue,
               'size' => 'sm',
               'options' => [
                   'placeholder' => Yii::t('app', 'Search for a property...'),
                   'form' => $form->id
+              ], 'addon' => [
+                  'prepend' => [
+                      'content' => Html::button('', [
+                          'class' => 'btn btn-toggle btn-default collapsed',
+                          'data-toggle' => 'collapse',
+                          'href' => '#property-collapse'
+                      ]),
+                      'asButton' => true
+                  ] 
               ], 'language' => Yii::$app->language,
               'pluginOptions' => [
                   'allowClear' => true,
@@ -195,27 +239,37 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
                       'url' => Url::to(['/property/list']),
                       'dataType' => 'json'
                   ],
-          ]]); ?>
+        ]]); ?>
+        <div id="property-collapse" class="collapse well well-sm">
+          <?php if (isset($property)) echo $this->render('/property/_view', ['model' => $property]) ?>
+        </div>
       </div>
       <div class="col-md-6">
         <label>&nbsp;</label>
-        <?= $form->field($model, 'is_home_staged')->checkbox(['form' => $form->id]) ?>
+        <?= $form->field($model, 'is_home_staged')->checkbox(['label' => $model->getAttributeLabel('is_home_staged'), 'form' => $form->id]) ?>
       </div>
       <div class="col-md-12">
-        <legend><?= Yii::t('app', 'Fees') ?></legend>
+        <legend class="bg-primary"><?= Yii::t('app', 'Fees') ?></legend>
       </div>
       <div class="col-md-6">
         <div class="row">
-          <label class="col-md-12"><?= Yii::t('app', 'Our fees') ?></label>
+          <label class="col-md-12">
+          <?= Yii::t('app', '{company}\'s fee', ['company' => Yii::$app->params['company']]) ?></label>
           <div class="col-md-5">
-            <?= Html::dropDownList('our_fee_pct', null, range(0.1, 10, 0.1), [
-                'class' => 'form-control input-sm',
-                'form' => $form->id
-            ]) ?>
+            <div class="input-group">
+              <?= MaskMoney::widget([
+                  'name' => 'our_fee_pct',
+                  'options' => [
+                      'class' => 'form-control text-right input-sm mask-money',
+                      'maxlength' => 6
+                  ]
+              ]) ?>
+              <span class="input-group-addon">%</span>
+            </div>
           </div>
           <div class="col-md-7">
             <?= $form->field($model, 'our_fee_eu', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
-                    'class' => 'text-right input-sm currency',
+                    'class' => 'text-right input-sm mask-money',
                     'form' => $form->id
                 ]])->label(false); ?>
           </div>
@@ -225,14 +279,20 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
         <div class="row">
           <label class="col-md-12"><?= Yii::t('app', 'Our partner\'s fees') ?></label>
           <div class="col-md-5">
-            <?= Html::dropDownList('their_fee_pct', null, range(0.1, 10, 0.1), [
-                'class' => 'form-control input-sm',
-                'form' => $form->id
-            ]) ?>
+            <div class="input-group">
+              <?= MaskMoney::widget([
+                  'name' => 'their_fee_pct',
+                  'options' => [
+                      'class' => 'form-control text-right input-sm mask-money',
+                      'maxlength' => 6
+                  ]
+              ]) ?>
+              <span class="input-group-addon">%</span>
+            </div>
           </div>
           <div class="col-md-7">
             <?= $form->field($model, 'their_fee_eu', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
-                    'class' => 'text-right input-sm currency',
+                    'class' => 'text-right input-sm mask-money',
                     'form' => $form->id
                 ]])->label(false); ?>
           </div>
@@ -250,7 +310,7 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
         </div>
       </div>
       <div class="col-md-12">
-        <legend><?= Yii::t('app', 'Commissions') ?></legend>
+        <legend class="bg-primary"><?= Yii::t('app', 'Commissions') ?></legend>
       </div>
       <div class="col-md-6">
         <?= $form->field($model, 'payrolled_at')->widget(DatePicker::classname(), [
@@ -268,7 +328,9 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
           <div class="panel-body">
             <?= $this->render('/attribution/index', [
                 'dataProvider' => $attributionDataProvider,
-                'model' => $attribution
+                'model' => $attribution,
+                'attribution_types' => $attribution_types,
+                'advisor_defaults' => $advisor_defaults
             ]) ?>
           </div>
         </div>
@@ -283,8 +345,8 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
 
   <small>
     <dl class="text-info pull-right dl-horizontal">
-      <dt><?= Yii::t('app', 'Created at') ?></dt> <dd><?= Yii::$app->formatter->asDatetime($model->created_at, 'long') ?></dd>
-      <dt><?= Yii::t('app', 'Last updated at') ?></dt> <dd><?= Yii::$app->formatter->asDatetime($model->updated_at, 'long') ?></dd>
+      <dt><?= Yii::t('app', 'Created At') ?></dt> <dd><?= Yii::$app->formatter->asDatetime($model->created_at, 'long') ?></dd>
+      <dt><?= Yii::t('app', 'Last Updated At') ?></dt> <dd><?= Yii::$app->formatter->asDatetime($model->updated_at, 'long') ?></dd>
     </dl>
   </small>
 
@@ -301,7 +363,7 @@ $script = <<< JS
           .find('input[type="hidden"][name="{name}"]'.replace('{name}', $(this).attr('name')))
           .attr('form', '{$form->id}');
   });
-  $('.currency').on('keydown', function(e) {
+  $('.mask-money').on('keydown', function(e) {
       if(e.keyCode == 13) {
           return false;
       }

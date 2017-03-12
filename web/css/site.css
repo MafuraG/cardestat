@@ -285,16 +285,40 @@ td .btn .glyphicon {
 }
 
 legend {
-  background-color: #f5f5f5;
   margin-top: 6px;
   padding: 0 6px;
 }
 
 div.required label.control-label:after {
-    content: " * ";
-    color: red;
+  content: " * ";
+  color: red;
 }
 
 a[href*="delete"] {
-    color: #a94442;
+  color: #a94442;
+}
+
+.btn-toggle[data-toggle="collapse"]:before {
+  font-family: 'Glyphicons Halflings';
+  content: "\e106";
+  line-height: 1;
+  position: relative;
+  top: 2px;
+}
+.btn-toggle[data-toggle="collapse"].collapsed:before {
+  font-family: 'Glyphicons Halflings';
+  content: "\e105";
+  line-height: 1;
+  position: relative;
+  top: 2px;
+}
+
+.form-group + .well.collapse, .form-group + .well.collapsing {
+  margin-top: -15px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+}
+
+.form-group + .well.collapse dl {
+  margin-bottom: 0;
 }

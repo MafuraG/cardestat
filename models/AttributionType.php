@@ -10,7 +10,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property integer $id
  * @property string $name
- * @property integer $attribution_per10000
+ * @property integer $attribution_bp
  *
  * @property Advisor[] $advisors
  * @property Attribution[] $attributions
@@ -31,10 +31,10 @@ class AttributionType extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'attribution_per10000'], 'required'],
-            [['attribution_per10000'], 'integer'],
+            [['name', 'attribution_bp'], 'required'],
+            [['attribution_bp'], 'integer'],
             [['name'], 'string', 'max' => 32],
-            [['name', 'attribution_per10000'], 'unique', 'targetAttribute' => ['name', 'attribution_per10000'], 'message' => 'The combination of Name and Attribution Per10000 has already been taken.'],
+            [['name', 'attribution_bp'], 'unique', 'targetAttribute' => ['name', 'attribution_bp'], 'message' => 'The combination of Name and Attribution bips has already been taken.'],
         ];
     }
 
@@ -46,7 +46,7 @@ class AttributionType extends \yii\db\ActiveRecord
         return [
             'id' => Yii::t('app', 'ID'),
             'name' => Yii::t('app', 'Name'),
-            'attribution_per10000' => Yii::t('app', 'Attribution Per10000'),
+            'attribution_bp' => Yii::t('app', 'Attribution Rate'),
         ];
     }
 
@@ -68,6 +68,9 @@ class AttributionType extends \yii\db\ActiveRecord
 
     public static function listAll()
     {
-        return ArrayHelper::map(static::find()->all(), 'id', 'name');
+        return ArrayHelper::map(static::find()->orderBy('name')->all(), 'id', function($el) {
+            $attrPct = $el->attribution_bp / 100;
+            return "$el->name $attrPct%";
+        });
     }
 }

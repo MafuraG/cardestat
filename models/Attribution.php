@@ -38,9 +38,8 @@ class Attribution extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['advisor_id', 'attribution_type_id', 'amount_eu', 'transaction_id'], 'required'],
+            [['advisor_id', 'attribution_type_id', 'transaction_id'], 'required'],
             [['advisor_id', 'attribution_type_id', 'transaction_id'], 'integer'],
-            ['amount_eu', 'number'],
             [['comments'], 'string'],
             [['office'], 'string', 'max' => 18],
             [['advisor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Advisor::className(), 'targetAttribute' => ['advisor_id' => 'id']],
@@ -61,7 +60,7 @@ class Attribution extends \yii\db\ActiveRecord
             'advisor_id' => Yii::t('app', 'Advisor'),
             'office' => Yii::t('app', 'Office'),
             'attribution_type_id' => Yii::t('app', 'Attribution Type'),
-            'amount_eu' => Yii::t('app', 'Amount'),
+            'amount_eu' => Yii::t('app', 'Attributed Amount'),
             'transaction_id' => Yii::t('app', 'Transaction ID'),
             'comments' => Yii::t('app', 'Comments'),
         ];
@@ -101,7 +100,6 @@ class Attribution extends \yii\db\ActiveRecord
 
     public function afterFind() {
         parent::afterFind();
-        $formatter = Yii::$app->formatter;
         $this->amount_eu = round($this->amount_euc / 100., 2);
         
     }
