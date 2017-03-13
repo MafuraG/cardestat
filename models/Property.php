@@ -44,11 +44,13 @@ class Property extends \yii\db\ActiveRecord
         return [
             [['created_at', 'updated_at'], 'required'],
             [['created_at', 'updated_at'], 'safe'],
-            [['reference', 'active_date', 'inactive_date'], 'string', 'max' => 12],
-            [['entry_date', 'property_type', 'building_complex'], 'string', 'max' => 24],
+            [['entry_date', 'active_date', 'inactive_date'], 'date', 'format' => 'yyyy-MM-dd'],
+            ['reference', 'string', 'max' => 12],
+            [['property_type', 'building_complex'], 'string', 'max' => 24],
             [['location'], 'string', 'max' => 48],
             [['geo_coordinates'], 'string', 'max' => 32],
-            [['plot_area_m2', 'built_area_m2'], 'string', 'max' => 8],
+            [['plot_area_m2', 'built_area_m2'], 'number'],
+            [['plot_area_m2', 'built_area_m2'], 'default', 'value' => null],
             [['n_bedrooms'], 'string', 'max' => 4],
         ];
     }
@@ -88,5 +90,15 @@ class Property extends \yii\db\ActiveRecord
         parent::afterFind();
         $this->plot_area_m2 = round($this->plot_area_dm2 / 100., 2);
         $this->built_area_m2 = round($this->built_area_dm2 / 100., 2);
+    }
+    public function beforeValidate() {
+        if (!$this->plot_area_m2) $this->plot_area_m2 = null;
+        if (!$this->built_area_m2) $this->built_area_m2 = null;
+        return parent::beforeValidate();
+    }
+    public function beforeSave($insert) {
+        $this->plot_area_dm2 = round($this->plot_area_m2 * 100.);
+        $this->built_area_dm2 = round($this->built_area_m2 * 100.);
+        return parent::beforeSave($insert);
     }
 }

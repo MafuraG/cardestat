@@ -167,6 +167,14 @@ class Transaction extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getTransactionAttributions()
+    {
+        return $this->hasMany(TransactionAttribution::className(), ['transaction_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getPassedToSalesBy()
     {
         return $this->hasOne(Advisor::className(), ['id' => 'passed_to_sales_by']);
@@ -267,6 +275,16 @@ class Transaction extends \yii\db\ActiveRecord
     public function beforeValidate() {
         if (!$this->sale_price_eu) $this->sale_price_eu = null;
         return parent::beforeValidate();
+    }
+    public function afterSave($insert, $changedAttributes) {
+        foreach($this->transactionAttributions as $transaction_attribution) {
+            if ($this->payrolled_at) {
+                $transaction_attribution->attribution->amount_euc = $transaction_attribution->amount_euc;
+            } else {
+                $transaction_attribution->attribution->amount_euc = null;
+            }
+            $transaction_attribution->attribution->save(false);
+        }
     }
     public function beforeSave($insert) {
         $this->sale_price_euc = round($this->sale_price_eu * 100.);

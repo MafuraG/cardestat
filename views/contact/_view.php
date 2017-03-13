@@ -7,7 +7,8 @@ use yii\helpers\Html;
       'id' => $model->id
   ], [
       'class' => 'close',
-      'target' => '_blank'
+      'target' => '_blank',
+      'data-pjax' => 0
   ]); ?>
   <dt><?= $model->getAttributeLabel('reference') ?></dt>
   <dd><?= $model->reference ?></dd>

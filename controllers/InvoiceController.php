@@ -76,6 +76,17 @@ class InvoiceController extends Controller
             ]);
         }
     }
+    /**
+     */
+    public function actionDelete($id)
+    {
+        $model = $this->findModel($id);
+        $transaction_id = $model->transaction_id;
+        $model->delete();
+        if (Yii::$app->request->isAjax)
+            return $this->actionIndex($transaction_id);
+        else $this->redirect(['index', 'transaction_id' => $transaction_id]);
+    }
 
     protected function findModel($id)
     {

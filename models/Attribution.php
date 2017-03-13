@@ -103,12 +103,4 @@ class Attribution extends \yii\db\ActiveRecord
         $this->amount_eu = round($this->amount_euc / 100., 2);
         
     }
-    public function beforeValidate() {
-        if (!$this->amount_eu) $this->amount_eu = null;
-        return parent::beforeValidate();
-    }
-    public function beforeSave($insert) {
-        $this->amount_euc = round($this->amount_eu * 100.);
-        return parent::beforeSave($insert);
-    }
 }

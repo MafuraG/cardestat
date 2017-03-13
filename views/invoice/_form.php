@@ -53,6 +53,9 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
         <?= $form->field($model, 'amount_eu', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
                 'class' => 'text-right input-sm currency',
                 'form' => $form->id
+            ], 'pluginOptions' => [
+                'allowZero' => false,
+                'allowNegative' => true
             ]]); ?>
       </div>
   

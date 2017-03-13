@@ -168,11 +168,16 @@ class m170303_154953_transactions extends Migration
             'comments' => $this->text()
         ]);
         $this->execute('
+            create or replace function array_distinct(anyarray) returns anyarray as $$
+                select array_agg(distinct x) from unnest($1) t(x);
+            $$ language sql immutable');
+
+        $this->execute('
             create view transaction_list_item as
                 select t.*,
                        t.option_signed_at - first_published_at as sale_duration,
-                       p.location as property_location, 
-                       p.building_complex as property_building_complex, 
+                       p.location as property_location,
+                       p.building_complex as property_building_complex,
                        p.reference as property_reference,
                        s.reference as seller_reference,
                        coalesce(nullif(s.first_name, \'\') || \' \', \'\') ||
@@ -181,7 +186,7 @@ class m170303_154953_transactions extends Migration
                        coalesce(nullif(b.first_name, \'\') || \' \', \'\') ||
                            coalesce(nullif(b.last_name, \'\') || \' \', \'\') as buyer_name,
                        buyer_provider is null and seller_provider is null as cardenas100,
-                       string_agg(ad.name, \', \') as advisors,
+                       array_to_string(array_distinct(array_agg(ad.name)), \', \') as advisors,
                        i.count as n_invoices,
                        fi.first_issued_at as first_invoiced_at,
                        coalesce(our_fee_euc*100. / sale_price_euc, 0) as our_fee_bp,
@@ -201,10 +206,36 @@ class m170303_154953_transactions extends Migration
                            from invoice
                            group by transaction_id) fi on (fi.transaction_id = t.id)
                 group by t.id, p.reference, p.location, p.building_complex, s.reference, s.first_name, s.last_name, b.reference, b.first_name, b.last_name, i.count, fi.first_issued_at, t.buyer_provider, t.seller_provider');
+        $this->execute('
+            create view transaction_attribution as
+                select a.id,
+                       a.advisor_id,
+                       a.office,
+                       a.attribution_type_id,
+                       case
+                           when t.payrolled_at is not null and a.amount_euc is not null then
+                               a.amount_euc
+                           when i.sum is null then
+                               0
+                           else
+                               round(at.attribution_bp / 10000. * i.sum)
+                       end as amount_euc,
+                       a.transaction_id,
+                       a.comments
+                from attribution a
+                     join attribution_type at on (a.attribution_type_id = at.id)
+                     join transaction t on (t.id = a.transaction_id)
+                     left join (
+                         select transaction_id, sum(amount_euc)
+                         from invoice
+                         group by transaction_id) i on (a.transaction_id = i.transaction_id)
+            ');
     }
 
     public function safeDown() {
+        $this->execute('drop view transaction_attribution');
         $this->execute('drop view transaction_list_item');
+        $this->execute('drop function array_distinct(anyarray)');
         $this->dropTable('attribution');
         $this->dropTable('invoice');
         $this->dropTable('transaction');

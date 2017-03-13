@@ -48,7 +48,7 @@ class Invoice extends \yii\db\ActiveRecord
     {
         return [
             'code' => Yii::t('app', 'Code'),
-            'issued_at' => Yii::t('app', 'Issued At'),
+            'issued_at' => Yii::t('app', 'Issue Date'),
             'amount_eu' => Yii::t('app', 'Amount'),
             'recipient_category' => Yii::t('app', 'Recipient Category'),
         ];

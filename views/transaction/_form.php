@@ -330,7 +330,8 @@ $pctTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-
                 'dataProvider' => $attributionDataProvider,
                 'model' => $attribution,
                 'attribution_types' => $attribution_types,
-                'advisor_defaults' => $advisor_defaults
+                'advisor_defaults' => $advisor_defaults,
+                'total_invoiced_eu' => $total_invoiced_eu 
             ]) ?>
           </div>
         </div>
@@ -356,6 +357,7 @@ $pctTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-
 
 </div>
 <?php
+$attrIndexUrl = Url::to(['/attribution/index', 'transaction_id' => $model->id]);
 $script = <<< JS
   // workaround until new release of yii includes commit github.com/yiisoft/yii2/commit/f47b6c
   $('.transaction-form input[type="checkbox"]').each(function(i) {
@@ -368,6 +370,33 @@ $script = <<< JS
           return false;
       }
   });
+  var attrIndexUrl = '$attrIndexUrl';
+  $('#invoice-index-p0').on('pjax:end', function() {
+      $.pjax.reload('#attribution-index-p0', {url: attrIndexUrl, push: false, replace: false});
+  });
+  \$salePriceEuMM = $('input[name="Transaction[sale_price_eu]"]').siblings('.mask-money');
+  \$ourFeeEuMM = $('input[name="Transaction[our_fee_eu]"]').siblings('.mask-money');
+  \$ourFeePctMM = $('input[name="our_fee_pct"]').siblings('.mask-money');
+  \$ourFeePctMM.on('blur', function() {
+      \$ourFeeEuMM.maskMoney('mask',
+          \$ourFeePctMM.maskMoney('unmasked')[0] / 100. * \$salePriceEuMM.maskMoney('unmasked')[0]);
+  });
+  \$ourFeeEuMM.on('blur', function() {
+      \$ourFeePctMM.maskMoney('mask',
+           \$ourFeeEuMM.maskMoney('unmasked')[0] * 100. / \$salePriceEuMM.maskMoney('unmasked')[0]);
+  });
+  \$ourFeeEuMM.blur();
+  \$theirFeeEuMM = $('input[name="Transaction[their_fee_eu]"]').siblings('.mask-money');
+  \$theirFeePctMM = $('input[name="their_fee_pct"]').siblings('.mask-money');
+  \$theirFeePctMM.on('blur', function() {
+      \$theirFeeEuMM.maskMoney('mask',
+          \$theirFeePctMM.maskMoney('unmasked')[0] / 100. * \$salePriceEuMM.maskMoney('unmasked')[0]);
+  });
+  \$theirFeeEuMM.on('blur', function() {
+      \$theirFeePctMM.maskMoney('mask',
+           \$theirFeeEuMM.maskMoney('unmasked')[0] * 100. / \$salePriceEuMM.maskMoney('unmasked')[0]);
+  });
+  \$theirFeeEuMM.blur();
 JS;
 $this->registerJs($script);
 ?>

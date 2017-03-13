@@ -68,7 +68,6 @@ $script = <<< JS
           data: \$form.serialize(),
           success: function (response) {                  
               \$transactionModal.modal('hide');
-              $.pjax.reload('#p0');
           }, error: function () {
               console.log('internal server error');
           }
@@ -77,7 +76,9 @@ $script = <<< JS
   });
   $('.transaction-list-item-search form .btn-reset').on('click', function() {
       \$form = $('.transaction-list-item-search form');
-      \$form[0].reset();
+      \$form.find(':input')
+          .filter(':not([name="direction"])')
+          .filter(':not([name="sort"])').val(null);
       \$form.submit();
   });
   $('#p0').on('pjax:end', function(xhr, options) {
@@ -117,18 +118,23 @@ $script = <<< JS
   $('#p0').on('click', 'a.transaction-edit', function() {
     editing = true;
     var id = $(this).closest('.transaction').data('key');
-    if (id != last_id)
-        $.pjax({container: '#p1', url: detailsUrl.replace('_id_', id), scrollTo: false, push: false});
-    else modalDataLoaded();
+    $.pjax({container: '#p1', url: detailsUrl.replace('_id_', id), scrollTo: false, push: false});
     last_id = id;
   });
   $('#p0').on('click', 'a.transaction-details', function() {
     editing = false;
     var id = $(this).closest('.transaction').data('key');
-    if (id != last_id)
-        $.pjax({container: '#p1', url: detailsUrl.replace('_id_', id), scrollTo: false, push: false});
-    else modalDataLoaded();
+    $.pjax({container: '#p1', url: detailsUrl.replace('_id_', id), scrollTo: false, push: false});
     last_id = id;
+  });
+  var related_changed = false;
+  \$transactionModal.on('pjax:end', '#invoice-index-p0, #attribution-index-p0', function() {
+    related_changed = true;
+  });
+  \$transactionModal.on('hide.bs.modal', function() {
+    if (related_changed) $.pjax.reload('#p0');
+    related_changed = false;
+    return true;
   });
 JS;
 $this->registerJs($script);

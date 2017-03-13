@@ -8,6 +8,7 @@ use app\models\Advisor;
 use app\models\Attribution;
 use app\models\AttributionType;
 use app\models\Transaction;
+use app\models\TransactionAttribution;
 use app\models\TransactionListItem;
 use app\models\TransactionListItemSearch;
 use yii\helpers\ArrayHelper;
@@ -98,12 +99,15 @@ class TransactionController extends Controller
     {
         $model = $this->findModel($id, true);
         $invoice = new Invoice(['transaction_id' => $id]);
+        $query = Invoice::find()->where(['transaction_id' => $id]);
         $invoiceDataProvider = new ActiveDataProvider([
-            'query' => $invoice->find()->where(['transaction_id' => $id])
+            'query' => $query
         ]);
+        $total_invoiced_eu = $query->sum('amount_euc') / 100.;
         $attribution = new Attribution(['transaction_id' => $id]);
+        $transaction_attribution = new TransactionAttribution(['transaction_id' => $id]);
         $attributionDataProvider = new ActiveDataProvider([
-            'query' => $attribution->find()->where(['transaction_id' => $id])
+            'query' => $transaction_attribution->find()->where(['transaction_id' => $id])
         ]);
         $advisor_defaults = ArrayHelper::index(Advisor::find()->with('defaultAttributionType')->asArray()->all(), 'id');
         $attribution_types = ArrayHelper::map(AttributionType::find()->all(), 'id', 'attribution_bp');
@@ -120,7 +124,8 @@ class TransactionController extends Controller
                 'invoiceDataProvider' => $invoiceDataProvider,
                 'attributionDataProvider' => $attributionDataProvider,
                 'attribution_types' => $attribution_types,
-                'advisor_defaults' => $advisor_defaults
+                'advisor_defaults' => $advisor_defaults,
+                'total_invoiced_eu' => $total_invoiced_eu
             ];
             if (Yii::$app->request->isAjax) return $this->renderAjax('_form', $data);
             else return $this->render('update', $data);
@@ -161,7 +166,7 @@ class TransactionController extends Controller
         if ($with_related) {
             if (($model = Transaction::find()
                 ->with(['invoices', 'attributions.advisor', 'attributions.attributionType'])
-                ->where(['id' => $id]) 
+                ->where(['id' => $id])
                 ->one()) !== null) return $model;
             else throw new NotFoundHttpException('The requested page does not exist.');
         } else if (($model = Transaction::findOne($id)) !== null) {

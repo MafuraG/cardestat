@@ -21,7 +21,8 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
         'attribution' => $attribution,
         'attributionDataProvider' => $attributionDataProvider,
         'attribution_types' => $attribution_types,
-        'advisor_defaults' => $advisor_defaults
+        'advisor_defaults' => $advisor_defaults,
+        'total_invoiced_eu' => $total_invoiced_eu
     ]) ?>
 
 </div>

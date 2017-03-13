@@ -86,7 +86,6 @@ $script = <<< JS
   var \$advisorId = $('select[name="Attribution[advisor_id]"]');
   var \$office = $('select[name="Attribution[office]"]');
   var \$attributionTypeId = $('select[name="Attribution[attribution_type_id]"]');
-  var \$ourFeeEu = $('input[name="Transaction[our_fee_eu]"]');
   var \$amountEu = $('input[name="Attribution[amount_eu]"]');
   \$advisorId.on('change', function() {
       var advisorId = $(this).val();
@@ -95,10 +94,11 @@ $script = <<< JS
       \$attributionTypeId.change();
       
   });
+  var totalInvoiced = $total_invoiced_eu;
   \$attributionTypeId.on('change', function() {
       var attribution_type_id = $(this).val();
       var advisorId = \$advisorId.val();
-      var amount_eu = (\$ourFeeEu.val() * attribution_types[attribution_type_id] / 10000.).toFixed(2);
+      var amount_eu = (totalInvoiced * attribution_types[attribution_type_id] / 10000.).toFixed(2);
       \$amountEu.val(amount_eu);
   });
 JS;

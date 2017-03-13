@@ -101,15 +101,18 @@ class TransactionListItemSearch extends TransactionListItem
             ['between', 'first_invoiced_at', $this->first_invoiced_from, $this->first_invoiced_to]);
 
         $query->andFilterWhere([
-            'transaction_type' => $this->transaction_type,
-            'advisors' => $this->advisors,
-            'approved' => $this->approved,
-            'payrolled' => $this->payrolled,
-            'invoiced' => $this->invoiced,
-            'with_collaborator' => $this->with_collaborator
+            'like', 'advisors', $this->advisors,
+            ['transaction_type' => $this->transaction_type],
+            ['approved' => $this->approved],
+            ['payrolled' => $this->payrolled],
+            ['invoiced' => $this->invoiced],
+            ['with_collaborator' => $this->with_collaborator]
         ]);
+
+        $search_id = null;
+        if (intval($this->search_any)) $search_id = intval($this->search_any);
         $query->andFilterWhere(['or', 
-            ['id' => $this->search_any],
+            ['id' => $search_id],
             ['ilike', 'transaction_type', $this->search_any],
             ['ilike', 'custom_type', $this->search_any],
             ['ilike', 'transfer_type', $this->search_any],

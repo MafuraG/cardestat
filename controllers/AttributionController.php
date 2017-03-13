@@ -8,7 +8,9 @@ use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use app\models\Advisor;
+use app\models\Invoice;
 use app\models\Attribution;
+use app\models\TransactionAttribution;
 use app\models\AttributionType;
 use yii\helpers\ArrayHelper;
 
@@ -46,8 +48,11 @@ class AttributionController extends Controller
     public function actionIndex($transaction_id)
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => Attribution::find()->where(['transaction_id' => $transaction_id])
+            'query' => TransactionAttribution::find()->where(['transaction_id' => $transaction_id])
         ]);
+        $total_invoiced_eu = Invoice::find()
+            ->where(['transaction_id' => $transaction_id])
+            ->sum('amount_euc') / 100.;
         $advisor_defaults = ArrayHelper::index(Advisor::find()->with('defaultAttributionType')->asArray()->all(), 'id');
         $attribution_types = ArrayHelper::map(AttributionType::find()->all(), 'id', 'attribution_bp');
 
@@ -58,6 +63,7 @@ class AttributionController extends Controller
             ]),
             'attribution_types' => $attribution_types,
             'advisor_defaults' => $advisor_defaults,
+            'total_invoiced_eu' => $total_invoiced_eu
         ]);
     }
 
@@ -74,7 +80,8 @@ class AttributionController extends Controller
             return $this->actionIndex($model->transaction_id);
         } else {
             $dataProvider = new ActiveDataProvider([
-                'query' => Attribution::find()->where(['transaction_id' => $model->transaction_id])
+                'query' => TransactionAttribution::find()
+                    ->where(['transaction_id' => $model->transaction_id])
             ]);
             return $this->render('index', [
                 'model' => $model,
@@ -82,6 +89,18 @@ class AttributionController extends Controller
                 'formExpanded' => true
             ]);
         }
+    }
+
+    /**
+     */
+    public function actionDelete($id)
+    {
+        $model = $this->findModel($id);
+        $transaction_id = $model->transaction_id;
+        $model->delete();
+        if (Yii::$app->request->isAjax)
+            return $this->actionIndex($transaction_id);
+        else $this->redirect(['index', 'transaction_id' => $transaction_id]);
     }
 
     protected function findModel($id)

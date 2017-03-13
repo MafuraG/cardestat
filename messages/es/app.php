@@ -146,7 +146,7 @@ return [
     'Invoiced' => 'Facturado',
     'Invoices' => 'Facturas',
     'Is admin?' => '¿Es administrador?',
-    'Issued At' => 'Emitida el',
+    'Issue Date' => 'Fecha de Emisión',
     'Last Name' => 'Apellidos',
     'Last Published Date' => 'Fecha de Última Publicación',
     'Last Published Price' => 'Último Precio Publicado',

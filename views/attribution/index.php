@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
 /* @var $this yii\web\View */
@@ -33,7 +34,17 @@ if (!isset($formExpanded)) $formExpanded = false;
           ['class' => 'yii\grid\ActionColumn', 'buttons' => [
               'view' => function ($url, $model) {},
               'update' => function ($url, $model) {},
-          ]]
+              'delete' => function ($url, $model, $key) {
+                  return Html::a('<span class="text-danger glyphicon glyphicon-trash"></span>', $url, [
+                      'title' => 'Delete',
+                      'data-pjax' => true,
+                      'data-method' => 'post',
+                      'data-confirm' => Yii::t('app', 'Are you sure you want to delete this item?')
+                  ]);
+              }
+          ], 'urlCreator' => function ($action, $model, $key, $index) {
+              if ($action === 'delete') return Url::to(["/attribution/delete/{$model->id}"]);
+          }]
       ]
   ]); ?>
 
@@ -41,7 +52,8 @@ if (!isset($formExpanded)) $formExpanded = false;
       'model' => $model,
       'formExpanded' => $formExpanded,
       'attribution_types' => $attribution_types,
-      'advisor_defaults' => $advisor_defaults
+      'advisor_defaults' => $advisor_defaults,
+      'total_invoiced_eu' => $total_invoiced_eu
   ]) ?>
 </div>
 

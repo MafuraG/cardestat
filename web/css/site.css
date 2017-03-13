@@ -294,7 +294,7 @@ div.required label.control-label:after {
   color: red;
 }
 
-a[href*="delete"] {
+td a[href*="delete"] {
   color: #a94442;
 }
 
@@ -321,4 +321,8 @@ a[href*="delete"] {
 
 .form-group + .well.collapse dl {
   margin-bottom: 0;
+}
+
+.strike-through {
+  text-decoration: line-through;
 }
