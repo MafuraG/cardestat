@@ -139,7 +139,7 @@ $pctTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-
                   ],
         ]]); ?>
         <div id="seller-collapse" class="collapse well well-sm">
-          <? if (isset($seller)) echo  $this->render('/contact/_view', ['model' => $seller]) ?>
+          <?php if (isset($seller)) echo $this->render('/contact/_view', ['model' => $seller]) ?>
         </div>
         <?= $form->field($model, 'is_new_seller')->checkbox(['form' => $form->id]) ?>
         <?= $form->field($model, 'seller_provider')->dropDownList(
@@ -181,7 +181,7 @@ $pctTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-
                   ],
         ]]); ?>
         <div id="buyer-collapse" class="collapse well well-sm">
-          <? if (isset($buyer)) echo  $this->render('/contact/_view', ['model' => $buyer]) ?>
+          <?php if (isset($buyer)) echo $this->render('/contact/_view', ['model' => $buyer]) ?>
         </div>
         <?= $form->field($model, 'is_new_buyer')->checkbox(['form' => $form->id]) ?>
         <?= $form->field($model, 'buyer_provider')->dropDownList(
