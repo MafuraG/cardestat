@@ -78,7 +78,7 @@ class Advisor extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getAdvisorTranches()
+    public function getTranches()
     {
         return $this->hasMany(AdvisorTranche::className(), ['advisor_id' => 'id']);
     }

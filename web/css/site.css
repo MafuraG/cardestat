@@ -99,8 +99,12 @@ thead.text-center th {
     vertical-align: bottom;
 }
 
-.table th.break-all {
-    word-wrap: break-word;
+.table th.break-all, .table td.break-all {
+    word-break: break-all;
+}
+
+.table th.nowrap, .table td.nowrap {
+    white-space: nowrap;
 }
 
 .navbar-inverse {
@@ -143,6 +147,10 @@ td.editable input {
     border: 0;
     border-bottom: solid 1px #ddd;
     width: 100%;
+}
+
+select {
+    text-transform: uppercase;
 }
 
 .scrollable-x {
@@ -242,6 +250,11 @@ td .btn .glyphicon {
 .first-transaction {
   border-top: 1px solid #ccc;
 }
+
+.table h3, .table h4 {
+  margin-top: 0;
+}
+
 .ellipsis {
   overflow: hidden;
   white-space: nowrap;
@@ -325,4 +338,13 @@ td a[href*="delete"] {
 
 .strike-through {
   text-decoration: line-through;
+}
+
+.monospace {
+    font-family: monospace;
+}
+
+table.table caption {
+  color: #333;
+  border-bottom: 2px solid #ccc;
 }

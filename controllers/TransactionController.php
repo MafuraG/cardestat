@@ -8,6 +8,7 @@ use app\models\Advisor;
 use app\models\Attribution;
 use app\models\AttributionType;
 use app\models\Transaction;
+use app\models\TransactionCommission;
 use app\models\TransactionAttribution;
 use app\models\TransactionListItem;
 use app\models\TransactionListItemSearch;
@@ -16,6 +17,7 @@ use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use kartik\mpdf\Pdf;
 
 /**
  * TransactionController implements the CRUD actions for TransactionListItem model.
@@ -43,7 +45,60 @@ class TransactionController extends Controller
             ],
         ];
     }
+    /**
+     */
+    public function actionCommissions($year = '', $advisor_id = '')
+    {
+        if (!$year) $year = date('Y');
+        $data = $this->mkCommissionsViewData($year, $advisor_id);
+        //\yii\helpers\VarDumper::dump($data, 8, true); die;
+        $years = Transaction::find()->select(['to_char(payrolled_at, \'yyyy\')'])
+            ->distinct()->where(['not', ['payrolled_at'=> null]])
+            ->asArray()->createCommand()->queryColumn();
+        $years = array_combine($years, $years);
+        $invoiced_euc = Invoice::find()->with(['transaction' => function($q) use ($year) {
+            $q->where(['to_char(payrolled_at, \'yyyy\')' => $year]);
+        }])->sum('amount_euc');
+        $our_fees_euc = Transaction::find()
+            ->where(['to_char(payrolled_at, \'yyyy\')' => $year])
+            ->sum('our_fee_euc');
+        $their_fees_euc = Transaction::find()
+            ->where(['to_char(payrolled_at, \'yyyy\')' => $year])
+            ->sum('their_fee_euc');
+        return $this->render('commissions', [
+            'data' => $data,
+            'year' => $year,
+            'advisor_id' => $advisor_id,
+            'years' => $years,
+            'invoiced_euc' => $invoiced_euc,
+            'our_fees_euc' => $our_fees_euc,
+            'their_fees_euc' => $their_fees_euc
+        ]);
+    }
 
+    public function actionPrintCommissions($year = '', $advisor_id = '') {
+        $this->layout = 'print';
+        if (!$year) $year = date('Y');
+        $data = $this->mkCommissionsViewData($year, $advisor_id);
+        $content = $this->render('_commission_tables', [
+            'data' => $data,
+            'year' => $year,
+            'expanded' => true
+        ]);
+        $pdf = new Pdf([
+            'mode' => Pdf::MODE_CORE, 
+            'format' => Pdf::FORMAT_A4, // width 210mm
+            'orientation' => Pdf::ORIENT_LANDSCAPE, 
+            'destination' => Pdf::DEST_BROWSER, 
+            'marginTop' => 10,
+            'marginBottom' => 6,
+            'marginLeft' => 3,
+            'marginRight' => 2,
+            'cssInline' => '.col-xs-2 { width: 12.87% } .col-xs-8 { width: 62.87%; } .col-xs-4 { width: 29.55%; } ',
+            'content' => $content,   
+        ]);
+        return $pdf->render();
+    }
     /**
      * Lists all TransactionListItem models.
      * @return mixed
@@ -174,5 +229,91 @@ class TransactionController extends Controller
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    /**
+     */
+    protected function mkCommissionsViewData($year, $advisor_id) {
+        $q = TransactionCommission::find()
+            ->with(['tranches' => function($q) {
+                $q->orderBy('from_euc desc');
+            }])->where(['like', 'payroll_month', $year]);
+        if ($advisor_id) $q->where(['advisor_id' => $advisor_id]);
+        $commissions = $q->orderBy('advisor_name asc, payroll_month asc, transaction_id asc')
+            ->asArray()->all();
+        $commissions = ArrayHelper::index($commissions, 'transaction_id', ['advisor_name', 'payroll_month']);
+        $data = [];
+        foreach ($commissions as $advisor => & $months) {
+            $data[$advisor]['months'] = [];
+            $accu[$advisor] = [];
+            $accu_corrected[$advisor] = [];
+            $prev = null;
+            foreach ($months as $month => & $transactions) {
+                $tranches = [];
+                foreach ($transactions as $tr) {
+                    $attr = $tr['total_attributed_sum_euc'];
+                    $attr_corrected = $tr['total_attributed_sum_corrected_euc'];
+                    if ($attr_corrected === null) $attr_corrected = 0;
+                    if (isset($accu[$advisor][$month])) {
+                        $accu[$advisor][$month] += $attr;
+                        $accu_corrected[$advisor][$month] += $attr_corrected;
+                    } else if ($prev !== null) {
+                        $accu[$advisor][$month] = $accu[$advisor][$prev] + $attr;
+                        $accu_corrected[$advisor][$month] = $accu_corrected[$advisor][$prev] + $attr_corrected;
+                    } else {
+                        $accu[$advisor][$month] = $attr;
+                        $accu_corrected[$advisor][$month] = $attr_corrected;
+                    }
+                    if (!$tranches) $tranches = $tr['tranches'];
+                }
+                if ($prev !== null) {
+                    $attr = $accu[$advisor][$month] - $accu[$advisor][$prev];
+                    $attr_corrected = $accu_corrected[$advisor][$month] - $accu_corrected[$advisor][$prev];
+                } else {
+                    $attr = $accu[$advisor][$month];
+                    $attr_corrected = $accu_corrected[$advisor][$month];
+                }
+                $data[$advisor]['months'][$month] = [
+                    'transactions' => $transactions,
+                    'accumulated_attribution_euc' => $accu[$advisor][$month],
+                    'accumulated_attribution_corrected_euc' => $accu_corrected[$advisor][$month],
+                    'month_attribution_euc' => $attr,
+                    'month_attribution_corrected_euc' => $attr_corrected
+                ];
+                unset($transactions);
+                $prev = $month;
+                $selected_tranche = null;
+                $selected_tranche_corrected = null;
+                foreach ($tranches as $tranche) {
+                    if ($selected_tranche === null &&
+                        $tranche['from_euc'] <= $data[$advisor]['months'][$month]['accumulated_attribution_euc']) {
+                        $selected_tranche = $tranche;
+                    }
+                    if ($selected_tranche_corrected === null &&
+                        $tranche['from_euc'] <= $data[$advisor]['months'][$month]['accumulated_attribution_corrected_euc']) {
+                        $selected_tranche_corrected = $tranche;
+                    }
+                }
+                if ($selected_tranche) {
+                    $data[$advisor]['months'][$month]['tranche_bp'] = $selected_tranche['commission_bp'];
+                    $data[$advisor]['months'][$month]['commission_euc'] = 
+                        $selected_tranche['commission_bp'] / 10000. * $data[$advisor]['months'][$month]['month_attribution_euc'];
+                }
+                if ($selected_tranche_corrected) {
+                    $data[$advisor]['months'][$month]['tranche_corrected_bp'] = $selected_tranche_corrected['commission_bp'];
+                    $data[$advisor]['months'][$month]['commission_corrected_euc'] = 
+                        $selected_tranche_corrected['commission_bp'] / 10000. * $data[$advisor]['months'][$month]['month_attribution_corrected_euc'];
+                }
+            }
+            $data[$advisor]['total_commission_euc'] = 0;
+            $data[$advisor]['total_commission_corrected_euc'] = 0;
+            foreach ($data[$advisor]['months'] as $month) {
+                if (isset($month['commission_euc']))
+                    $data[$advisor]['total_commission_euc'] += $month['commission_euc'];
+                if (isset($month['commission_corrected_euc']))
+                    $data[$advisor]['total_commission_corrected_euc'] += $month['commission_corrected_euc'];
+            }
+        }
+        return $data;
     }
 }

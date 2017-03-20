@@ -86,6 +86,7 @@ class Transaction extends \yii\db\ActiveRecord
         return [
             ['external_id', 'unique'],
             [['first_published_at', 'last_published_at', 'option_signed_at', 'search_started_at', 'payrolled_at'], 'safe'],
+            ['payrolled_at', 'date', 'format' => 'YYYY-mm-dd'],
             [['first_published_price_eu', 'last_published_price_eu', 'sale_price_eu', 'suggested_sale_price_eu', 'our_fee_eu', 'their_fee_eu'], 'number'],
             [['buyer_id', 'seller_id', 'passed_to_sales_by', 'property_id'], 'integer'],
             [['transaction_type', 'option_signed_at', 'buyer_id', 'seller_id', 'property_id', 'created_at', 'updated_at'], 'required'],
@@ -138,7 +139,7 @@ class Transaction extends \yii\db\ActiveRecord
             'passed_to_sales_by' => Yii::t('app', 'Passed To Sales By'),
             'property_id' => Yii::t('app', 'Property'),
             'is_home_staged' => Yii::t('app', 'Home Staging'),
-            'our_fee_eu' => Yii::t('app', 'Our Fee'),
+            'our_fee_eu' => Yii::t('app', 'Our Fees'),
             'their_fee_eu' => Yii::t('app', 'Collaborator\'s Fee'),
             'payrolled_at' => Yii::t('app', 'Date Payrolled'),
             'comments' => Yii::t('app', 'Comments'),
@@ -274,6 +275,7 @@ class Transaction extends \yii\db\ActiveRecord
     }
     public function beforeValidate() {
         if (!$this->sale_price_eu) $this->sale_price_eu = null;
+        if (strlen($this->payrolled_at) == 7) $this->payrolled_at .= '-01';
         return parent::beforeValidate();
     }
     public function afterSave($insert, $changedAttributes) {

@@ -277,7 +277,7 @@ $pctTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-
       </div>
       <div class="col-md-6">
         <div class="row">
-          <label class="col-md-12"><?= Yii::t('app', 'Our partner\'s fees') ?></label>
+          <label class="col-md-12"><?= Yii::t('app', 'Our Partner\'s Fees') ?></label>
           <div class="col-md-5">
             <div class="input-group">
               <?= MaskMoney::widget([
@@ -318,7 +318,9 @@ $pctTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-
             'size' => 'sm',
             'pluginOptions' => [
                 'autoclose' => true,
-                'format' => 'yyyy-mm-dd',
+                'format' => 'yyyy-mm',
+                'startView' => 'months', 
+                'minViewMode' => 'months'
             ]
         ]); ?>
       </div>
