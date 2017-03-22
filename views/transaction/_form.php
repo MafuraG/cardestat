@@ -312,18 +312,6 @@ $pctTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-
       <div class="col-md-12">
         <legend class="bg-primary"><?= Yii::t('app', 'Commissions') ?></legend>
       </div>
-      <div class="col-md-6">
-        <?= $form->field($model, 'payrolled_at')->widget(DatePicker::classname(), [
-            'options' => ['form' => $form->id],
-            'size' => 'sm',
-            'pluginOptions' => [
-                'autoclose' => true,
-                'format' => 'yyyy-mm',
-                'startView' => 'months', 
-                'minViewMode' => 'months'
-            ]
-        ]); ?>
-      </div>
       <div class="col-md-12">
         <div class="panel panel-default">
           <div class="panel-heading"><h4 class="panel-title"><?= Yii::t('app', 'Attributions') ?></h4></div>
@@ -337,6 +325,18 @@ $pctTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-
             ]) ?>
           </div>
         </div>
+      </div>
+      <div class="col-md-6">
+        <?= $form->field($model, 'payrolled_at')->widget(DatePicker::classname(), [
+            'options' => ['form' => $form->id],
+            'size' => 'sm',
+            'pluginOptions' => [
+                'autoclose' => true,
+                'format' => 'yyyy-mm',
+                'startView' => 'months', 
+                'minViewMode' => 'months'
+            ]
+        ]); ?>
       </div>
       <div class="col-md-12">
         <hr style="border-top: 1px solid #ddd">

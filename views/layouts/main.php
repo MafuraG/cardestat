@@ -42,6 +42,8 @@ AppAsset::register($this);
         'items' => [
             ['label' => \Yii::t('app', 'Home'), 'url' => ['/table/index']],
             ['label' => \Yii::t('app', 'Transactions'), 'url' => ['/transaction/index']],
+            ['label' => \Yii::t('app', 'Commissions'), 'url' => ['/transaction/commissions']],
+            ['label' => \Yii::t('app', 'Advisors'), 'url' => ['/advisor/index']],
             ['label' => \Yii::t('app', 'Presentations'), 'items' => [
                 ['label' => \Yii::t('app', 'Salesmeter'), 'url' => ['/presentation/n-sales']],
             ]],

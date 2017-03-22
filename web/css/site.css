@@ -120,7 +120,7 @@ thead.text-center th {
     color: transparent;
 }
 .navbar .navbar-header a {
-    width: 336px;
+    width: 298px;
     color: transparent;
     font-size: 0;
     background-image: url(../images/cardenas_logo_white.jpeg);
@@ -199,10 +199,6 @@ td.actions .btn .glyphicon-pencil {
 
 td.actions .btn .glyphicon-eye-open {
    color: green;
-}
-
-td .btn .glyphicon {
-   color: black;
 }
 
 .modal-add .modal-edit-only {

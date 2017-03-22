@@ -12,7 +12,7 @@ class m170303_154953_transactions extends Migration
         $this->createTable('custom_type', [
             'name' => $this->string(32) . ' primary key'
         ]);
-        $this->batchInsert('custom_type', ['name'], [['NO EXCLUSIVA'], ['MULTIEXCLUSIVA'], ['EXCLUSIVA']]);
+        $this->batchInsert('custom_type', ['name'], [['ABIERTO'], ['MULTIEXCLUSIVA'], ['EXCLUSIVA']]);
         $this->createTable('transfer_type', [
             'name' => $this->string(32) . ' primary key'
         ]);
@@ -28,7 +28,7 @@ class m170303_154953_transactions extends Migration
         $this->createTable('lead_type', [
             'name' => $this->string(18) . ' primary key'
         ]);
-        $this->batchInsert('lead_type', ['name'], [['A'], ['A+'], ['B'], ['B+'], ['C'], ['C+'], ['NC'], ['NC+'], ['500+']]);
+        $this->batchInsert('lead_type', ['name'], [['A'], ['A+'], ['B'], ['B+'], ['C'], ['C+'], ['NC'], ['NC+']]);
         $this->createTable('office', [
             'name' => $this->string(18) . ' primary key'
         ]);
@@ -36,18 +36,19 @@ class m170303_154953_transactions extends Migration
         $this->createTable('attribution_type', [
             'id' => $this->primaryKey(),
             'name' => $this->string(32)->notNull(),
+            'active' => $this->boolean()->notNull()->defaultValue(false),
             'attribution_bp' => $this->integer()->notNull(),
         ]);
-        $this->batchInsert('attribution_type', ['name', 'attribution_bp'], [[
-            'DESCONOCIDO', 0
+        $this->batchInsert('attribution_type', ['name', 'attribution_bp', 'active'], [[
+            'DESCONOCIDO', 0, false
         ], [
-            'GESTIÓN FIRMAS', 0
+            'GESTIÓN FIRMAS', 0, true
         ], [
-            'GESTIÓN LEAD', 0
+            'GESTIÓN LEAD', 0, true
         ], [
-            'VENTA', 7000
+            'VENTA', 7000, true
         ], [
-            'CAPTACIÓN', 3000
+            'CAPTACIÓN', 3000, true
         ]]);
         $this->createIndex('attribution_type-name-attribution_bp-uidx', 'attribution_type', ['name', 'attribution_bp'], true);
         $this->createTable('advisor', [
@@ -95,6 +96,12 @@ class m170303_154953_transactions extends Migration
             'THERESA BONA', 'ARGUINEGUÍN', $unknown0_id, false, false
         ], [
             'THOMAS EKBLOM', 'ARGUINEGUÍN', $unknown0_id, true, false
+        ], [
+            'ANNA KORPALA', 'ARGUINEGUÍN', $unknown0_id, true, false
+        ], [
+            'ROBERT KORTLANG', 'ARGUINEGUÍN', $unknown0_id, true, false
+        ], [
+            'NATHALIE PARADIS', 'ARGUINEGUÍN', $unknown0_id, true, false
         ], [
             'CRISTINA CARUSO', 'ARGUINEGUÍN', $unknown0_id, false, false
         ]]);

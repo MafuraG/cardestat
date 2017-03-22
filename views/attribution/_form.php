@@ -39,7 +39,7 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
                 'form' => $form->id
             ]) ?>
         <?= $form->field($model, 'attribution_type_id')->dropDownList(
-            AttributionType::listAll(), [
+            AttributionType::listActive(), [
                 'prompt' => '',
                 'class' => 'form-control input-sm',
                 'form' => $form->id

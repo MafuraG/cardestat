@@ -143,7 +143,7 @@ class Transaction extends \yii\db\ActiveRecord
             'their_fee_eu' => Yii::t('app', 'Collaborator\'s Fee'),
             'payrolled_at' => Yii::t('app', 'Date Payrolled'),
             'comments' => Yii::t('app', 'Comments'),
-            'approved' => Yii::t('app', 'Approved'),
+            'approved' => Yii::t('app', 'Approved By Direction'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];

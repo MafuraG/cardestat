@@ -16,7 +16,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property AttributionType $defaultAttributionType
  * @property Office $defaultOffice
- * @property AdvisorTranche[] $advisorTranches
+ * @property Tranche[] $tranches
  * @property Attribution[] $attributions
  * @property Transaction[] $transactions
  */
@@ -37,6 +37,7 @@ class Advisor extends \yii\db\ActiveRecord
     {
         return [
             [['name'], 'required'],
+            [['is_hub_agent', 'active'], 'boolean'],
             [['default_attribution_type_id'], 'integer'],
             [['name'], 'string', 'max' => 32],
             [['default_office'], 'string', 'max' => 18],
@@ -54,9 +55,23 @@ class Advisor extends \yii\db\ActiveRecord
         return [
             'id' => Yii::t('app', 'ID'),
             'name' => Yii::t('app', 'Name'),
+            'is_hub_agent' => Yii::t('app', 'Hub Agent'),
+            'active' => Yii::t('app', 'Active'),
             'default_office' => Yii::t('app', 'Default Office'),
             'default_attribution_type_id' => Yii::t('app', 'Default Attribution Type'),
         ];
+    }
+
+    public function afterFind()
+    {
+        parent::afterFind();
+        if ($this->id and !$this->tranches) {
+            $tranche = new AdvisorTranche();
+            $tranche->from_euc = 0;
+            $tranche->commission_bp = 0;
+            $tranche->advisor_id = $this->id;
+            $tranche->save(false);
+        }
     }
 
     /**
@@ -80,7 +95,8 @@ class Advisor extends \yii\db\ActiveRecord
      */
     public function getTranches()
     {
-        return $this->hasMany(AdvisorTranche::className(), ['advisor_id' => 'id']);
+        return $this->hasMany(AdvisorTranche::className(), ['advisor_id' => 'id'])
+            ->orderBy(['from_euc' => SORT_ASC]);
     }
 
     /**
