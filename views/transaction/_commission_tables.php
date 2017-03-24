@@ -1,8 +1,15 @@
 <?php
+use yii\helpers\Url;
+
+$sellerLbl = Yii::t('app', 'Seller');
+$buyerLbl = Yii::t('app', 'Buyer');
+$propertyLbl = Yii::t('app', 'Property');
+$salePriceLbl = Yii::t('app', 'Sale price');
+$commentsLbl = Yii::t('app', 'Comments');
 
 function mkInvoiceTooltip($tc) {
-    $icodes = explode(',', substr($tc['invoice_codes'], 1, strlen($tc['invoice_codes']) - 2));
-    $idates = explode(',', substr($tc['invoice_issuance_dates'], 1, strlen($tc['invoice_issuance_dates']) - 2));
+    $icodes = explode(', ', $tc['invoice_codes']);
+    $idates = explode(', ', $tc['invoice_issuance_dates']);
     $icd = array_combine($icodes, $idates);
     $invoices = $br = '';
     foreach ($icd as $code => $date) {
@@ -46,11 +53,27 @@ foreach ($data as $advisor => $advisor_data): ?>
             <th><?= Yii::t('app', 'Accumulated') ?></th>
             <th><?= Yii::t('app', 'Tranche') ?></th>
             <th><?= Yii::t('app', 'Commission') ?></th>
-            <th><?= Yii::t('app', 'Correction') ?></th>
+            <th><?= Yii::t('app', 'Difference') ?></th>
           </tr></thead>
           <tbody>
             <?php foreach ($advisor_data['months'] as $month => $month_data): ?>
               <?php $first = true; $rowspan = count($month_data['transactions']); ?>
+              <?php $tranches = []; $prev = null;
+              foreach (array_reverse($advisor_data['tranches']) as $i => $tranche) {
+                $tranche['commission_pct'] = $formatter->asDecimal($tranche['commission_bp'] / 100., 2);
+                $tranche['from_eu'] = $formatter->asDecimal($tranche['from_euc'] / 100., 2);
+                $tranches[$i] = $tranche;
+                if ($prev !== null) $tranches[$prev]['to_eu'] =
+                    $formatter->asDecimal(($tranche['from_euc'] - 1) / 100., 2);
+                $prev = $i;
+              } if ($prev !== null) $tranches[$prev]['to_eu'] = '&infin;';
+              $tranchesTitle = '';
+              $br = '';
+              foreach ($tranches as $tranche) {
+                $tranchesTitle .=
+                    "{$br}{$tranche['from_eu']} - {$tranche['to_eu']} €: {$tranche['commission_pct']} %";
+                $br = '<br>';
+              } ?>
               <tr>
                 <td rowspan="<?= $rowspan ?>">
                   <h4><span class="label label-danger monospace"><?= $formatter->asDate($month, 'MMM') ?></span></h4>
@@ -59,9 +82,22 @@ foreach ($data as $advisor => $advisor_data): ?>
                   <?php if (!$first): ?>
                     <tr>
                   <?php endif; ?>
-                  <td><button class="btn btn-default btn-xs btn-popover">
+                  <?php $salePriceEu = $formatter->asDecimal($tc['sale_price_euc'] / 100. ,2);
+                  $popoverContent = (
+                    "<dl class=\"text-left\"> " .
+                    " <dt>$sellerLbl</dt> " .
+                    " <dd><a href=\"#\">{$tc['seller_name']}</a></dd> " .
+                    " <dt>$buyerLbl</dt> " .
+                    " <dd><a href=\"#\">{$tc['buyer_name']}</a></dd> " .
+                    " <dt>$propertyLbl</dt> " .
+                    " <dd><a href=\"#\">{$tc['property_reference']}</a></dd> " .
+                    " <dt>$salePriceLbl</dt> " .
+                    " <dd>{$salePriceEu} €</dd> " .
+                    " <dt>$commentsLbl</dt> " .
+                    " <dd>{$tc['attribution_comments']}</dd></dl>"); $popoverContent = str_replace('"', '&quote;', $popoverContent); ?>
+                  <td><button class="btn btn-default btn-xs btn-popover" data-title="<?= Yii::t('app', 'Transaction details') ?>" data-content="<?= $popoverContent ?>" data-toggle="popover" data-placement="bottom" data-html="true" tabindex="0" role="button">
                     <span class="glyphicon glyphicon-info-sign">
-                  </span></button> <a href="#">#<?= $tc['transaction_id']?></a></td>
+                  </span></button> <a href="<?= Url::to(['transaction/view', 'id' => $tc['transaction_id']]) ?>">#<?= $tc['transaction_id']?></a></td>
                   <td class="text-right nowrap">
                     <?php $class = ($tc['total_invoiced_euc'] < $tc['our_fee_euc']) ? 'text-danger' : '' ?>
                     <?php $invoices = mkInvoiceTooltip($tc); ?>
@@ -83,11 +119,11 @@ foreach ($data as $advisor => $advisor_data): ?>
                           echo $formatter->asDecimal($ta / 100., 2) . ' €<br>'; ?>
                   </td>
                   <?php if ($first): ?>
-                    <td rowspan="<?= $rowspan ?>" class="text-right text-success nowrap"><?= $formatter->asDecimal($month_data['month_attribution_euc'] / 100., 2) ?> €</td>
+                    <td rowspan="<?= $rowspan ?>" class="text-right text-success nowrap"><?= $formatter->asDecimal($month_data['attribution_euc'] / 100., 2) ?> €</td>
                     <td rowspan="<?= $rowspan ?>" class="text-right nowrap"><?= $formatter->asDecimal($month_data['accumulated_attribution_euc'] / 100., 2) ?> €</td>
-                    <td rowspan="<?= $rowspan ?>" class="text-center"><span class="label label-success">
-                      <?php if (isset($month_data['tranche_bp']))
-                          echo $formatter->asDecimal($month_data['tranche_bp'] / 100., 2);
+                    <td rowspan="<?= $rowspan ?>" class="text-center"><span class="label label-success" data-toggle="tooltip" title="<?= $tranchesTitle ?>" data-html="true" role="button">
+                      <?php if (isset($month_data['commission_bp']))
+                          echo $formatter->asDecimal($month_data['commission_bp'] / 100., 2);
                       else echo '?'; ?> %
                     </span></td>
                     <td rowspan="<?= $rowspan ?>" class="text-right nowrap"><strong>
@@ -95,14 +131,14 @@ foreach ($data as $advisor => $advisor_data): ?>
                           echo $formatter->asDecimal($month_data['commission_euc'] / 100., 2);
                       else echo '?'; ?> €
                     </strong></td>
-                    <?php if (isset($month_data['commission_corrected_euc'])) {
-                        if ($month_data['commission_corrected_euc'] - $month_data['commission_euc'] < 0)
+                    <?php if (isset($month_data['corrected_commission_euc'])) {
+                        if ($month_data['corrected_commission_euc'] - $month_data['commission_euc'] < 0)
                             $class = 'text-danger';
                         else $class = 'text-info';
                     } else $class = ''; ?>
                     <td rowspan="<?= $rowspan ?>" class="text-right nowrap <?= $class ?>">
-                      <?php if (isset($month_data['commission_corrected_euc'])) 
-                          echo $formatter->asDecimal(($month_data['commission_corrected_euc'] -
+                      <?php if (isset($month_data['corrected_commission_euc'])) 
+                          echo $formatter->asDecimal(($month_data['corrected_commission_euc'] -
                           $month_data['commission_euc']) / 100., 2);
                       else echo '?'; ?> €
                     </td>
@@ -162,17 +198,11 @@ foreach ($data as $advisor => $advisor_data): ?>
               <th><?= Yii::t('app', 'Rate') ?></th>
             <tr></thead>
             <tbody>
-              <?php $tranches = []; $prev = null;
-              foreach (array_reverse($tc['tranches']) as $i => $tranche) {
-                  $tranches[$i] = $tranche;
-                  if ($prev !== null) $tranches[$prev]['to_euc'] = $tranche['from_euc'] - 1;
-                  $prev = $i;
-              } if ($prev) $tranches[$prev]['to_euc'] = '&infin;' ?>
               <?php foreach ($tranches as $tranche): ?>
                 <tr>
-                  <td><?= $formatter->asDecimal($tranche['from_euc'] / 100., 2) ?> €</td>
-                  <td><?= is_numeric($tranche['to_euc']) ? ($formatter->asDecimal($tranche['to_euc'] / 100., 2) . ' €') : $tranche['to_euc'] ?> </td>
-                  <td><?= $formatter->asDecimal($tranche['commission_bp'] / 100., 2) ?> %</td>
+                  <td><?= $tranche['from_eu'] ?> €</td>
+                  <td><?= $tranche['to_eu'] ?> €</td>
+                  <td><?= $tranche['commission_pct'] ?> %</td>
                 </tr>
               <?php endforeach; ?>
             </tbody>
@@ -186,5 +216,13 @@ foreach ($data as $advisor => $advisor_data): ?>
 <?php
 $script = <<< JS
   $('[data-toggle="tooltip"]').tooltip();
+  $('[data-toggle="popover"]').popover();
+  $('body').on('shown.bs.popover', function (e) {
+      $('body').on('click', hidePopovers);
+  });
+  function hidePopovers(e) {
+      $('body').off('click', hidePopovers);
+      $('.popover').popover('hide');
+  }
 JS;
 $this->registerJs($script);

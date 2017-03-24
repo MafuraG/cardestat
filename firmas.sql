@@ -576,8 +576,8 @@ insert into transaction (external_id, option_signed_at, sale_price_euc, buyer_id
           array_length(f.ref_prop::text[], 1) = 1 and
           fecha_firma ~ '\d{4}\W\d{2}\W\d{2}';
 
-insert into transaction (external_id, option_signed_at, sale_price_euc, buyer_id, seller_id, property_id, created_at, updated_at)
-    select f.id, f.fecha_firma::date, (f.precio::text[])[1]::integer*100, b.id, s.id, p.id, now(), now()
+insert into transaction (external_id, option_signed_at, sale_price_euc, buyer_id, seller_id, property_id, created_at)
+    select f.id, f.fecha_firma::date, (f.precio::text[])[1]::integer*100, b.id, s.id, p.id, now()
     from firmas f
          join contact s on ((f.ref_vendedor::text[])[1] = s.reference)
          join contact b on ((f.ref_comprador::text[])[1] = b.reference)
@@ -589,8 +589,8 @@ insert into transaction (external_id, option_signed_at, sale_price_euc, buyer_id
           array_length(f.ref_prop::text[], 1) = 1 and
           fecha_firma ~ '\d{4}\W\d{2}\W\d{2}';
 
-insert into attribution (advisor_id, attribution_type_id, amount_euc, transaction_id)
-    select ad.id, at.id, 0, t.id
+insert into attribution (advisor_id, attribution_type_id, amount_euc, transaction_id, created_at)
+    select ad.id, at.id, 0, t.id, now()
     from firmas f
          join transaction t on (t.external_id = f.id)
          join attribution_type at on (at.name = 'DESCONOCIDO' and attribution_bp = 0),

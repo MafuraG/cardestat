@@ -109,7 +109,9 @@ class m170303_154953_transactions extends Migration
             'id' => $this->primaryKey(),
             'from_euc' => $this->integer()->notNull(),
             'commission_bp' => $this->integer()->notNull(),
-            'advisor_id' => $this->integer()->notNull() . ' references advisor(id)'
+            'advisor_id' => $this->integer()->notNull() . ' references advisor(id)',
+            'created_at' => $this->timestamp(2)->notNull()->defaultExpression('now()'),
+            'updated_at' => $this->timestamp(2)
         ]);
         $this->createIndex('advisor_tranche-from_euc-advisor_id-uidx', 'advisor_tranche', ['from_euc', 'advisor_id'], true);
         $rafa_id = Yii::$app->db->createCommand('select id from advisor where name = \'RAFAEL ALZOLA\'')->execute();
@@ -155,7 +157,7 @@ class m170303_154953_transactions extends Migration
             'comments' => $this->text(),
             'approved' => $this->boolean()->notNull()->defaultValue(false),
             'created_at' => $this->timestamp(2)->notNull(),
-            'updated_at' => $this->timestamp(2)->notNull()
+            'updated_at' => $this->timestamp(2)
         ]);
         $this->createTable('invoice', [
             'id' => $this->primaryKey(),
@@ -163,7 +165,9 @@ class m170303_154953_transactions extends Migration
             'issued_at' => $this->date()->notNull(),
             'amount_euc' => $this->integer()->notNull(),
             'transaction_id' => $this->integer()->notNull() . ' references transaction(id)',
-            'recipient_category' => $this->string(18)->notNull() . ' references recipient_category(name)'
+            'recipient_category' => $this->string(18)->notNull() . ' references recipient_category(name)',
+            'created_at' => $this->timestamp(2)->notNull(),
+            'updated_at' => $this->timestamp(2)
         ]);
         $this->createTable('attribution', [
             'id' => $this->primaryKey(),
@@ -172,7 +176,9 @@ class m170303_154953_transactions extends Migration
             'attribution_type_id' => $this->integer()->notNull() . ' references attribution_type(id)',
             'amount_euc' => $this->integer(),
             'transaction_id' => $this->integer()->notNull() . ' references transaction(id)',
-            'comments' => $this->text()
+            'comments' => $this->text(),
+            'created_at' => $this->timestamp(2)->notNull(),
+            'updated_at' => $this->timestamp(2)
         ]);
         $this->execute('
             create or replace function array_distinct(anyarray) returns anyarray as $$

@@ -12,6 +12,9 @@ use app\models\Invoice;
 use app\models\Partner;
 use app\models\Property;
 use app\models\TransactionType;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "transaction".
@@ -69,6 +72,7 @@ class Transaction extends \yii\db\ActiveRecord
     public $suggested_sale_price_eu;
     public $our_fee_eu;
     public $their_fee_eu;
+    private $_dbTransaction;
     
     /**
      * @inheritdoc
@@ -76,6 +80,14 @@ class Transaction extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'transaction';
+    }
+
+    public function behaviors()
+    {
+        return [[
+            'class' => TimestampBehavior::className(),
+            'value' => new Expression('now()')
+        ]];
     }
 
     /**
@@ -89,7 +101,7 @@ class Transaction extends \yii\db\ActiveRecord
             ['payrolled_at', 'date', 'format' => 'YYYY-mm-dd'],
             [['first_published_price_eu', 'last_published_price_eu', 'sale_price_eu', 'suggested_sale_price_eu', 'our_fee_eu', 'their_fee_eu'], 'number'],
             [['buyer_id', 'seller_id', 'passed_to_sales_by', 'property_id'], 'integer'],
-            [['transaction_type', 'option_signed_at', 'buyer_id', 'seller_id', 'property_id', 'created_at', 'updated_at'], 'required'],
+            [['transaction_type', 'option_signed_at', 'buyer_id', 'seller_id', 'property_id'], 'required'],
             [['is_new_buyer', 'is_new_seller', 'is_home_staged', 'approved'], 'boolean'],
             [['comments'], 'string'],
             [['transaction_type', 'lead_type'], 'string', 'max' => 18],
@@ -142,7 +154,7 @@ class Transaction extends \yii\db\ActiveRecord
             'our_fee_eu' => Yii::t('app', 'Our Fees'),
             'their_fee_eu' => Yii::t('app', 'Collaborator\'s Fee'),
             'payrolled_at' => Yii::t('app', 'Date Payrolled'),
-            'comments' => Yii::t('app', 'Comments'),
+            'comments' => Yii::t('app', 'Internal Comments'),
             'approved' => Yii::t('app', 'Approved By Direction'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
@@ -168,7 +180,15 @@ class Transaction extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getTransactionAttributions()
+    public function getAttributionSummary()
+    {
+        return $this->hasOne(TransactionAttributionSummary::className(), ['transaction_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCalculatedAttributions()
     {
         return $this->hasMany(TransactionAttribution::className(), ['transaction_id' => 'id']);
     }
@@ -275,20 +295,73 @@ class Transaction extends \yii\db\ActiveRecord
     }
     public function beforeValidate() {
         if (!$this->sale_price_eu) $this->sale_price_eu = null;
-        if (strlen($this->payrolled_at) == 7) $this->payrolled_at .= '-01';
+        if ($this->payrolled_at) $this->payrolled_at = substr($this->payrolled_at, 0, 7) . '-01';
         return parent::beforeValidate();
     }
     public function afterSave($insert, $changedAttributes) {
-        foreach($this->transactionAttributions as $transaction_attribution) {
-            if ($this->payrolled_at) {
-                $transaction_attribution->attribution->amount_euc = $transaction_attribution->amount_euc;
-            } else {
-                $transaction_attribution->attribution->amount_euc = null;
+        parent::afterSave($insert, $changedAttributes);
+        try {
+            if (array_key_exists('payrolled_at', $changedAttributes) and
+                $changedAttributes['payrolled_at'] !== $this->payrolled_at) {
+                if ($this->payrolled_at) {
+                    $month = substr($this->payrolled_at, 0, 7);
+                    $year = substr($this->payrolled_at, 0, 4);
+                    $accumulated_attributions = ArrayHelper::map(TransactionAttributionSummary::find()
+                        ->select(['advisor_id', 'sum(total_attributed_sum_euc)'])
+                        ->where(['to_char(payrolled_at, \'yyyy\')' => $year])
+                        ->andWhere(['<=', 'to_char(payrolled_at, \'yyyy-mm\')', $month])
+                        ->groupBy(['advisor_id'])->createCommand()->queryAll(), 'advisor_id', 'sum');
+                    $attributions = $this->getAttributions()->with('tranches')->all();
+                    $transaction_payrolls = [];
+                    foreach ($attributions as $attribution) {
+                        $advisor_id = $attribution->advisor_id;
+                        if (!isset($transaction_payrolls[$advisor_id])) {
+                            $accumulated_attribution_euc = $accumulated_attributions[$advisor_id];
+                            $tranche = AdvisorTranche::selectTranche($attribution->tranches->toArray(),
+                                $accumulated_attribution_euc);
+                            $transaction_payrolls[$advisor_id] = new TransactionPayroll([
+                                'commission_bp' => $tranche['commission_bp'],
+                                'accumulated_euc' => $accumulated_attribution_euc
+                            ]);
+                            if (!$transaction_payrolls[$advisor_id]->save()) {
+                                $msg = var_export($transaction_payrolls[$advisor_id]->errors, 1);
+                                throw new \Exception($msg);
+                            //$transaction_payrolls[$advisor_id]->refresh(); // refresh id attribute?
+                            }
+                        }
+                        $attribution->amount_euc = $calculated_attribution->amount_euc;
+                        $attribution->transaction_payroll_id = $transaction_payrolls[$advisor_id]->id;
+                        if (!$attribution->save(false)) {
+                            $msg = var_export($attribution->errors, 1);
+                            throw new \Exception($msg);
+                        }
+                    }
+                } else {
+                    $toDelete = [];
+                    foreach ($this->calculatedAttributions as $calculated_attribution) {
+                        if ($calculated_attribution->attribution->transactionPayroll)
+                            $toDelete[] = $calculated_attribution->attribution->transactionPayroll;
+                        $calculated_attribution->attribution->transaction_payroll_id = null;
+                        $calculated_attribution->attribution->amount_euc = null;
+                        if (!$calculated_attribution->attribution->save(false)) {
+                            $msg = var_export($calculated_attribution->errors, 1);
+                            throw new \Exception($msg);
+                        }
+                    }
+                    foreach ($toDelete as $model) if ($model->delete() === false) {
+                        $msg = var_export($model->errors, 1);
+                        throw new \Exception($msg);
+                    }
+                }
             }
-            $transaction_attribution->attribution->save(false);
+            $this->_dbTransaction->commit();
+        } catch (\Exception $e) {
+            $this->_dbTransaction->rollback();
+            throw new \yii\web\HttpException(500, $e->getMessage());
         }
     }
     public function beforeSave($insert) {
+        $this->_dbTransaction = Yii::$app->db->beginTransaction();
         $this->sale_price_euc = round($this->sale_price_eu * 100.);
         $this->first_published_price_euc = round($this->first_published_price_eu * 100.);
         if (!$this->first_published_price_euc ) $this->first_published_price_euc = null;
@@ -298,8 +371,6 @@ class Transaction extends \yii\db\ActiveRecord
         if (!$this->suggested_sale_price_euc ) $this->suggested_sale_price_euc = null;
         $this->our_fee_euc = round($this->our_fee_eu * 100.);
         $this->their_fee_euc = round($this->their_fee_eu * 100.);
-        $this->updated_at = date('Y-m-d H:i:s');
-        if ($insert) $this->created_at = $this->updated_at;
         return parent::beforeSave($insert);
     }
 }

@@ -5,7 +5,7 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "transaction_commission".
+ * This is the model class for table "transaction_attribution_summary".
  *
  * @property string $advisor_name
  * @property integer $transaction_id
@@ -22,7 +22,7 @@ use Yii;
  * @property string $n_invoices
  * @property string $invoice_issuance_dates
  * @property string $invoice_codes
- * @property string $total_invoiced_euc
+ * @property integer $total_invoiced_euc
  * @property integer $our_fee_euc
  * @property integer $their_fee_euc
  * @property string $attribution_offices
@@ -31,14 +31,14 @@ use Yii;
  * @property string $total_attributed_euc
  * @property integer $total_attributed_sum_euc
  */
-class TransactionCommission extends \yii\db\ActiveRecord
+class TransactionAttributionSummary extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'transaction_commission';
+        return 'transaction_attribution_summary';
     }
 
     /**
@@ -85,6 +85,13 @@ class TransactionCommission extends \yii\db\ActiveRecord
             'attribution_type_bps' => Yii::t('app', 'Attribution Type Bps'),
             'total_attributed_sum_euc' => Yii::t('app', 'Total Attributed Euc'),
         ];
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCorrectedSummary()
+    {
+        return $this->hasOne(TransactionAttributionCorrectedSummary::className(), ['transaction_id' => 'transaction_id']);
     }
     /**
      * @return \yii\db\ActiveQuery

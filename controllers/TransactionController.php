@@ -5,10 +5,12 @@ namespace app\controllers;
 use Yii;
 use app\models\Invoice;
 use app\models\Advisor;
+use app\models\AdvisorTranche;
 use app\models\Attribution;
 use app\models\AttributionType;
 use app\models\Transaction;
-use app\models\TransactionCommission;
+use app\models\TransactionAttributionSummary;
+use app\models\TransactionAttributionCorrectedSummary;
 use app\models\TransactionAttribution;
 use app\models\TransactionListItem;
 use app\models\TransactionListItemSearch;
@@ -51,14 +53,16 @@ class TransactionController extends Controller
     {
         if (!$year) $year = date('Y');
         $data = $this->mkCommissionsViewData($year, $advisor_id);
-        //\yii\helpers\VarDumper::dump($data, 8, true); die;
         $years = Transaction::find()->select(['to_char(payrolled_at, \'yyyy\')'])
             ->distinct()->where(['not', ['payrolled_at'=> null]])
             ->asArray()->createCommand()->queryColumn();
         $years = array_combine($years, $years);
-        $invoiced_euc = Invoice::find()->with(['transaction' => function($q) use ($year) {
+        $positive_invoiced_euc = Invoice::find()->with(['transaction' => function($q) use ($year) {
             $q->where(['to_char(payrolled_at, \'yyyy\')' => $year]);
-        }])->sum('amount_euc');
+        }])->where('amount_euc > 0')->sum('amount_euc');
+        $negative_invoiced_euc = Invoice::find()->with(['transaction' => function($q) use ($year) {
+            $q->where(['to_char(payrolled_at, \'yyyy\')' => $year]);
+        }])->where('amount_euc < 0')->sum('amount_euc');
         $our_fees_euc = Transaction::find()
             ->where(['to_char(payrolled_at, \'yyyy\')' => $year])
             ->sum('our_fee_euc');
@@ -70,7 +74,8 @@ class TransactionController extends Controller
             'year' => $year,
             'advisor_id' => $advisor_id,
             'years' => $years,
-            'invoiced_euc' => $invoiced_euc,
+            'positive_invoiced_euc' => $positive_invoiced_euc,
+            'negative_invoiced_euc' => $negative_invoiced_euc,
             'our_fees_euc' => $our_fees_euc,
             'their_fees_euc' => $their_fees_euc
         ]);
@@ -121,9 +126,7 @@ class TransactionController extends Controller
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findListModel($id),
-        ]);
+        return $this->render('view', $this->mkFormData($this->findListModel($id)));
     }
 
     /**
@@ -145,14 +148,9 @@ class TransactionController extends Controller
     }
 
     /**
-     * Updates an existing TransactionListItem model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
      */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id, true);
+    protected function mkFormData($model) {
+        $id = $model->id;
         $invoice = new Invoice(['transaction_id' => $id]);
         $query = Invoice::find()->where(['transaction_id' => $id]);
         $invoiceDataProvider = new ActiveDataProvider([
@@ -166,24 +164,27 @@ class TransactionController extends Controller
         ]);
         $advisor_defaults = ArrayHelper::index(Advisor::find()->with('defaultAttributionType')->asArray()->all(), 'id');
         $attribution_types = ArrayHelper::map(AttributionType::find()->all(), 'id', 'attribution_bp');
-
+        return [
+            'model' => $model,
+            'invoice' => $invoice,
+            'attribution' => $attribution,
+            'invoiceDataProvider' => $invoiceDataProvider,
+            'attributionDataProvider' => $attributionDataProvider,
+            'attribution_types' => $attribution_types,
+            'advisor_defaults' => $advisor_defaults,
+            'total_invoiced_eu' => $total_invoiced_eu
+        ];
+    }
+    public function actionUpdate($id)
+    {
+        $model = $this->findModel($id, true);
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             if (Yii::$app->request->isAjax)
                 return $this->actionView($model->id);
             else return $this->redirect(['view', 'id' => $model->id]);
         } else {
-            $data = [
-                'model' => $model,
-                'invoice' => $invoice,
-                'attribution' => $attribution,
-                'invoiceDataProvider' => $invoiceDataProvider,
-                'attributionDataProvider' => $attributionDataProvider,
-                'attribution_types' => $attribution_types,
-                'advisor_defaults' => $advisor_defaults,
-                'total_invoiced_eu' => $total_invoiced_eu
-            ];
-            if (Yii::$app->request->isAjax) return $this->renderAjax('_form', $data);
-            else return $this->render('update', $data);
+            $data = $this->mkFormData($model);
+            return $this->render('update', $data);
         }
     }
 
@@ -234,86 +235,74 @@ class TransactionController extends Controller
     /**
      */
     protected function mkCommissionsViewData($year, $advisor_id) {
-        $q = TransactionCommission::find()
-            ->with(['tranches' => function($q) {
-                $q->orderBy('from_euc desc');
-            }])->where(['like', 'payroll_month', $year]);
-        if ($advisor_id) $q->where(['advisor_id' => $advisor_id]);
-        $commissions = $q->orderBy('advisor_name asc, payroll_month asc, transaction_id asc')
-            ->asArray()->all();
-        $commissions = ArrayHelper::index($commissions, 'transaction_id', ['advisor_name', 'payroll_month']);
+        $q = TransactionAttributionSummary::find()
+            ->with('correctedSummary')
+            ->where(['to_char(payrolled_at, \'yyyy\')' => $year])
+            ->orderBy('advisor_name asc, payrolled_at asc, transaction_id asc')->asArray();
+        if ($advisor_id) $q->andWhere(['advisor_id' => $advisor_id]);
+        $row_set = $q->all();
+        $advisor_ids = ArrayHelper::getColumn($row_set, 'advisor_id');
+        $tranches = ArrayHelper::index(AdvisorTranche::find()
+            ->where(['advisor_id' => $advisor_ids])
+            ->orderBy('from_euc desc')
+            ->asArray()->all(), null, 'advisor_id');
+        $commissions = ArrayHelper::index($row_set, 'transaction_id', ['advisor_name', 'payrolled_at']);
         $data = [];
         foreach ($commissions as $advisor => & $months) {
-            $data[$advisor]['months'] = [];
-            $accu[$advisor] = [];
-            $accu_corrected[$advisor] = [];
-            $prev = null;
-            foreach ($months as $month => & $transactions) {
-                $tranches = [];
-                foreach ($transactions as $tr) {
-                    $attr = $tr['total_attributed_sum_euc'];
-                    $attr_corrected = $tr['total_attributed_sum_corrected_euc'];
-                    if ($attr_corrected === null) $attr_corrected = 0;
-                    if (isset($accu[$advisor][$month])) {
-                        $accu[$advisor][$month] += $attr;
-                        $accu_corrected[$advisor][$month] += $attr_corrected;
-                    } else if ($prev !== null) {
-                        $accu[$advisor][$month] = $accu[$advisor][$prev] + $attr;
-                        $accu_corrected[$advisor][$month] = $accu_corrected[$advisor][$prev] + $attr_corrected;
-                    } else {
-                        $accu[$advisor][$month] = $attr;
-                        $accu_corrected[$advisor][$month] = $attr_corrected;
-                    }
-                    if (!$tranches) $tranches = $tr['tranches'];
-                }
-                if ($prev !== null) {
-                    $attr = $accu[$advisor][$month] - $accu[$advisor][$prev];
-                    $attr_corrected = $accu_corrected[$advisor][$month] - $accu_corrected[$advisor][$prev];
-                } else {
-                    $attr = $accu[$advisor][$month];
-                    $attr_corrected = $accu_corrected[$advisor][$month];
-                }
-                $data[$advisor]['months'][$month] = [
-                    'transactions' => $transactions,
-                    'accumulated_attribution_euc' => $accu[$advisor][$month],
-                    'accumulated_attribution_corrected_euc' => $accu_corrected[$advisor][$month],
-                    'month_attribution_euc' => $attr,
-                    'month_attribution_corrected_euc' => $attr_corrected
-                ];
-                unset($transactions);
-                $prev = $month;
-                $selected_tranche = null;
-                $selected_tranche_corrected = null;
-                foreach ($tranches as $tranche) {
-                    if ($selected_tranche === null &&
-                        $tranche['from_euc'] <= $data[$advisor]['months'][$month]['accumulated_attribution_euc']) {
-                        $selected_tranche = $tranche;
-                    }
-                    if ($selected_tranche_corrected === null &&
-                        $tranche['from_euc'] <= $data[$advisor]['months'][$month]['accumulated_attribution_corrected_euc']) {
-                        $selected_tranche_corrected = $tranche;
-                    }
-                }
-                if ($selected_tranche) {
-                    $data[$advisor]['months'][$month]['tranche_bp'] = $selected_tranche['commission_bp'];
-                    $data[$advisor]['months'][$month]['commission_euc'] = 
-                        $selected_tranche['commission_bp'] / 10000. * $data[$advisor]['months'][$month]['month_attribution_euc'];
-                }
-                if ($selected_tranche_corrected) {
-                    $data[$advisor]['months'][$month]['tranche_corrected_bp'] = $selected_tranche_corrected['commission_bp'];
-                    $data[$advisor]['months'][$month]['commission_corrected_euc'] = 
-                        $selected_tranche_corrected['commission_bp'] / 10000. * $data[$advisor]['months'][$month]['month_attribution_corrected_euc'];
-                }
-            }
-            $data[$advisor]['total_commission_euc'] = 0;
-            $data[$advisor]['total_commission_corrected_euc'] = 0;
-            foreach ($data[$advisor]['months'] as $month) {
-                if (isset($month['commission_euc']))
-                    $data[$advisor]['total_commission_euc'] += $month['commission_euc'];
-                if (isset($month['commission_corrected_euc']))
-                    $data[$advisor]['total_commission_corrected_euc'] += $month['commission_corrected_euc'];
-            }
+           $previous_accum_attribution = 0;
+           $data[$advisor]['total_commission_euc'] = 0;
+           $data[$advisor]['corrected_total_commission_euc'] = 0;
+           foreach ($months as $month => & $tx_summaries) {
+               $data[$advisor]['months'][$month]['transactions'] = & $tx_summaries; 
+               $a_tx_summary= reset($tx_summaries);
+               $data[$advisor]['tranches'] = $tranches[$a_tx_summary['advisor_id']];
+               $an_attribution = Attribution::find()->with('transactionPayroll')
+                   ->where(['transaction_id' => $a_tx_summary['transaction_id']])
+                   //->andWhere(['not', ['transaction_payroll_id' => null]])
+                   ->andWhere(['advisor_id' => $a_tx_summary['advisor_id']])->one();
+               $data[$advisor]['months'][$month]['commission_bp'] =
+                   $an_attribution->transactionPayroll->commission_bp;
+               $data[$advisor]['months'][$month]['accumulated_attribution_euc'] =
+                   $an_attribution->transactionPayroll->accumulated_euc;
+               $data[$advisor]['months'][$month]['attribution_euc'] =
+                   $data[$advisor]['months'][$month]['accumulated_attribution_euc'] -
+                       $previous_accum_attribution;
+               $data[$advisor]['months'][$month]['commission_euc'] =
+                   $data[$advisor]['months'][$month]['attribution_euc'] *
+                       $data[$advisor]['months'][$month]['commission_bp'] / 10000.;
+               $data[$advisor]['total_commission_euc'] +=
+                   $data[$advisor]['months'][$month]['attribution_euc'] *
+                       $data[$advisor]['months'][$month]['commission_bp'] / 10000.;
+               $previous_accum_attribution = $data[$advisor]['months'][$month]['accumulated_attribution_euc'];
+               $data[$advisor]['months'][$month]['corrected_attribution_euc'] = 0;
+               foreach ($tx_summaries as & $tx_summary) {
+                   $tx_summary['corrected_total_attributed_sum_euc'] =
+                       $tx_summary['correctedSummary']['corrected_total_attributed_sum_euc'];
+                   unset($tx_summary['correctedSummary']);
+                   $data[$advisor]['months'][$month]['corrected_attribution_euc'] +=
+                       $tx_summary['corrected_total_attributed_sum_euc'];
+               }
+               $data[$advisor]['months'][$month]['corrected_accumulated_attribution_euc'] =
+                   TransactionAttributionCorrectedSummary::find()
+                       ->select(['sum(corrected_total_attributed_sum_euc)'])
+                       ->where(['to_char(payrolled_at, \'yyyy\')' => $year])
+                       ->andWhere(['advisor_id' => $a_tx_summary['advisor_id']])
+                       ->andWhere(['<=', 'payrolled_at', $month])
+                       ->groupBy(['to_char(payrolled_at, \'yyyy\')'])
+                       ->createCommand()->queryColumn()[0];
+               $data[$advisor]['months'][$month]['corrected_commission_bp'] = 
+                   AdvisorTranche::selectTranche($data[$advisor]['tranches'],
+                       $data[$advisor]['months'][$month]['corrected_accumulated_attribution_euc'])
+                           ['commission_bp'];
+               $data[$advisor]['months'][$month]['corrected_commission_euc'] =
+                   $data[$advisor]['months'][$month]['corrected_attribution_euc'] *
+                       $data[$advisor]['months'][$month]['corrected_commission_bp'] / 10000.;
+               $data[$advisor]['corrected_total_commission_euc'] +=
+                   $data[$advisor]['months'][$month]['corrected_attribution_euc'] *
+                       $data[$advisor]['months'][$month]['corrected_commission_bp'] / 10000.;
+           }
         }
+        //\yii\helpers\VarDumper::dump($data, 7, true); die;
         return $data;
     }
 }

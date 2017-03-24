@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\TransactionListItem */
@@ -12,8 +13,9 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
 ?>
 <div class="transaction-list-item-update">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+  <h1><?= Html::encode($this->title) ?></h1>
 
+  <?php Pjax::begin(['id' => 'p1']) ?>
     <?= $this->render('_form', [
         'model' => $model,
         'invoice' => $invoice,
@@ -24,5 +26,6 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
         'advisor_defaults' => $advisor_defaults,
         'total_invoiced_eu' => $total_invoiced_eu
     ]) ?>
+  <?php Pjax::end() ?>
 
 </div>

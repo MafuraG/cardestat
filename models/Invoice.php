@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "invoice".
@@ -11,6 +13,8 @@ use Yii;
  * @property string $issued_at
  * @property integer $amount_euc
  * @property string $recipient_category
+ * @property string $created_at
+ * @property string $updated_at
  *
  * @property RecipientCategory $recipientCategory
  */
@@ -25,6 +29,13 @@ class Invoice extends \yii\db\ActiveRecord
         return 'invoice';
     }
 
+    public function behaviors()
+    {
+        return [[
+            'class' => TimestampBehavior::className(),
+            'value' => new Expression('now()')
+        ]];
+    }
     /**
      * @inheritdoc
      */

@@ -55,7 +55,7 @@ class Advisor extends \yii\db\ActiveRecord
         return [
             'id' => Yii::t('app', 'ID'),
             'name' => Yii::t('app', 'Name'),
-            'is_hub_agent' => Yii::t('app', 'Hub Agent'),
+            'is_hub_agent' => Yii::t('app', 'Lead Hub'),
             'active' => Yii::t('app', 'Active'),
             'default_office' => Yii::t('app', 'Default Office'),
             'default_attribution_type_id' => Yii::t('app', 'Default Attribution Type'),

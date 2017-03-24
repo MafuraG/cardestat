@@ -6,7 +6,13 @@ use yii\widgets\Pjax;
 use yii\bootstrap\Modal;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use kartik\select2\Select2;
 BootstrapAsset::register($this);
+// force loading Select2 CSS for later use by pjax loaded modal:
+Select2::widget([
+    'name' => 'foo',
+    'value' => '',
+]);
 ?>
 
 <h1 class="page-header"><?= Yii::t('app', 'Transactions')?></h1>
@@ -44,9 +50,11 @@ BootstrapAsset::register($this);
 </div>
 <?php
 $transactionLbl = Yii::t('app', 'Transaction');
-$tranFormUrl = Url::to(['transaction/update', 'id' => '_id_']);
+$txUpdateUrl = Url::to(['transaction/update', 'id' => '_id_']);
+$txViewUrl = Url::to(['transaction/view', 'id' => '_id_']);
 $script = <<< JS
-  var detailsUrl = '$tranFormUrl';
+  var txUpdateUrl = '$txUpdateUrl';
+  var txViewUrl = '$txViewUrl';
   var \$transactionModal = $('#transaction-modal');
   $.pjax.defaults.timeout = 6000;
   $('.transaction-index').on('submit', '.transaction-list-item-search form', function(e) {
@@ -67,8 +75,8 @@ $script = <<< JS
           type: \$form.attr('method'),
           data: \$form.serialize(),
           success: function (response) {                  
-              \$transactionModal.modal('hide');
               reload_list = true;
+              \$transactionModal.modal('hide');
           }, error: function () {
               console.log('internal server error');
           }
@@ -88,15 +96,9 @@ $script = <<< JS
   $('#p1').on('pjax:end', function(xhr, options) {
       modalDataLoaded();
   });
-  var editing = false;
   var last_id = -1;
   function modalDataLoaded() {
       \$transactionModal.find('.modal-header h3').html('{$transactionLbl} #' + last_id);
-      if (editing) \$transactionModal.find('.btn-primary, .edit-mode').removeClass('hidden');
-      else \$transactionModal.find('.btn-primary, .edit-mode').addClass('hidden');
-      \$transactionModal.find('input, select, textarea, checkbox, .btn-danger')
-          .attr('disabled', !editing);
-      \$transactionModal.find('.kv-date-remove').toggleClass('hidden', !editing);
       \$transactionModal.modal('show');
   }
   $('[data-toggle="tooltip"]').tooltip()
@@ -117,15 +119,13 @@ $script = <<< JS
     }
   }
   $('#p0').on('click', 'a.transaction-edit', function() {
-    editing = true;
     var id = $(this).closest('.transaction').data('key');
-    $.pjax({container: '#p1', url: detailsUrl.replace('_id_', id), scrollTo: false, push: false});
+    $.pjax({container: '#p1', url: txUpdateUrl.replace('_id_', id), scrollTo: false, push: false});
     last_id = id;
   });
   $('#p0').on('click', 'a.transaction-details', function() {
-    editing = false;
     var id = $(this).closest('.transaction').data('key');
-    $.pjax({container: '#p1', url: detailsUrl.replace('_id_', id), scrollTo: false, push: false});
+    $.pjax({container: '#p1', url: txViewUrl.replace('_id_', id), scrollTo: false, push: false});
     last_id = id;
   });
   var reload_list = false;

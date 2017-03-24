@@ -37,7 +37,8 @@ $formatter = Yii::$app->formatter;
   <div class="col-xs-6 col-sm-3">
     <div class="thumbnail text-center">
       <h5><?= Yii::t('app', 'Invoiced') ?></h5>
-      <h4><?= $formatter->asDecimal($invoiced_euc / 100. , 2) ?> €</h4>
+      <h4><small><span class="text-info"><?= $formatter->asDecimal($positive_invoiced_euc / 100. , 2) ?></span>
+          <span class="text-danger">- <?= $formatter->asDecimal($negative_invoiced_euc / 100. , 2) ?></span></small> = <?= $formatter->asDecimal(($positive_invoiced_euc - $negative_invoiced_euc) / 100. , 2) ?> €</h4>
     </div>
   </div>
   <div class="col-xs-6 col-sm-3">
@@ -55,7 +56,7 @@ $formatter = Yii::$app->formatter;
   <div class="col-xs-6 col-sm-3">
     <div class="thumbnail text-center">
       <h5><?= Yii::t('app', 'Potential') ?></h5>
-      <h4><?= $formatter->asDecimal(($our_fees_euc + $their_fees_euc - $invoiced_euc) / 100., 2) ?> €</h4>
+      <h4><?= $formatter->asDecimal(($our_fees_euc + $their_fees_euc - $positive_invoiced_euc + $negative_invoiced_euc) / 100., 2) ?> €</h4>
     </div>
   </div>
 </div>

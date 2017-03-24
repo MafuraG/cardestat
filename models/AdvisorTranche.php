@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "advisor_tranche".
@@ -11,6 +13,8 @@ use Yii;
  * @property integer $from_euc
  * @property integer $commission_bp
  * @property integer $advisor_id
+ * @property string $created_at
+ * @property string $updated_at
  *
  * @property Advisor $advisor
  */
@@ -24,6 +28,14 @@ class AdvisorTranche extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'advisor_tranche';
+    }
+
+    public function behaviors()
+    {
+        return [[
+            'class' => TimestampBehavior::className(),
+            'value' => new Expression('now()')
+        ]];
     }
 
     /**
@@ -71,5 +83,13 @@ class AdvisorTranche extends \yii\db\ActiveRecord
         $this->from_euc = round($this->from_eu * 100.);
         $this->commission_bp = round($this->commission_pct * 100.);
         return parent::beforeSave($insert);
+    }
+
+    public static function selectTranche($tranches, $accumulated_euc) {
+        foreach ($tranches as $tranche) {
+            if ($tranche['from_euc'] <= $accumulated_euc) 
+                return $tranche;
+        }
+        return null;
     }
 }
