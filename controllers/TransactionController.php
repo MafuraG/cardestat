@@ -26,6 +26,8 @@ use kartik\mpdf\Pdf;
  */
 class TransactionController extends Controller
 {
+    const TRANCHES_CHANGED = 0;
+    const LATE_INVOICE_PROPAGATION = 1;
     /**
      * @inheritdoc
      */
@@ -250,56 +252,72 @@ class TransactionController extends Controller
         $data = [];
         foreach ($commissions as $advisor => & $months) {
            $previous_accum_attribution = 0;
+           $previous_correction_causes = [];
            $data[$advisor]['total_commission_euc'] = 0;
            $data[$advisor]['corrected_total_commission_euc'] = 0;
            foreach ($months as $month => & $tx_summaries) {
-               $data[$advisor]['months'][$month]['transactions'] = & $tx_summaries; 
+               $mondat = & $data[$advisor]['months'][$month];
+               $mondat['transactions'] = & $tx_summaries; 
                $a_tx_summary= reset($tx_summaries);
                $data[$advisor]['tranches'] = $tranches[$a_tx_summary['advisor_id']];
                $an_attribution = Attribution::find()->with('transactionPayroll')
                    ->where(['transaction_id' => $a_tx_summary['transaction_id']])
-                   //->andWhere(['not', ['transaction_payroll_id' => null]])
                    ->andWhere(['advisor_id' => $a_tx_summary['advisor_id']])->one();
-               $data[$advisor]['months'][$month]['commission_bp'] =
-                   $an_attribution->transactionPayroll->commission_bp;
-               $data[$advisor]['months'][$month]['accumulated_attribution_euc'] =
-                   $an_attribution->transactionPayroll->accumulated_euc;
-               $data[$advisor]['months'][$month]['attribution_euc'] =
-                   $data[$advisor]['months'][$month]['accumulated_attribution_euc'] -
+               $mondat['commission_bp'] = $an_attribution->transactionPayroll->commission_bp;
+               $mondat['accumulated_attribution_euc'] = $an_attribution->transactionPayroll->accumulated_euc;
+               $mondat['attribution_euc'] = $mondat['accumulated_attribution_euc'] -
                        $previous_accum_attribution;
-               $data[$advisor]['months'][$month]['commission_euc'] =
-                   $data[$advisor]['months'][$month]['attribution_euc'] *
-                       $data[$advisor]['months'][$month]['commission_bp'] / 10000.;
-               $data[$advisor]['total_commission_euc'] +=
-                   $data[$advisor]['months'][$month]['attribution_euc'] *
-                       $data[$advisor]['months'][$month]['commission_bp'] / 10000.;
-               $previous_accum_attribution = $data[$advisor]['months'][$month]['accumulated_attribution_euc'];
-               $data[$advisor]['months'][$month]['corrected_attribution_euc'] = 0;
+               $mondat['commission_euc'] = $mondat['attribution_euc'] * $mondat['commission_bp'] / 10000.;
+               $data[$advisor]['total_commission_euc'] += $mondat['attribution_euc'] *
+                       $mondat['commission_bp'] / 10000.;
+               $previous_accum_attribution = $mondat['accumulated_attribution_euc'];
+               $mondat['corrected_attribution_euc'] = 0;
                foreach ($tx_summaries as & $tx_summary) {
                    $tx_summary['corrected_total_attributed_sum_euc'] =
                        $tx_summary['correctedSummary']['corrected_total_attributed_sum_euc'];
                    unset($tx_summary['correctedSummary']);
-                   $data[$advisor]['months'][$month]['corrected_attribution_euc'] +=
-                       $tx_summary['corrected_total_attributed_sum_euc'];
+                   $mondat['corrected_attribution_euc'] += $tx_summary['corrected_total_attributed_sum_euc'];
                }
-               $data[$advisor]['months'][$month]['corrected_accumulated_attribution_euc'] =
+               $mondat['corrected_accumulated_attribution_euc'] =
                    TransactionAttributionCorrectedSummary::find()
                        ->select(['sum(corrected_total_attributed_sum_euc)'])
                        ->where(['to_char(payrolled_at, \'yyyy\')' => $year])
                        ->andWhere(['advisor_id' => $a_tx_summary['advisor_id']])
                        ->andWhere(['<=', 'payrolled_at', $month])
-                       ->groupBy(['to_char(payrolled_at, \'yyyy\')'])
-                       ->createCommand()->queryColumn()[0];
-               $data[$advisor]['months'][$month]['corrected_commission_bp'] = 
-                   AdvisorTranche::selectTranche($data[$advisor]['tranches'],
-                       $data[$advisor]['months'][$month]['corrected_accumulated_attribution_euc'])
-                           ['commission_bp'];
-               $data[$advisor]['months'][$month]['corrected_commission_euc'] =
-                   $data[$advisor]['months'][$month]['corrected_attribution_euc'] *
-                       $data[$advisor]['months'][$month]['corrected_commission_bp'] / 10000.;
-               $data[$advisor]['corrected_total_commission_euc'] +=
-                   $data[$advisor]['months'][$month]['corrected_attribution_euc'] *
-                       $data[$advisor]['months'][$month]['corrected_commission_bp'] / 10000.;
+                       ->groupBy(['to_char(payrolled_at, \'yyyy\')'])->createCommand()->queryColumn()[0];
+               $mondat['corrected_commission_bp'] = AdvisorTranche::selectTranche($data[$advisor]['tranches'],
+                       $mondat['corrected_accumulated_attribution_euc'])['commission_bp'];
+               $mondat['simulated_commission_bp'] = AdvisorTranche::selectTranche($data[$advisor]['tranches'],
+                       $mondat['accumulated_attribution_euc'])['commission_bp'];
+               $mondat['corrected_commission_euc'] = $mondat['corrected_attribution_euc'] *
+                       $mondat['corrected_commission_bp'] / 10000.;
+               $data[$advisor]['corrected_total_commission_euc'] += $mondat['corrected_attribution_euc'] *
+                       $mondat['corrected_commission_bp'] / 10000.;
+               if ($mondat['commission_bp'] != $mondat['corrected_commission_bp']) {
+                   if ($mondat['accumulated_attribution_euc'] ==
+                       $mondat['corrected_accumulated_attribution_euc'])
+                       $mondat['correction_causes'] = [self::TRANCHES_CHANGED];
+                   else {
+                       if ($mondat['simulated_commission_bp'] == $mondat['commission_bp'])
+                           $mondat['correction_causes'] = [self::LATE_INVOICE_PROPAGATION];
+                       else {
+                           $mondat['correction_causes'] = [self::TRANCHES_CHANGED];
+                           if (array_search($previous_correction_causes,
+                               self::LATE_INVOICE_PROPAGATION) !== false)
+                               $mondat['correction_causes'][] = self::LATE_INVOICE_PROPAGATION;
+                       }
+                   }
+               } else if ($mondat['accumulated_attribution_euc'] !=
+                   $mondat['corrected_accumulated_attribution_euc']) {
+                   if ($mondat['simulated_commission_bp'] == $mondat['commission_bp'])
+                       $mondat['correction_causes'] = [self::LATE_INVOICE_PROPAGATION];
+                   else {
+                       $mondat['correction_causes'] = [self::TRANCHES_CHANGED];
+                       if (array_search($previous_correction_causes, self::LATE_INVOICE_PROPAGATION) !== false)
+                           $mondat['correction_causes'][] = self::LATE_INVOICE_PROPAGATION;
+                   }
+               }
+               $previous_correction_causes = $mondat['correction_causes'];
            }
         }
         //\yii\helpers\VarDumper::dump($data, 7, true); die;

@@ -3,14 +3,16 @@
 namespace app\controllers;
 
 use Yii;
-use yii\web\Response;
-use app\models\Contact;
-use yii\filters\AccessControl;
-use yii\filters\VerbFilter;
+use app\models\Partner;
 use yii\data\ActiveDataProvider;
+use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\filters\VerbFilter;
 
-class ContactController extends Controller
+/**
+ * PartnerController implements the CRUD actions for Partner model.
+ */
+class PartnerController extends Controller
 {
     /**
      * @inheritdoc
@@ -18,13 +20,6 @@ class ContactController extends Controller
     public function behaviors()
     {
         return [
-            'access' => [
-                'class' => AccessControl::className(),
-                'rules' => [[
-                    'allow' => true,
-                    'roles' => ['@']
-                ]]
-            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -35,46 +30,23 @@ class ContactController extends Controller
     }
 
     /**
-     * Lists all Contact models.
+     * Lists all Partner models.
      * @return mixed
      */
     public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => Contact::find(),
+            'query' => Partner::find(),
         ]);
+
         return $this->render('index', [
             'dataProvider' => $dataProvider,
         ]);
     }
 
-    public function actionList($q = null, $id = null, $page = 1)
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-        $out = ['results' => ['id' => '', 'text' => '']];
-        if (!is_null($q)) {
-            $query = Contact::find();
-            $query->select(['id', 'concat(last_name, \', \', first_name, \' (ref. \', reference, \')\') as text'])
-                ->where(['ilike', 'first_name', $q])
-                ->orWhere(['ilike', 'last_name', $q])
-                ->orWhere(['ilike', 'reference', $q])
-                ->asArray();
-            $ntotal = $query->count();
-            $data = $query->limit(10)->offset(10 * ($page - 1))->all();
-            $out['results'] = array_values($data);
-            $out['pagination'] = ['more' => $ntotal > 10 * $page];
-        } elseif ($id > 0) {
-            $model = Contact::findOne($id);
-            $out['results'] = [
-                'id' => $id,
-                'text' => "{$model->last_name}, {$model->first_name} (ref. {$model->reference})"
-            ];
-        }
-        return $out;
-    }
     /**
-     * Displays a single Contact model.
-     * @param integer $id
+     * Displays a single Partner model.
+     * @param string $id
      * @return mixed
      */
     public function actionView($id)
@@ -83,16 +55,18 @@ class ContactController extends Controller
             'model' => $this->findModel($id),
         ]);
     }
+
     /**
-     * Creates a new Contact model.
+     * Creates a new Partner model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Contact();
+        $model = new Partner();
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['view', 'id' => $model->name]);
         } else {
             return $this->render('create', [
                 'model' => $model,
@@ -101,43 +75,47 @@ class ContactController extends Controller
     }
 
     /**
-     * Updates an existing Contact model.
+     * Updates an existing Partner model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
+     * @param string $id
      * @return mixed
      */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['view', 'id' => $model->name]);
         } else {
             return $this->render('update', [
                 'model' => $model,
             ]);
         }
     }
+
     /**
-     * Deletes an existing Contact model.
+     * Deletes an existing Partner model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
+     * @param string $id
      * @return mixed
      */
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
+
         return $this->redirect(['index']);
     }
+
     /**
-     * Finds the Contact model based on its primary key value.
+     * Finds the Partner model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return Contact the loaded model
+     * @param string $id
+     * @return Partner the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Contact::findOne($id)) !== null) {
+        if (($model = Partner::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

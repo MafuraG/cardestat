@@ -108,12 +108,12 @@ thead.text-center th {
 }
 
 .navbar-inverse {
-    background-color: #171d7d;
+    background-color: #1f2776;
     border-color: #26153f;
 }
 
 .navbar-inverse .navbar-brand, .navbar-inverse .navbar-nav > li > a {
-    color: #fbd11a;
+    color: #F4CD1A;
 }
 
 .navbar .navbar-header a:hover {
@@ -134,7 +134,7 @@ thead.text-center th {
 }
 
 .navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
-    background-color: #001B4B;
+    background-color: #7B6C4C;
 }
 
 .table tbody tr td.editable {

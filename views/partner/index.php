@@ -6,28 +6,24 @@ use yii\widgets\Pjax;
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('app', 'Properties');
+$this->title = Yii::t('app', 'Partners');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="property-index">
+<div class="partner-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a(Yii::t('app', 'Create Property'), ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a(Yii::t('app', 'Create Partner'), ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 <?php Pjax::begin(); ?>    <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'columns' => [
-            'id',
-            'reference',
-            'entry_date:date',
-            'property_type',
-            'location',
-            'n_bedrooms',
-            'plot_area_m2',
-            'built_area_m2',
+            ['class' => 'yii\grid\SerialColumn'],
+
+            'name',
+
             ['class' => 'yii\grid\ActionColumn'],
-        ]
-    ]) ?>
+        ],
+    ]); ?>
 <?php Pjax::end(); ?></div>

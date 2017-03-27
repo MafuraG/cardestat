@@ -1,7 +1,7 @@
 <?php
 
 use yii\helpers\Html;
-use yii\widgets\ListView;
+use yii\grid\GridView;
 use yii\widgets\Pjax;
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -16,11 +16,19 @@ $this->params['breadcrumbs'][] = $this->title;
     <p>
         <?= Html::a(Yii::t('app', 'Create Contact'), ['create'], ['class' => 'btn btn-success']) ?>
     </p>
-<?php Pjax::begin(); ?>    <?= ListView::widget([
+<?php Pjax::begin(); ?>    <?= GridView::widget([
         'dataProvider' => $dataProvider,
-        'itemOptions' => ['class' => 'item'],
-        'itemView' => function ($model, $key, $index, $widget) {
-            return Html::a(Html::encode($model->id), ['view', 'id' => $model->id]);
-        },
+        'columns' => [
+            'id',
+            'reference',
+            ['attribute' => 'last_name', 'label' => Yii::t('app', 'Name'), 'value' => function($model) {
+                return "{$model->last_name}, {$model->first_name}";
+            }], 'nationality',
+            'type_of_data',
+            'internet',
+            'contact_source',
+            'birth_date:date',
+            ['class' => 'yii\grid\ActionColumn'],
+        ]
     ]) ?>
 <?php Pjax::end(); ?></div>

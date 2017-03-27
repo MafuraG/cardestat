@@ -19,8 +19,8 @@ Select2::widget([
 
 <div class="transaction-index">
   <p>
-  <?= Html::a(Yii::t('app', 'Create'), ['transaction/create'], [
-      'class' => 'btn btn-primary',
+  <?= Html::a(Yii::t('app', 'Create Transaction'), ['transaction/create'], [
+      'class' => 'btn btn-success',
   ]) ?>
   </p>
   <?= $this->render('_search', [

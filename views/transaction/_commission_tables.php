@@ -83,21 +83,24 @@ foreach ($data as $advisor => $advisor_data): ?>
                     <tr>
                   <?php endif; ?>
                   <?php $salePriceEu = $formatter->asDecimal($tc['sale_price_euc'] / 100. ,2);
+                  $seller_url = Url::to(['contact/view', 'id' => $tc['seller_id']]);
+                  $buyer_url = Url::to(['contact/view', 'id' => $tc['buyer_id']]);
+                  $property_url = Url::to(['contact/view', 'id' => $tc['property_id']]);
                   $popoverContent = (
-                    "<dl class=\"text-left\"> " .
+                    "<dl class='text-left'> " .
                     " <dt>$sellerLbl</dt> " .
-                    " <dd><a href=\"#\">{$tc['seller_name']}</a></dd> " .
+                    " <dd><a href='{$seller_url}'>{$tc['seller_name']}</a></dd> " .
                     " <dt>$buyerLbl</dt> " .
-                    " <dd><a href=\"#\">{$tc['buyer_name']}</a></dd> " .
+                    " <dd><a href='{$buyer_url}'>{$tc['buyer_name']}</a></dd> " .
                     " <dt>$propertyLbl</dt> " .
-                    " <dd><a href=\"#\">{$tc['property_reference']}</a></dd> " .
+                    " <dd><a href='{$property_url}'>{$tc['property_reference']}</a></dd> " .
                     " <dt>$salePriceLbl</dt> " .
                     " <dd>{$salePriceEu} €</dd> " .
                     " <dt>$commentsLbl</dt> " .
-                    " <dd>{$tc['attribution_comments']}</dd></dl>"); $popoverContent = str_replace('"', '&quote;', $popoverContent); ?>
-                  <td><button class="btn btn-default btn-xs btn-popover" data-title="<?= Yii::t('app', 'Transaction details') ?>" data-content="<?= $popoverContent ?>" data-toggle="popover" data-placement="bottom" data-html="true" tabindex="0" role="button">
+                    " <dd>{$tc['attribution_comments']}</dd></dl>"); ?>
+                  <td><a class="btn btn-default btn-xs btn-popover" data-title="<?= Yii::t('app', 'Transaction details') ?>" data-content="<?= $popoverContent ?>" data-toggle="popover" data-placement="bottom" data-html="true" tabindex="0" role="button" data-trigger="focus">
                     <span class="glyphicon glyphicon-info-sign">
-                  </span></button> <a href="<?= Url::to(['transaction/view', 'id' => $tc['transaction_id']]) ?>">#<?= $tc['transaction_id']?></a></td>
+                  </span></a> <a href="<?= Url::to(['transaction/view', 'id' => $tc['transaction_id']]) ?>">#<?= $tc['transaction_id']?></a></td>
                   <td class="text-right nowrap">
                     <?php $class = ($tc['total_invoiced_euc'] < $tc['our_fee_euc']) ? 'text-danger' : '' ?>
                     <?php $invoices = mkInvoiceTooltip($tc); ?>
@@ -217,12 +220,5 @@ foreach ($data as $advisor => $advisor_data): ?>
 $script = <<< JS
   $('[data-toggle="tooltip"]').tooltip();
   $('[data-toggle="popover"]').popover();
-  $('body').on('shown.bs.popover', function (e) {
-      $('body').on('click', hidePopovers);
-  });
-  function hidePopovers(e) {
-      $('body').off('click', hidePopovers);
-      $('.popover').popover('hide');
-  }
 JS;
 $this->registerJs($script);
