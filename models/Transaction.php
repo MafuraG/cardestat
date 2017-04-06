@@ -47,7 +47,8 @@ use yii\helpers\ArrayHelper;
  * @property integer $their_fee_euc
  * @property string $payrolled_at
  * @property string $comments
- * @property boolean $approved
+ * @property boolean $approved_by_direction
+ * @property boolean $approved_by_accounting
  * @property string $created_at
  * @property string $updated_at
  *
@@ -102,7 +103,7 @@ class Transaction extends \yii\db\ActiveRecord
             [['first_published_price_eu', 'last_published_price_eu', 'sale_price_eu', 'suggested_sale_price_eu', 'our_fee_eu', 'their_fee_eu'], 'number'],
             [['buyer_id', 'seller_id', 'passed_to_sales_by', 'property_id'], 'integer'],
             [['transaction_type', 'option_signed_at', 'buyer_id', 'seller_id', 'property_id'], 'required'],
-            [['is_new_buyer', 'is_new_seller', 'is_home_staged', 'approved'], 'boolean'],
+            [['is_new_buyer', 'is_new_seller', 'is_home_staged', 'approved_by_direction', 'approved_by_accounting'], 'boolean'],
             [['comments'], 'string'],
             [['transaction_type', 'lead_type'], 'string', 'max' => 18],
             [['custom_type', 'transfer_type', 'development_type', 'buyer_provider', 'seller_provider'], 'string', 'max' => 32],
@@ -155,7 +156,8 @@ class Transaction extends \yii\db\ActiveRecord
             'their_fee_eu' => Yii::t('app', 'Collaborator\'s Fee'),
             'payrolled_at' => Yii::t('app', 'Date Payrolled'),
             'comments' => Yii::t('app', 'Internal Comments'),
-            'approved' => Yii::t('app', 'Approved By Direction'),
+            'approved_by_direction' => Yii::t('app', 'Direc. Apprv.'),
+            'approved_by_accounting' => Yii::t('app', 'Account. Apprv.'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];
@@ -311,14 +313,15 @@ class Transaction extends \yii\db\ActiveRecord
                         ->where(['to_char(payrolled_at, \'yyyy\')' => $year])
                         ->andWhere(['<=', 'to_char(payrolled_at, \'yyyy-mm\')', $month])
                         ->groupBy(['advisor_id'])->createCommand()->queryAll(), 'advisor_id', 'sum');
-                    $attributions = $this->getAttributions()->with('tranches')->all();
+                    $calc_attributions = $this->getCalculatedAttributions()->with('tranches')->all();
                     $transaction_payrolls = [];
-                    foreach ($attributions as $attribution) {
+                    foreach ($calc_attributions as $calc_attribution) {
+                        $attribution = $calc_attribution->attribution;
                         $advisor_id = $attribution->advisor_id;
                         if (!isset($transaction_payrolls[$advisor_id])) {
                             $accumulated_attribution_euc = $accumulated_attributions[$advisor_id];
-                            $tranche = AdvisorTranche::selectTranche($attribution->tranches->toArray(),
-                                $accumulated_attribution_euc);
+                            $tranche = AdvisorTranche::selectTranche(
+                                ArrayHelper::toArray($calc_attribution->tranches), $accumulated_attribution_euc);
                             $transaction_payrolls[$advisor_id] = new TransactionPayroll([
                                 'commission_bp' => $tranche['commission_bp'],
                                 'accumulated_euc' => $accumulated_attribution_euc
@@ -326,10 +329,9 @@ class Transaction extends \yii\db\ActiveRecord
                             if (!$transaction_payrolls[$advisor_id]->save()) {
                                 $msg = var_export($transaction_payrolls[$advisor_id]->errors, 1);
                                 throw new \Exception($msg);
-                            //$transaction_payrolls[$advisor_id]->refresh(); // refresh id attribute?
                             }
                         }
-                        $attribution->amount_euc = $calculated_attribution->amount_euc;
+                        $attribution->amount_euc = $calc_attribution->amount_euc;
                         $attribution->transaction_payroll_id = $transaction_payrolls[$advisor_id]->id;
                         if (!$attribution->save(false)) {
                             $msg = var_export($attribution->errors, 1);

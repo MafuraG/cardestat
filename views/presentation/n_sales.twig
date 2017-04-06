@@ -5,7 +5,7 @@
     }, t('app', 'Salesmeter')]})
 }}
 
-<h1>{{ t('app', 'Salesmeter') }} <small>{{ t('app', 'Accumulated as of') ~ ' ' ~ app.formatter.asDate('now', 'long') }}</small></h1>
+<h1>{{ t('app', 'Salesmeter') | raw }} <small>{{ t('app', 'Accumulated as of') ~ ' ' ~ app.formatter.asDate('now', 'long') }}</small></h1>
 
 {{ pjax_begin() }}
 <p class="text-center">

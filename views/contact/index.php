@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'internet',
             'contact_source',
             'birth_date:date',
-            ['class' => 'yii\grid\ActionColumn'],
+            ['class' => 'yii\grid\ActionColumn', 'contentOptions' => ['class' => 'nowrap']],
         ]
     ]) ?>
 <?php Pjax::end(); ?></div>

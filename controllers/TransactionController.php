@@ -101,7 +101,7 @@ class TransactionController extends Controller
             'marginBottom' => 6,
             'marginLeft' => 3,
             'marginRight' => 2,
-            'cssInline' => '.col-xs-2 { width: 12.87% } .col-xs-8 { width: 62.87%; } .col-xs-4 { width: 29.55%; } ',
+            'cssInline' => '.col-xs-3 { width: 22.0% } .col-xs-2 { width: 12.87% } .col-xs-8 { width: 62.87%; } .col-xs-4 { width: 29.55%; } ',
             'content' => $content,   
         ]);
         return $pdf->render();
@@ -293,6 +293,7 @@ class TransactionController extends Controller
                        $mondat['corrected_commission_bp'] / 10000.;
                $data[$advisor]['corrected_total_commission_euc'] += $mondat['corrected_attribution_euc'] *
                        $mondat['corrected_commission_bp'] / 10000.;
+               $mondat['correction_causes'] = [];
                if ($mondat['commission_bp'] != $mondat['corrected_commission_bp']) {
                    if ($mondat['accumulated_attribution_euc'] ==
                        $mondat['corrected_accumulated_attribution_euc'])
@@ -320,7 +321,6 @@ class TransactionController extends Controller
                $previous_correction_causes = $mondat['correction_causes'];
            }
         }
-        //\yii\helpers\VarDumper::dump($data, 7, true); die;
         return $data;
     }
 }

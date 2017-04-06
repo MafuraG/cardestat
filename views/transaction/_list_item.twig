@@ -8,7 +8,7 @@
   <div class="col-md-3 uppercase">
     <div class="ellipsis">
       <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?modul_name=daten&datensatz=193&inhalt=grunddaten" class="onoffice-icon"></a> 
-      <a data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>{{ model.property_building_complex }}<br>{{ model.property_location }}<br>{{ t('app', 'Ref.') }} {{ model.property_reference }}</div>" href="#">{{ model.property_building_complex }}, {{ model.property_location }}</a>
+      <a data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>{{ model.property_building_complex }}<br>{{ model.property_location }}<br>{{ t('app', 'Ref.') }} {{ model.property_reference }}</div>" href="{{ path({0: 'property/view', id: model.property_id}) }}">{{ model.property_building_complex }}, {{ model.property_location }}</a>
     </div>
   </div>
   <div class="col-md-5 uppercase">
@@ -16,7 +16,7 @@
       <div class="col-md-6 text-right">
         <div class="ellipsis">
           <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?datensatz=33297&seite=0&modul_name=adressen&inhalt=adresse-bearbeiten" class="onoffice-icon"></a> 
-          <a  data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>{{ model.seller_name }}<br>{{ t('app', 'Ref.') }} {{ model.seller_reference }}</div>" href="#">{{ model.seller_name }}</a>
+          <a data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>{{ model.seller_name }}<br>{{ t('app', 'Ref.') }} {{ model.seller_reference }}</div>" href="{{ path({0: 'contact/view', id: model.seller_id}) }}">{{ model.seller_name }}</a>
         </div>
       </div>
       <div class="col-md-1 text-center">
@@ -25,7 +25,7 @@
       <div class="col-md-5">
         <div class="ellipsis">
           <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?datensatz=33297&seite=0&modul_name=adressen&inhalt=adresse-bearbeiten" class="onoffice-icon"></a> 
-          <a data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>{{ model.buyer_name }}<br>{{ t('app', 'Ref.') }} {{ model.buyer_reference }}</div>" href="#">{{ model.buyer_name }}</a>
+          <a data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>{{ model.buyer_name }}<br>{{ t('app', 'Ref.') }} {{ model.buyer_reference }}</div>" href="{{ path({0: 'contact/view', id: model.buyer_id}) }}">{{ model.buyer_name }}</a>
         </div>
       </div>
     </div> 
@@ -76,7 +76,7 @@
   </div>
   <div class="col-md-2 text-right">
     <small class="text-muted">({{ app.formatter.asDecimal(model.our_fee_bp, 2) }}%)</small> {{ app.formatter.asDecimal(model.our_fee_euc/100, 2) }} € &nbsp;
-    {% if (model.approved) %}
+    {% if (model.approved_by_direction) %}
       <span class="text-success glyphicon glyphicon-ok-sign"></span>&nbsp;
     {% else %}
       <span class="text-warning glyphicon glyphicon-alert"></span>&nbsp;

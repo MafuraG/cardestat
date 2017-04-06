@@ -31,6 +31,14 @@ $m2Tpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
         ]]); ?>
 
         <?= $form->field($model, 'n_bedrooms')->textInput(['class' => 'input-sm form-control']) ?>
+        <?= $form->field($model, 'active_date')->widget(DatePicker::classname(), [
+            'options' => ['form' => $form->id],
+            'size' => 'sm',
+            'pluginOptions' => [
+                'autoclose' => true,
+                'format' => 'yyyy-mm-dd',
+            ]
+        ]); ?>
       </div>
       <div class="col-md-6">
         <?= $form->field($model, 'entry_date')->widget(DatePicker::classname(), [
@@ -54,14 +62,7 @@ $m2Tpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
                 'form' => $form->id
         ]]); ?>
 
-        <?= $form->field($model, 'active_date')->widget(DatePicker::classname(), [
-            'options' => ['form' => $form->id],
-            'size' => 'sm',
-            'pluginOptions' => [
-                'autoclose' => true,
-                'format' => 'yyyy-mm-dd',
-            ]
-        ]); ?>
+        <?= $form->field($model, 'units')->textInput(['class' => 'input-sm form-control']) ?>
 
         <?= $form->field($model, 'inactive_date')->widget(DatePicker::classname(), [
             'options' => ['form' => $form->id],

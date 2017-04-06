@@ -155,7 +155,8 @@ class m170303_154953_transactions extends Migration
             'their_fee_euc' => $this->integer(),
             'payrolled_at' => $this->date(),
             'comments' => $this->text(),
-            'approved' => $this->boolean()->notNull()->defaultValue(false),
+            'approved_by_direction' => $this->boolean()->notNull()->defaultValue(false),
+            'approved_by_accounting' => $this->boolean()->notNull()->defaultValue(false),
             'created_at' => $this->timestamp(2)->notNull(),
             'updated_at' => $this->timestamp(2)
         ]);

@@ -26,7 +26,7 @@
     columns: [
         {attribute: 'id', contentOptions: {class: 'id', 'data-id': true}},
         {attribute: 'username', label: t('app', 'Username'), contentOptions: {'data-username': true}},
-        {attribute: 'roles', label: t('app', 'Roles'), content: [this.context, 'renderRoles']},
+        {attribute: 'role', contentOptions: {'data-role': true}},
         {
             class: 'yii\\grid\\ActionColumn',
             contentOptions: {class: 'actions text-center'},
@@ -69,7 +69,7 @@
           {{ form.field(model, 'username', {enableAjaxValidation: true}) | raw }}
           {{ form.field(model, 'password', {validateOnChange: true}).passwordInput() | raw }}
           {{ form.field(model, 'password_repeat', {validateOnChange: true}).passwordInput() | raw }}
-          {{ form.field(model, 'is_admin').checkbox({value: 1}) | raw }}
+          {{ form.field(model, 'role').dropdownList(roles, {prompt: ''}) | raw }}
         {{ active_form_end() }}
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">
@@ -89,7 +89,6 @@ var $userForm = $('#user-form');
 $('.actions .btn-add').on('click', function() {
     $userModal.find('form :input').val('');
     $userModal.find('.has-success').removeClass('.has-success');
-    $userForm.find('input[name="UserForm[is_admin]"]').prop('checked', false);
     $userModal.removeClass('modal-edit').addClass('modal-add');
     $userForm.find('input[name="UserForm[username]"]').attr('readonly', false);
     $userModal.modal('show');
@@ -121,12 +120,8 @@ $('#users').on('click', '.table .actions a[href*="user/update"]', function() {
     $userModal.find('.has-success').removeClass('.has-success');
     $userModal.removeClass('modal-add').addClass('modal-edit');
     $userModal.modal('show');
-    var roles = $.map($(this).closest('tr').find('[data-role]'), function(e) { return $(e).html().trim()});
-    if (roles.indexOf('admin') != -1)
-        $userForm.find('input[name="UserForm[is_admin]"]').prop('checked', true);
-    else 
-        $userForm.find('input[name="UserForm[is_admin]"]').prop('checked', false);
-
+    var role = $.map($(this).closest('tr').find('[data-role]'), function(e) { return $(e).html().trim()});
+    $userForm.find('select[name="UserForm[role]"]').val(role);
     $userForm.find('input[name="UserForm[id]"]')
         .val($(this).closest('tr').find('td[data-id]').html().trim());
     $userForm.find('input[name="UserForm[username]"]').attr('readonly', true)

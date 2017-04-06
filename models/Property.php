@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "property".
@@ -19,6 +21,7 @@ use Yii;
  * @property string $plot_area_m2
  * @property string $built_area_m2
  * @property string $n_bedrooms
+ * @property string $units
  * @property string $created_at
  * @property string $updated_at
  *
@@ -36,13 +39,20 @@ class Property extends \yii\db\ActiveRecord
         return 'property';
     }
 
+    public function behaviors()
+    {
+        return [[
+            'class' => TimestampBehavior::className(),
+            'value' => new Expression('now()')
+        ]];
+    }
+
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['created_at', 'updated_at'], 'required'],
             [['created_at', 'updated_at'], 'safe'],
             [['entry_date', 'active_date', 'inactive_date'], 'date', 'format' => 'yyyy-MM-dd'],
             ['reference', 'string', 'max' => 12],
@@ -51,7 +61,7 @@ class Property extends \yii\db\ActiveRecord
             [['geo_coordinates'], 'string', 'max' => 32],
             [['plot_area_m2', 'built_area_m2'], 'number'],
             [['plot_area_m2', 'built_area_m2'], 'default', 'value' => null],
-            [['n_bedrooms'], 'string', 'max' => 4],
+            [['n_bedrooms', 'units'], 'integer'],
         ];
     }
 
@@ -71,8 +81,11 @@ class Property extends \yii\db\ActiveRecord
             'building_complex' => Yii::t('app', 'Building/Complex'),
             'geo_coordinates' => Yii::t('app', 'Geo Coordinates'),
             'plot_area_m2' => Yii::t('app', 'Plot Area'),
+            'plot_area_dm2' => Yii::t('app', 'Plot Area'),
             'built_area_m2' => Yii::t('app', 'Built Area'),
+            'built_area_dm2' => Yii::t('app', 'Built Area'),
             'n_bedrooms' => Yii::t('app', 'No. Bedrooms'),
+            'units' => Yii::t('app', 'Units'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];

@@ -78,27 +78,30 @@ $yesno = [true => Yii::t('app', 'Yes'), false => Yii::t('app', 'No')]
                     ]
                 ]); ?>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-4">
                 <?php 
                     $advisors = Advisor::listAll();
                     $advisors = array_combine(array_values($advisors), array_values($advisors));
                     echo $form->field($model, 'advisors')
                         ->dropDownList($advisors, ['prompt' => '', 'class' => 'form-control input-sm']) ?>
               </div>
-              <div class="clearfix"></div>
-              <div class="col-md-3">
-                <?= $form->field($model, 'approved')
+              <div class="col-md-4">
+                <?= $form->field($model, 'approved_by_direction')
                     ->dropDownList($yesno, ['prompt' => Yii::t('app', 'All'), 'class' => 'form-control input-sm']) ?>
               </div>
-              <div class="col-md-3">
+              <div class="col-md-4">
+                <?= $form->field($model, 'approved_by_accounting')
+                    ->dropDownList($yesno, ['prompt' => Yii::t('app', 'All'), 'class' => 'form-control input-sm']) ?>
+              </div>
+              <div class="col-md-4">
                 <?= $form->field($model, 'payrolled')
                     ->dropDownList($yesno, ['prompt' => Yii::t('app', 'All'), 'class' => 'form-control input-sm']) ?>
               </div>
-              <div class="col-md-3">
+              <div class="col-md-4">
                 <?= $form->field($model, 'invoiced')
                     ->dropDownList($yesno, ['prompt' => Yii::t('app', 'All'), 'class' => 'form-control input-sm']) ?>
               </div>
-              <div class="col-md-3">
+              <div class="col-md-4">
                 <?= $form->field($model, 'with_collaborator')
                     ->dropDownList($yesno, ['prompt' => Yii::t('app', 'All'), 'class' => 'form-control input-sm']) ?>
               </div>

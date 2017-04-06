@@ -25,8 +25,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'property_type',
             'location',
             'n_bedrooms',
-            'plot_area_m2',
-            'built_area_m2',
+            ['attribute' => 'plot_area_dm2', 'value' => function($model) { return $model->plot_area_m2; }],
+            ['attribute' => 'built_area_dm2', 'value' => function($model) { return $model->built_area_m2; }],
             ['class' => 'yii\grid\ActionColumn'],
         ]
     ]) ?>

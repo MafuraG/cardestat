@@ -6,7 +6,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model app\models\Property */
 
-$this->title = $model->id;
+$this->title = "$model->property_type $model->reference";
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Properties'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -37,11 +37,12 @@ $this->params['breadcrumbs'][] = $this->title;
             'location',
             'building_complex',
             'geo_coordinates',
-            'created_at',
-            'updated_at',
             'n_bedrooms',
+            'units',
             'plot_area_dm2',
             'built_area_dm2',
+            'created_at',
+            'updated_at',
         ],
     ]) ?>
 

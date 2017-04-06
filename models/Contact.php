@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "contact".
@@ -33,13 +35,20 @@ class Contact extends \yii\db\ActiveRecord
         return 'contact';
     }
 
+    public function behaviors()
+    {
+        return [[
+            'class' => TimestampBehavior::className(),
+            'value' => new Expression('now()')
+        ]];
+    }
+
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['reference', 'created_at', 'updated_at'], 'required'],
             [['created_at', 'updated_at'], 'safe'],
             ['birth_date', 'date', 'format' => 'YYYY-mm-dd'],
             [['reference'], 'string', 'max' => 20],

@@ -9,8 +9,8 @@ use yii\widgets\ActiveForm;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\web\HttpException;
+use app\models\AuthItem;
 use app\models\User;
-use app\models\UserExtended;
 use app\models\UserForm;
 
 class UserController extends Controller {
@@ -41,13 +41,15 @@ class UserController extends Controller {
     }
     public function actionIndex() {
         $model = new UserForm();
-        $query = UserExtended::find();
+        $query = User::find();
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
         $dataProvider->sort->route = 'user/index';
+        $roles = AuthItem::listRoles();
         return $this->render('index.twig', [
             'model' => $model,
+            'roles' => $roles,
             'dataProvider' => $dataProvider,
         ]);
     }
@@ -101,9 +103,9 @@ class UserController extends Controller {
                 throw new HttpException(500, \Yii::t('app', 'Could not save the user'));
 
             $auth = \Yii::$app->authManager;
-            $admin = $auth->getRole('admin');
-            if ($model->is_admin) $auth->assign($admin, $user->id);
-            else $auth->revoke($admin, $user->id);
+            $role = $auth->getRole($model->role);
+            if ($role) $auth->assign($role, $user->id);
+            else $auth->revokeAll($user->id);
 
             $this->layout = false;
             return $this->actionIndex();

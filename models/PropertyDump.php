@@ -18,6 +18,7 @@ use Yii;
  * @property string $plot_area_m2
  * @property string $built_area_m2
  * @property string $n_bedrooms
+ * @property string $units
  */
 class PropertyDump extends \yii\db\ActiveRecord
 {
@@ -41,6 +42,7 @@ class PropertyDump extends \yii\db\ActiveRecord
             [['geo_coordinates'], 'string', 'max' => 32],
             [['plot_area_m2', 'built_area_m2'], 'string', 'max' => 8],
             [['n_bedrooms'], 'string', 'max' => 4],
+            [['units'], 'string', 'max' => 3],
         ];
     }
 
@@ -61,6 +63,7 @@ class PropertyDump extends \yii\db\ActiveRecord
             'plot_area_m2' => Yii::t('app', 'Plot Area'),
             'built_area_m2' => Yii::t('app', 'Built Area'),
             'n_bedrooms' => Yii::t('app', 'No. Bedrooms'),
+            'units' => Yii::t('app', 'Units'),
         ];
     }
 }

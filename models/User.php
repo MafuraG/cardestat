@@ -66,4 +66,17 @@ class User extends ActiveRecord implements \yii\web\IdentityInterface
     public function validatePassword($password) {
         return \Yii::$app->getSecurity()->validatePassword($password, $this->hash);
     }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRoles()
+    {
+        return $this->hasMany(AuthItem::className(), ['name' => 'item_name'])
+            ->where(['type' => 1])
+            ->viaTable('auth_assignment', ['user_id' => 'id']);
+    }
+    public function getRole()
+    {
+        if (!empty($this->roles[0])) return $this->roles[0]->name;
+    }
 }

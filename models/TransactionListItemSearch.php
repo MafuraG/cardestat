@@ -25,7 +25,7 @@ class TransactionListItemSearch extends TransactionListItem
     {
         return [
             [['transaction_type', 'advisors', 'option_signed_from', 'option_signed_to', 'search_any', 'first_invoiced_from', 'first_invoiced_to'], 'safe'],
-            [['approved', 'payrolled', 'invoiced', 'with_collaborator'], 'boolean'],
+            [['approved_by_direction', 'approved_by_accounting', 'payrolled', 'invoiced', 'with_collaborator'], 'boolean'],
         ];
     }
 
@@ -49,7 +49,6 @@ class TransactionListItemSearch extends TransactionListItem
             'first_invoiced_from' => Yii::t('app', 'First Invoiced From'),
             'first_invoiced_to' => Yii::t('app', 'First Invoiced To'),
             'search_any' => Yii::t('app', 'Search Any'),
-            'approved' => Yii::t('app', 'Approved'),
             'payrolled' => Yii::t('app', 'Payrolled'),
             'with_collaborator' => Yii::t('app', 'Collaborator'),
             'invoiced' => Yii::t('app', 'Invoiced'),
@@ -103,7 +102,8 @@ class TransactionListItemSearch extends TransactionListItem
         $query->andFilterWhere([
             'like', 'advisors', $this->advisors,
             ['transaction_type' => $this->transaction_type],
-            ['approved' => $this->approved],
+            ['approved_by_accounting' => $this->approved_by_accounting],
+            ['approved_by_direction'=> $this->approved_by_direction],
             ['payrolled' => $this->payrolled],
             ['invoiced' => $this->invoiced],
             ['with_collaborator' => $this->with_collaborator]

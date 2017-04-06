@@ -28,7 +28,7 @@ class m170221_133734_contacts extends Migration
             'birth_date' => $this->string(20),
             'country_of_residence' => $this->string(42),
             'created_at' => $this->timestamp(2)->notNull(),
-            'updated_at' => $this->timestamp(2)->notNull()
+            'updated_at' => $this->timestamp(2)
         ]);
         $this->createTable('property_dump', [
             'reference' => $this->string(12),
@@ -41,7 +41,8 @@ class m170221_133734_contacts extends Migration
             'geo_coordinates' => $this->string(32),
             'plot_area_m2' => $this->string(8),
             'built_area_m2' => $this->string(8),
-            'n_bedrooms' => $this->string(4)
+            'n_bedrooms' => $this->string(4),
+            'units' => $this->string(3),
         ]);
         $this->createTable('property', [
             'id' => $this->primaryKey(),
@@ -56,8 +57,9 @@ class m170221_133734_contacts extends Migration
             'plot_area_dm2' => $this->integer(),
             'built_area_dm2' => $this->integer(),
             'n_bedrooms' => $this->smallInteger(),
+            'units' => $this->smallInteger(),
             'created_at' => $this->timestamp(2)->notNull(),
-            'updated_at' => $this->timestamp(2)->notNull()
+            'updated_at' => $this->timestamp(2)
         ]);
         $this->batchInsert('configuration', ['category', 'name', 'value'], [[
             'FTP_ONOFFICE',
@@ -93,6 +95,10 @@ class m170221_133734_contacts extends Migration
             '8',
         ], [
             'ONOFFICE_CSV2PROPERTY',
+            'units',
+            '23',
+        ], [
+            'ONOFFICE_CSV2PROPERTY',
             'property_type',
             '38',
         ], [
@@ -113,8 +119,8 @@ class m170221_133734_contacts extends Migration
             '97',
         ], [
             'ONOFFICE_CSV2PROPERTY',
-            '98',
             'built_area_m2',
+            '98',
         ], [
             'ONOFFICE_CSV2PROPERTY',
             'n_bedrooms',
@@ -239,6 +245,7 @@ class m170221_133734_contacts extends Migration
     }
     public function safeDown() {
         $this->delete('configuration', ['category' => 'ONOFFICE_CSV2CONTACT']);
+        $this->delete('configuration', ['category' => 'ONOFFICE_CSV2PROPERTY']);
         $this->delete('configuration', ['category' => 'FTP_ONOFFICE']);
         $this->dropTable('property');
         $this->dropTable('property_dump');

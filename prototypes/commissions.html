@@ -18,6 +18,9 @@
     td.nowrap {
       white-space: nowrap;
     }
+    .popover {
+      max-width: 500px;
+    }
     .popover-content dl {
       margin-bottom: 0;
     }
@@ -136,7 +139,7 @@
       <div class="col-xs-6 col-md-3">
         <div class="thumbnail text-center">
           <h5>Facturado</h5>
-          <h4>828.300,00 €</h4>
+          <h4><small>828.300,00 <span class="text-danger">- 100.000,00 </span> = </small>728.300,00 €</h4>
         </div>
       </div>
       <div class="col-xs-6 col-md-3">
@@ -173,12 +176,12 @@
         </div>
         <div class="col-md-12">
           <table class="table table-condensed">
-            <thead><tr><th>Nómina</th><th>Transacción</th><th>Facturado</th><th>Hon. Cárdenas</th><th>Hon. Colab.</th><th>Oficina</th><th>Tipo atribución</th><th>Atribución</th><th>Total atrib.</th><th>Acumulado</th><th>Tramo</th><th>Comisión</th><th>Corrección</th></tr></thead>
+            <thead><tr><th>Nómina</th><th>Transacción</th><th>Facturado</th><th>Hon. Cárdenas</th><th>Hon. Colab.</th><th>Oficina</th><th>Tipo atribución</th><th>Atribución</th><th>Total atrib.</th><th>Acumulado</th><th>Tramo</th><th>Comisión</th><th>Diferencia</th></tr></thead>
                   <tbody>
-                    <tr><td rowspan="2"><h4><span class="label label-danger">ene '17</span></h4></td><td><button class="btn btn-default btn-xs btn-popover"><span class="glyphicon glyphicon-info-sign"></span></button> <a href="#">#234</a></td><td class="text-right"><span class="badge">1</span> <span class="text-danger">7.000,00 €</span></td><td class="text-right">10.000,00 €</td><td class="text-right">0 €</td><td>Arguineguín</td><td class="text-center">CAPTACIÓN 30%</td><td class="text-right">2.100,00 €</td><td rowspan="2" class="text-right text-success">9.100,00 €</td><td rowspan="2" class="text-right">9.177,00 €</td><td class="text-center" rowspan="2"><span class="label label-success">20%</span></td><td class="nowrap"><h4 class="pull-right">1.820,00 €</h4></td><td class="text-right text-danger">-10,00 €</td></tr> 
+                    <tr><td rowspan="2"><h4><span class="label label-danger">ene '17</span></h4></td><td><a class="btn btn-default btn-xs btn-popover"><span class="glyphicon glyphicon-info-sign"></span></a> <a href="#">#234</a></td><td class="text-right"><span class="badge">1</span> <span class="text-danger">7.000,00 €</span></td><td class="text-right">10.000,00 €</td><td class="text-right">0 €</td><td>Arguineguín</td><td class="text-center">CAPTACIÓN 30%</td><td class="text-right">2.100,00 €</td><td rowspan="2" class="text-right text-success">9.100,00 €</td><td rowspan="2" class="text-right">9.177,00 €</td><td class="text-center" rowspan="2"><span class="label label-success">20%</span></td><td class="nowrap"><h4 class="pull-right">1.820,00 €</h4></td><td class="text-left"><a class="btn btn-default btn-xs btn-popover2"><span class="glyphicon glyphicon-info-sign"></span></a> <span class="pull-right text-danger">-10,00 €</span></td></tr> 
                     <tr><td><button class="btn btn-default btn-xs btn-popover"><span class="glyphicon glyphicon-info-sign"></span></button> <a href="#">#141</a></td><td class="text-right nowrap"><span class="badge">2</span> 20.000,00 €</td><td class="text-right">10.000,00 €</td><td class="text-right">10.000,00 €</td><td>Puerto Rico</td><td class="text-center">VENTA 70%</td><td class="text-right">7.000,00 €</td></tr> 
-                    <tr><td><h4><span class="label label-danger">dic '16</span></h4></td><td><button class="btn btn-default btn-xs btn-popover"><span class="glyphicon glyphicon-info-sign"></span></button> <a href="#">#130</a></td><td class="text-right"><span class="badge">1</span> 700,00 €</td><td class="text-right">700,00 €</td><td class="text-right">0 €</td><td>Arguineguín</td><td class="text-center">ALQUILER 25%</td><td class="text-right">175,00 €</td><td class="text-right text-success">49,00 €</td><td class="text-right">77,00 €</td><td class="text-center"><span class="label label-success">20%</span></td><td class="nowrap"><h4 class="pull-right">9,80 €</h4></td><td class="text-right">0,00 €</td></tr></tbody>
-                    <tr><td><h4><span class="label label-danger">oct '16</span></h4></td><td><button class="btn btn-default btn-xs btn-popover"><span class="glyphicon glyphicon-info-sign"></span></button> <a href="#">#117</a></td><td class="text-right"><span class="badge">1</span> 6.000,00 €</td><td class="text-right">4.000,00 €</td><td class="text-right">2.000,00 €</td><td>Arguineguín</td><td class="text-center">VENTA 70%</td><td class="text-right">2.800,00 €</td><td class="text-right text-success">28,00 €</td><td class="text-right">28,00 €</td><td class="text-center"><span class="label label-success">20%</span></td><td class="nowrap"><h4 class="pull-right">5,60 €</h4></td><td class="text-right">0,00 €</td></tr></tbody>
+                    <tr><td><h4><span class="label label-danger">dic '16</span></h4></td><td><button class="btn btn-default btn-xs btn-popover2"><span class="glyphicon glyphicon-info-sign"></span></button> <a href="#">#130</a></td><td class="text-right"><span class="badge">1</span> 700,00 €</td><td class="text-right">700,00 €</td><td class="text-right">0 €</td><td>Arguineguín</td><td class="text-center">ALQUILER 25%</td><td class="text-right">175,00 €</td><td class="text-right text-success">49,00 €</td><td class="text-right">77,00 €</td><td class="text-center"><span class="label label-success">20%</span></td><td class="nowrap"><h4 class="pull-right">9,80 €</h4></td><td class="text-right"><button class="pull-left btn btn-default btn-xs btn-popover2"><span class="glyphicon glyphicon-info-sign"></span></button>0,00 €</td></tr></tbody>
+                    <tr><td><h4><span class="label label-danger">oct '16</span></h4></td><td><button class="btn btn-default btn-xs btn-popover"><span class="glyphicon glyphicon-info-sign"></span></button> <a href="#">#117</a></td><td class="text-right"><span class="badge">1</span> 6.000,00 €</td><td class="text-right">4.000,00 €</td><td class="text-right">2.000,00 €</td><td>Arguineguín</td><td class="text-center">VENTA 70%</td><td class="text-right">2.800,00 €</td><td class="text-right text-success">28,00 €</td><td class="text-right">28,00 €</td><td class="text-center"><span class="label label-success">20%</span></td><td class="nowrap"><h4 class="pull-right">5,60 €</h4></td><td class="text-right"><button class="pull-left btn btn-default btn-xs btn-popover2"><span class="glyphicon glyphicon-info-sign"></span></button>0,00 €</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -199,11 +202,11 @@
           <table class="table table-condensed">
             <thead><tr><th>Nómina</th><th>Transacción</th><th>Facturado</th><th>Hon. Cárdenas</th><th>Hon. Colab.</th><th>Oficina</th><th>Tipo atribución</th><th>Atribución</th><th>Total</th><th>Acumulado</th><th>Tramo</th><th>Comisión</th><th>Corrección</th></tr></thead>
                   <tbody>
-                    <tr><td rowspan="2"><h4><span class="label label-danger">ene '17</span></h4></td><td><button class="btn btn-default btn-xs btn-popover"><span class="glyphicon glyphicon-info-sign"></span></button> <a href="#">#217</a></td><td class="text-right"><span class="badge">1</span> 8.300,00 €</td><td class="text-right">8.300,00 €</td><td class="text-right">0 €</td><td>Pto. Mogán</td><td class="text-center">CAPTACIÓN 30%</td><td class="text-right">2.490,00 €</td><td rowspan="2" class="text-right text-success">5.790,00 €</td><td rowspan="2" class="text-right">16.780,00 €</td><td rowspan="2" class="text-center"><span class="label label-success">21%</span></td><td rowspan="2"><h4 class="pull-right" >1215,90 €</h4></td><td rowspan="2" class="text-right">0,00 €</td></tr> 
+                    <tr><td rowspan="2"><h4><span class="label label-danger">ene '17</span></h4></td><td><button class="btn btn-default btn-xs btn-popover"><span class="glyphicon glyphicon-info-sign"></span></button> <a href="#">#217</a></td><td class="text-right"><span class="badge">1</span> 8.300,00 €</td><td class="text-right">8.300,00 €</td><td class="text-right">0 €</td><td>Pto. Mogán</td><td class="text-center">CAPTACIÓN 30%</td><td class="text-right">2.490,00 €</td><td rowspan="2" class="text-right text-success">5.790,00 €</td><td rowspan="2" class="text-right">16.780,00 €</td><td rowspan="2" class="text-center"><span class="label label-success">21%</span></td><td rowspan="2"><h4 class="pull-right" >1215,90 €</h4></td><td rowspan="2" class="text-right"><button class="pull-left btn btn-default btn-xs btn-popover"><span class="glyphicon glyphicon-info-sign"></span></button>0,00 €</td></tr> 
                     <tr><td><button class="btn btn-default btn-xs btn-popover"><span class="glyphicon glyphicon-info-sign"></span></button> <a href="#">#209</a></td><td class="text-right"><span class="badge">2</span> 11.000,00 €</td><td class="text-right">5.500,00 €</td><td class="text-right">5.500,00 €</td><td>Puerto Rico</td><td class="text-center">CAPTACIÓN 30%</td><td class="text-right">3.300,00 €</td></tr> 
-                    <tr><td rowspan="2"><h4><span class="label label-danger">dic '16</span></h4></td><td><button class="btn btn-default btn-xs btn-popover"><span class="glyphicon glyphicon-info-sign"></span></button> <a href="#">#200</a></td><td class="text-right"><span class="badge">1</span> <span class="text-danger">1.900,00 €</span></td><td class="text-right">4.900,00 €</td><td class="text-right">0 €</td><td>Arguineguín</td><td class="text-center">CAPTACIÓN 30%</td><td class="text-right">1.470,00 €</td><td rowspan="2" class="text-right text-success">8.470,00 €</td><td rowspan="2" class="text-right">10.990,00 €</td><td class="text-center" rowspan="2"><span class="label label-success">21%</span></td><td rowspan="2"><h4 class="pull-right" >1778,70 €</h4></td><td rowspan="2" class="text-right">0,00 €</td></tr> 
+                    <tr><td rowspan="2"><h4><span class="label label-danger">dic '16</span></h4></td><td><button class="btn btn-default btn-xs btn-popover"><span class="glyphicon glyphicon-info-sign"></span></button> <a href="#">#200</a></td><td class="text-right"><span class="badge">1</span> <span class="text-danger">1.900,00 €</span></td><td class="text-right">4.900,00 €</td><td class="text-right">0 €</td><td>Arguineguín</td><td class="text-center">CAPTACIÓN 30%</td><td class="text-right">1.470,00 €</td><td rowspan="2" class="text-right text-success">8.470,00 €</td><td rowspan="2" class="text-right">10.990,00 €</td><td class="text-center" rowspan="2"><span class="label label-success">21%</span></td><td rowspan="2"><h4 class="pull-right" >1778,70 €</h4></td><td rowspan="2" class="text-right"><button class="pull-left btn btn-default btn-xs btn-popover"><span class="glyphicon glyphicon-info-sign"></span></button>0,00 €</td></tr> 
                     <tr><td><button class="btn btn-default btn-xs btn-popover"><span class="glyphicon glyphicon-info-sign"></span></button> <a href="#">#192</a></td><td class="text-right"><span class="badge">2</span> 10.000,00 €</td><td class="text-right">10.000,00 €</td><td class="text-right">0 €</td><td>Puerto Rico</td><td class="text-center">VENTA 70%</td><td class="text-right">7.000,00 €</td></tr> 
-                    <tr><td><h4><span class="label label-danger">oct '16</span></h4></td><td><button class="btn btn-default btn-xs btn-popover"><span class="glyphicon glyphicon-info-sign"></span></button> <a href="#">#134</a></td><td class="text-right"><span class="badge">1</span> 3.600,00 €</td><td class="text-right">1.800,00 €</td><td class="text-right">1.800,00 €</td><td>Pto. Mogán</td><td class="text-center">VENTA 70%</td><td class="text-right">2.520,00 €</td><td class="text-right text-success">2.520,00 €</td><td class="text-right">2.520,00 €</td><td class="text-center"><span class="label label-success">21%</span></td><td><h4 class="pull-right">529,20 €</h4></td><td class="text-right text-primary">+18,00 €</td></tr></tbody>
+                    <tr><td><h4><span class="label label-danger">oct '16</span></h4></td><td><button class="btn btn-default btn-xs btn-popover"><span class="glyphicon glyphicon-info-sign"></span></button> <a href="#">#134</a></td><td class="text-right"><span class="badge">1</span> 3.600,00 €</td><td class="text-right">1.800,00 €</td><td class="text-right">1.800,00 €</td><td>Pto. Mogán</td><td class="text-center">VENTA 70%</td><td class="text-right">2.520,00 €</td><td class="text-right text-success">2.520,00 €</td><td class="text-right">2.520,00 €</td><td class="text-center"><span class="label label-success">21%</span></td><td><h4 class="pull-right">529,20 €</h4></td><td class="text-right text-primary"><button class="pull-left btn btn-default btn-xs btn-popover"><span class="glyphicon glyphicon-info-sign"></span></button>+18,00 €</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -223,6 +226,62 @@
   </div>
   <br>
   * La corrección indica cómo cambiaría la nómina si se hiciera ahora, p.ej. +10,00 € significa que la nómina hoy incluiría 10 € más, que se deberán incluir en una nómina posterior.
+  <div id="diff-correc" class="hidden">
+    <table class="table table-condensed">
+      <thead><tr>
+        <th>Concepto</th><th>Corrección</th><th>Compensación</th><th>Nómina</th>
+      </tr></thead>
+      <tbody><tr>
+        <td>Cambio en tramos</td>
+        <td class="text-right">-10,00 €</td>
+        <td class="text-right">0,00 €</td>
+        <td>ene '17</td>
+      </tr></tbody>
+    </table>
+    <form class="form">
+      <legend>Nueva corrección</legend>
+      <div class="row">
+        <div class="col-sm-4"> 
+          <div class="form-group">
+            <label>Corrección</label>
+            <div class="input-group">
+              <input class="form-control input-sm text-right">
+              <span class="input-group-addon">€</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4"> 
+          <div class="form-group">
+            <label>Compensación</label>
+            <div class="input-group">
+              <input class="form-control input-sm text-right">
+              <span class="input-group-addon">€</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4"> 
+          <div class="form-group">
+            <label>Nómina</label>
+            <div class="input-group">
+              <input class="form-control input-sm text-right">
+              <span class="input-group-addon"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></span>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-12"> 
+          <div class="form-group">
+            <label>Motivo</label>
+            <input class="form-control input-sm ">
+          </div>
+        </div>
+        <div class="col-sm-12"> 
+          <div class="form-group">
+            <button class="btn btn-primary btn-sm">Enviar</button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
   <script>
     /*
     $('.glyphicon-info-sign').on('click', function() {
@@ -234,14 +293,26 @@
     $(function () {
       $('.btn-popover')
          .attr('role', 'button')
-         .attr('tabindex', 0)
+         .attr('tabindex', '0')
          .attr('data-title', 'Detalles de la transacción')
          .attr('data-content', '<dl class="text-left"><dt>Vendedor</dt><dd><a href="#">WARREN T. BUFFET</a></dd><dt>Comprador</dt><dd><a href="#">CHARLES T. MUNGER</a></dd><dt>Propiedad</dt><dd><a href="#">GUACIMARA 27, LOMA DOS</a></dd><dt>Precio venta</dt><dd>120.000,00 €</dd><dt>Comentarios</dt><dd>Comentarios para el asesor...</dd></dl>')
          .attr('data-toggle', 'popover')
          .attr('data-placement', 'bottom')
          .attr('data-html', true)
          .attr('data-trigger', 'focus');
-      $('body').popover({selector: '[data-toggle="popover"]'});
+      $('.btn-popover2')
+         .attr('role', 'button')
+         .attr('tabindex', '0')
+         .attr('data-title', 'Diferencias y correcciones<button type="button" class="close" onclick="$(\'.btn-popover2\').popover(\'hide\')">&times;</button>')
+         .attr('data-content', $('#diff-correc').html())
+         .attr('data-toggle', 'popover')
+         .attr('data-placement', 'left')
+         .attr('data-html', true)
+         .attr('data-trigger', 'click');
+      //$('body').popover({selector: '[data-toggle="popover"]'});
+      $('.btn-popover').popover();
+      $('.btn-popover2').popover();
+      /*
       $('body').on('shown.bs.popover', function (e) {
         $('body').on('click', hidePopovers);
       });
@@ -249,6 +320,7 @@
         $('.popover').popover('hide');
         $('body').off('click', hidePopovers);
       }
+      */
       $('.badge').attr('role', 'button')
           .attr('data-toggle', 'tooltip')
           .attr('title', function() {

@@ -17,7 +17,7 @@ class UserForm extends Model
     public $username;
     public $password;
     public $password_repeat;
-    public $is_admin = false;
+    public $role;
     private $_user = false;
 
 
@@ -38,7 +38,7 @@ class UserForm extends Model
             [['username', 'password', 'password_repeat'], 'required', 'on' => 'create'],
             ['password_repeat', 'compare', 'compareAttribute' => 'password', 'message' => \Yii::t('app', 'Passwords don\'t match')],
             // rememberMe must be a boolean value
-            ['is_admin', 'boolean'],
+            ['role', 'exist', 'targetAttribute' => 'name', 'targetClass' => 'app\models\AuthItem'],
             // password is validated by validatePassword()
         ];
     }

@@ -98,6 +98,14 @@ class Attribution extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getTranches()
+    {
+        return $this->hasMany(AdvisorTranche::className(), ['advisor_id' => 'advisor_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getAttributionType()
     {
         return $this->hasOne(AttributionType::className(), ['id' => 'attribution_type_id']);
