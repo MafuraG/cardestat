@@ -108,17 +108,14 @@ $yesno = [true => Yii::t('app', 'Yes'), false => Yii::t('app', 'No')]
               <div class="clearfix"></div>
               <div class="col-md-9">
                 <div class="form-group">
-                  <label><?= Yii::t('app', 'Order by') ?></label><br>
+                  <label><?= Yii::t('app', 'Order by') ?></label>
                   <div class="input-group">
-                    <span class="input-group-addon"></span>
-                    <div class="input-group-btn">
-                      <select name="sort" class="input-sm form-control">
-                        <option data-value="option_signed_at" selected value="-option_signed_at"><?= $model->getAttributeLabel('option_signed_at') ?></option>
-                        <option data-value="first_invoiced_at" value="-first_invoiced_at"><?= $model->getAttributeLabel('first_invoiced_at') ?></option>
-                        <option data-value="sale_price_euc" value="-sale_price_euc"><?= $model->getAttributeLabel('sale_price_euc') ?></option>
-                      </select>
-                    </div>
-                    <select name="direction" class="input-sm form-control">
+                    <select name="sort" class="input-sm form-control" style="float: left; width: initial">
+                      <option data-value="option_signed_at" selected value="-option_signed_at"><?= $model->getAttributeLabel('option_signed_at') ?></option>
+                      <option data-value="first_invoiced_at" value="-first_invoiced_at"><?= $model->getAttributeLabel('first_invoiced_at') ?></option>
+                      <option data-value="sale_price_euc" value="-sale_price_euc"><?= $model->getAttributeLabel('sale_price_euc') ?></option>
+                    </select>
+                    <select name="direction" class="input-sm form-control" style="float: left; width: initial">
                       <option value=""><?= Yii::t('app', 'Asc') ?></option>
                       <option selected value="-"><?= Yii::t('app', 'Desc') ?></option>
                     </select>

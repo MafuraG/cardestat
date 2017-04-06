@@ -88,43 +88,43 @@ class m170221_133734_contacts extends Migration
         ], [
             'ONOFFICE_CSV2PROPERTY',
             'active_date',
-            '7',
-        ], [
-            'ONOFFICE_CSV2PROPERTY',
-            'inactive_date',
             '8',
         ], [
             'ONOFFICE_CSV2PROPERTY',
+            'inactive_date',
+            '9',
+        ], [
+            'ONOFFICE_CSV2PROPERTY',
             'units',
-            '23',
+            '25',
         ], [
             'ONOFFICE_CSV2PROPERTY',
             'property_type',
-            '38',
+            '40',
         ], [
             'ONOFFICE_CSV2PROPERTY',
             'location',
-            '46',
+            '48',
         ], [
             'ONOFFICE_CSV2PROPERTY',
             'building_complex',
-            '47',
+            '49',
         ], [
             'ONOFFICE_CSV2PROPERTY',
             'geo_coordinates',
-            '51',
+            '53',
         ], [
             'ONOFFICE_CSV2PROPERTY',
             'plot_area_m2',
-            '97',
+            '96',
         ], [
             'ONOFFICE_CSV2PROPERTY',
             'built_area_m2',
-            '98',
+            '97',
         ], [
             'ONOFFICE_CSV2PROPERTY',
             'n_bedrooms',
-            '103',
+            '102',
         ], [
             'ONOFFICE_CSV2CONTACT',
             'first_name',

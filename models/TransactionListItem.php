@@ -73,7 +73,7 @@ class TransactionListItem extends Transaction
             [['id', 'first_published_price_euc', 'last_published_price_euc', 'sale_price_euc', 'buyer_id', 'seller_id', 'suggested_sale_price_euc', 'passed_to_sales_by', 'property_id', 'our_fee_euc', 'their_fee_euc', 'sale_duration', 'n_invoices', 'our_fee_bp'], 'integer'],
             [['first_published_at', 'last_published_at', 'option_signed_at', 'search_started_at', 'payrolled_at', 'created_at', 'updated_at', 'first_invoiced_at'], 'safe'],
             [['is_new_buyer', 'is_new_seller', 'is_home_staged', 'approved_by_direction', 'approved_by_accounting', 'cardenas100'], 'boolean'],
-            [['comments', '?column?', 'seller_name', 'buyer_name', 'advisors'], 'string'],
+            [['comments', 'seller_name', 'buyer_name', 'advisors'], 'string'],
             [['transaction_type', 'lead_type'], 'string', 'max' => 18],
             [['custom_type', 'transfer_type', 'development_type', 'buyer_provider', 'seller_provider'], 'string', 'max' => 32],
             [['property_location'], 'string', 'max' => 48],

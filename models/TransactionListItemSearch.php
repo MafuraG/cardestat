@@ -32,12 +32,6 @@ class TransactionListItemSearch extends TransactionListItem
     /**
      * @inheritdoc
      */
-    public function scenarios()
-    {
-        // bypass scenarios() implementation in the parent class
-        return Model::scenarios();
-    }
-
     /**
      * @inheritdoc
      */
@@ -99,21 +93,21 @@ class TransactionListItemSearch extends TransactionListItem
         $query->andFilterWhere(
             ['between', 'first_invoiced_at', $this->first_invoiced_from, $this->first_invoiced_to]);
 
+        //\yii\helpers\VarDumper::dump($this->transaction_type, 9, true); die;
+        $query->andFilterWhere(['like', 'advisors', $this->advisors]);
         $query->andFilterWhere([
-            'like', 'advisors', $this->advisors,
-            ['transaction_type' => $this->transaction_type],
-            ['approved_by_accounting' => $this->approved_by_accounting],
-            ['approved_by_direction'=> $this->approved_by_direction],
-            ['payrolled' => $this->payrolled],
-            ['invoiced' => $this->invoiced],
-            ['with_collaborator' => $this->with_collaborator]
+            'transaction_type' => $this->transaction_type,
+            'approved_by_accounting' => $this->approved_by_accounting,
+            'approved_by_direction'=> $this->approved_by_direction,
+            'payrolled' => $this->payrolled,
+            'invoiced' => $this->invoiced,
+            'with_collaborator' => $this->with_collaborator
         ]);
 
         $search_id = null;
         if (intval($this->search_any)) $search_id = intval($this->search_any);
         $query->andFilterWhere(['or', 
             ['id' => $search_id],
-            ['ilike', 'transaction_type', $this->search_any],
             ['ilike', 'custom_type', $this->search_any],
             ['ilike', 'transfer_type', $this->search_any],
             ['ilike', 'development_type', $this->search_any],
