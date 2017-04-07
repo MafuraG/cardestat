@@ -98,8 +98,7 @@ class Transaction extends \yii\db\ActiveRecord
     {
         return [
             ['external_id', 'unique'],
-            [['first_published_at', 'last_published_at', 'option_signed_at', 'search_started_at', 'payrolled_at'], 'safe'],
-            ['payrolled_at', 'date', 'format' => 'YYYY-mm-dd'],
+            [['first_published_at', 'last_published_at', 'option_signed_at', 'search_started_at', 'payrolled_at'], 'date', 'format' => 'yyyy-MM-dd'],
             [['first_published_price_eu', 'last_published_price_eu', 'sale_price_eu', 'suggested_sale_price_eu', 'our_fee_eu', 'their_fee_eu'], 'number'],
             [['buyer_id', 'seller_id', 'passed_to_sales_by', 'property_id'], 'integer'],
             [['transaction_type', 'option_signed_at', 'buyer_id', 'seller_id', 'property_id'], 'required'],

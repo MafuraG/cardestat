@@ -12,14 +12,14 @@ use Yii;
  * @property string $payrolled_at
  * @property string $total_attributed_sum_corrected_euc
  */
-class TransactionAttributionCorrectedSummary extends \yii\db\ActiveRecord
+class TransactionAttributionCalculatedSummary extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'transaction_attribution_corrected_summary';
+        return 'transaction_attribution_calculated_summary';
     }
 
     /**
@@ -30,7 +30,7 @@ class TransactionAttributionCorrectedSummary extends \yii\db\ActiveRecord
         return [
             [['transaction_id', 'advisor_id'], 'integer'],
             [['payrolled_at'], 'safe'],
-            [['total_attributed_sum_corrected_euc'], 'number'],
+            [['total_attributed_sum_calculated_euc'], 'number'],
         ];
     }
 
@@ -43,7 +43,7 @@ class TransactionAttributionCorrectedSummary extends \yii\db\ActiveRecord
             'transaction_id' => Yii::t('app', 'Transaction ID'),
             'advisor_id' => Yii::t('app', 'Advisor ID'),
             'payrolled_at' => Yii::t('app', 'Payrolled At'),
-            'total_attributed_sum_corrected_euc' => Yii::t('app', 'Total Attributed Sum Corrected Euc'),
+            'total_attributed_sum_calculated_euc' => Yii::t('app', 'Total Attributed Sum Calculated Euc'),
         ];
     }
 }

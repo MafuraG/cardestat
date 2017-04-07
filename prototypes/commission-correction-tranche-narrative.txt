@@ -1,0 +1,16 @@
+Basándonos en un caso inventado, te comento sobre la captura "antes":
+
+* la nómina muestra una diferencia de 10,00 € en contra del asesor
+* al abrir el popover se ve que la diferencia es debida a un cambio en los tramos
+* se estima que se debe ignorar la diferencia porque el cambio en los tramos no debería tener carácter retroactivo
+* se hace una nueva corrección por esos 10,00 € pero sin compensar, es decir sin que se provoque cambios en las comisiones de nómina alguna
+* la corrección se aplica siempre en la nómina del contexto, en este caso ene '17
+* se elige la nómina en que se compensa, p.ej. ene '17 (en este caso sería irrelevante porque el importe compensado es cero, pero es bueno que el dato sea coherente)
+* se redacta el motivo y se envía el formulario
+
+Y "después":
+
+* la diferencia aparece como 0,00 € por la corrección aplicada
+* al abrir el popover se ve la nueva corrección que anula la diferencia que existía previamente
+
+En el PDF, como no es interactivo, aparecerían todas las correcciones en una tabla, p.ej. debajo.

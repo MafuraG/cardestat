@@ -281,6 +281,10 @@ td.actions .btn .glyphicon-eye-open {
 .glyphicon.text-warning {
   color: #ffc000;
 }
+
+.text-warning {
+  color: #b75700;
+} 
 .advanced-input {
   padding: 12px;
   position: absolute;
@@ -349,4 +353,11 @@ td a[href*="delete"] {
 table.table caption {
   color: #333;
   border-bottom: 2px solid #ccc;
+}
+.popover {
+  max-width: 500px;
+}
+.popover-title .close {
+  position: relative;
+  bottom: 4px;
 }

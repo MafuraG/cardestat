@@ -27,8 +27,8 @@ class m170221_133734_contacts extends Migration
             'internet' => $this->string(42),
             'birth_date' => $this->string(20),
             'country_of_residence' => $this->string(42),
-            'created_at' => $this->timestamp(2)->notNull(),
-            'updated_at' => $this->timestamp(2)
+            'created_at' => $this->timestamp(2)->notNull()->defaultExpression('now()'),
+            'updated_at' => $this->timestamp(2)->notNull()->defaultExpression('now()')
         ]);
         $this->createTable('property_dump', [
             'reference' => $this->string(12),
@@ -58,8 +58,8 @@ class m170221_133734_contacts extends Migration
             'built_area_dm2' => $this->integer(),
             'n_bedrooms' => $this->smallInteger(),
             'units' => $this->smallInteger(),
-            'created_at' => $this->timestamp(2)->notNull(),
-            'updated_at' => $this->timestamp(2)
+            'created_at' => $this->timestamp(2)->notNull()->defaultExpression('now()'),
+            'updated_at' => $this->timestamp(2)->notNull()->defaultExpression('now()')
         ]);
         $this->batchInsert('configuration', ['category', 'name', 'value'], [[
             'FTP_ONOFFICE',

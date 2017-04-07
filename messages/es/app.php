@@ -203,6 +203,7 @@ return [
     'Password' => 'Contraseña',
     'Passwords don\'t match' => 'Las contraseñas no concuerdan',
     'Payrolled' => 'Pasado a Nómina',
+    'Not payrolled' => 'Sin pasar a nómina',
     'Payroll' => 'Nómina',
     'Please fill out the following fields to login' => 'Por favor, rellene los siguientes campos para ingresar',
     'Plot Area' => 'Área de Parcela',

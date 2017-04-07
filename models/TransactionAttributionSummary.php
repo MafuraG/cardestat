@@ -89,9 +89,9 @@ class TransactionAttributionSummary extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCorrectedSummary()
+    public function getCalculatedSummary()
     {
-        return $this->hasOne(TransactionAttributionCorrectedSummary::className(), ['transaction_id' => 'transaction_id', 'advisor_id' => 'advisor_id']);
+        return $this->hasOne(TransactionAttributionCalculatedSummary::className(), ['transaction_id' => 'transaction_id', 'advisor_id' => 'advisor_id']);
     }
     /**
      * @return \yii\db\ActiveQuery

@@ -16,10 +16,12 @@ class m170317_093446_commissions extends Migration
         $this->createTable('correction', [
             'id' => $this->primaryKey(),
             'transaction_payroll_id' => $this->integer()->notNull() . ' references transaction_payroll(id)',
-            'amount_euc' => $this->integer()->notNull(),
-            'reason' => $this->string(32)->notNull(),
-            'created_at' => $this->timestamp(2)->notNull(),
-            'updated_at' => $this->timestamp(2)->notNull()
+            'corrected_euc' => $this->integer()->notNull(),
+            'compensated_euc' => $this->integer()->notNull()->defaultValue(0),
+            'compensated_at' => $this->date()->notNull(),
+            'reason' => $this->string(32),
+            'created_at' => $this->timestamp(2)->notNull()->defaultExpression('now()'),
+            'updated_at' => $this->timestamp(2)->notNull()->defaultExpression('now()')
         ]);
         $this->addColumn('attribution', 'transaction_payroll_id', 'integer references transaction_payroll(id)');
         $this->execute('
@@ -104,12 +106,12 @@ class m170317_093446_commissions extends Migration
                     attribution_comments
         ');
         $this->execute('
-            create view transaction_attribution_corrected_summary as
+            create view transaction_attribution_calculated_summary as
                 select 
                     a.transaction_id,
                     a.advisor_id,
                     payrolled_at,
-                    round(sum(at.attribution_bp / 10000. * i.sum)) as corrected_total_attributed_sum_euc
+                    round(sum(at.attribution_bp / 10000. * i.sum)) as calculated_total_attributed_sum_euc
                 from transaction t
                      join attribution a on (t.id = a.transaction_id)
                      join attribution_type at on (a.attribution_type_id = at.id)
@@ -123,7 +125,7 @@ class m170317_093446_commissions extends Migration
 
     public function safeDown()
     {
-        $this->execute('drop view transaction_attribution_corrected_summary');
+        $this->execute('drop view transaction_attribution_calculated_summary');
         $this->execute('drop view transaction_attribution_summary');
         $this->dropColumn('attribution', 'transaction_payroll_id');
         $this->dropTable('correction');

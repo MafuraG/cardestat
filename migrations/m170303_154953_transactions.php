@@ -49,6 +49,12 @@ class m170303_154953_transactions extends Migration
             'VENTA', 7000, true
         ], [
             'CAPTACIÓN', 3000, true
+        ], [
+            'REFERIDO COMPRADOR', 1000, true
+        ], [
+            'REFERIDO VENDEDOR', 1000, true
+        ], [
+            'CAPTACIÓN', 3000, true
         ]]);
         $this->createIndex('attribution_type-name-attribution_bp-uidx', 'attribution_type', ['name', 'attribution_bp'], true);
         $this->createTable('advisor', [
@@ -111,7 +117,7 @@ class m170303_154953_transactions extends Migration
             'commission_bp' => $this->integer()->notNull(),
             'advisor_id' => $this->integer()->notNull() . ' references advisor(id)',
             'created_at' => $this->timestamp(2)->notNull()->defaultExpression('now()'),
-            'updated_at' => $this->timestamp(2)
+            'updated_at' => $this->timestamp(2)->notNull()->defaultExpression('now()')
         ]);
         $this->createIndex('advisor_tranche-from_euc-advisor_id-uidx', 'advisor_tranche', ['from_euc', 'advisor_id'], true);
         $rafa_id = Yii::$app->db->createCommand('select id from advisor where name = \'RAFAEL ALZOLA\'')->execute();
@@ -157,8 +163,8 @@ class m170303_154953_transactions extends Migration
             'comments' => $this->text(),
             'approved_by_direction' => $this->boolean()->notNull()->defaultValue(false),
             'approved_by_accounting' => $this->boolean()->notNull()->defaultValue(false),
-            'created_at' => $this->timestamp(2)->notNull(),
-            'updated_at' => $this->timestamp(2)
+            'created_at' => $this->timestamp(2)->notNull()->defaultExpression('now()'),
+            'updated_at' => $this->timestamp(2)->notNull()->defaultExpression('now()')
         ]);
         $this->createTable('invoice', [
             'id' => $this->primaryKey(),
@@ -167,8 +173,8 @@ class m170303_154953_transactions extends Migration
             'amount_euc' => $this->integer()->notNull(),
             'transaction_id' => $this->integer()->notNull() . ' references transaction(id)',
             'recipient_category' => $this->string(18)->notNull() . ' references recipient_category(name)',
-            'created_at' => $this->timestamp(2)->notNull(),
-            'updated_at' => $this->timestamp(2)
+            'created_at' => $this->timestamp(2)->notNull()->defaultExpression('now()'),
+            'updated_at' => $this->timestamp(2)->notNull()->defaultExpression('now()')
         ]);
         $this->createTable('attribution', [
             'id' => $this->primaryKey(),
@@ -178,8 +184,8 @@ class m170303_154953_transactions extends Migration
             'amount_euc' => $this->integer(),
             'transaction_id' => $this->integer()->notNull() . ' references transaction(id)',
             'comments' => $this->text(),
-            'created_at' => $this->timestamp(2)->notNull(),
-            'updated_at' => $this->timestamp(2)
+            'created_at' => $this->timestamp(2)->notNull()->defaultExpression('now()'),
+            'updated_at' => $this->timestamp(2)->notNull()->defaultExpression('now()')
         ]);
         $this->execute('
             create or replace function array_distinct(anyarray) returns anyarray as $$

@@ -68,7 +68,8 @@ class CsvImportController extends Controller {
             "    built_area_dm2, \n" .
             "    n_bedrooms, \n" .
             "    units, \n" .
-            "    created_at) \n" .
+            "    created_at, \n" .
+            "    updated_at) \n" .
             "select \n" .
             "    pd.reference, \n" .
             "    pd.entry_date, \n" .
@@ -82,14 +83,16 @@ class CsvImportController extends Controller {
             "    nullif(replace(pd.built_area_m2, ',', '')::int, 0), \n" .
             "    nullif(substring(pd.n_bedrooms, '\d+')::smallint, 0), \n" .
             "    nullif(substring(pd.units, '\d+')::smallint, 0), \n" .
-            "    :arg1 \n" .
+            "    :arg1, \n" .
+            "    :arg2 \n" .
             "from property_dump pd \n" .
             "    left join property p on (p.reference = pd.reference) \n" .
             "where p.id is null and \n" .
             "      pd.reference is not null", [
-            ':arg1' => $created_at
+            ':arg1' => $created_at,
+            ':arg2' => $created_at
         ])->execute();
-        // avoid overwriting rows updated locally: updated_at is null
+        // avoid overwriting rows updated locally: updated_at equals created_at
         $rows = $connection->createCommand(
             "update property set \n" .
             "    entry_date = pd.entry_date, \n" .
@@ -104,8 +107,8 @@ class CsvImportController extends Controller {
             "    n_bedrooms = nullif(substring(pd.n_bedrooms, '\d+')::smallint, 0), \n" .
             "    units= nullif(substring(pd.units, '\d+')::smallint, 0) \n" .
             "from property_dump pd \n" .
-            "where updated_at is null and \n" .
-            "      property.created_at < :arg1 and \n" . // to avoid updating rows inserted above
+            "where updated_at = created_at and \n" .
+            "      property.created_at < :arg1 and \n" . // to avoid updating rows just inserted above
             "      pd.reference = property.reference", [
             ':arg1' => $created_at
         ])->execute();
@@ -148,7 +151,8 @@ class CsvImportController extends Controller {
             "    internet, \n" .
             "    birth_date, \n" .
             "    country_of_residence, \n" .
-            "    created_at) \n" .
+            "    created_at, \n" .
+            "    updated_at) \n" .
             "select \n" .
             "    cd.customer_number, \n" .
             "    cd.first_name, \n" .
@@ -159,14 +163,16 @@ class CsvImportController extends Controller {
             "    cd.internet, \n" .
             "    cd.birth_date, \n" .
             "    cd.country_of_residence, \n" .
-            "    :arg1 \n" .
+            "    :arg1, \n" .
+            "    :arg2 \n" .
             "from contact_dump cd \n" .
             "    left join contact c on (c.reference = cd.customer_number) \n" .
             "where c.id is null and \n" .
             "      cd.customer_number is not null", [
-            ':arg1' => $created_at
+            ':arg1' => $created_at,
+            ':arg2' => $created_at
         ])->execute();
-        // avoid overwriting rows updated locally: updated_at is null
+        // avoid overwriting rows updated locally: updated_at equals created_at
         $rows = $connection->createCommand(
             "update contact set \n" .
             "    first_name = cd.first_name, \n" .
@@ -178,8 +184,8 @@ class CsvImportController extends Controller {
             "    birth_date = cd.birth_date, \n" .
             "    country_of_residence = cd.country_of_residence \n" .
             "from contact_dump cd \n" .
-            "where updated_at is null and \n" .
-            "      contact.created_at < :arg1 and \n" .  // to avoid updating rows inserted above
+            "where updated_at = created_at and \n" .
+            "      contact.created_at < :arg1 and \n" .  // to avoid updating rows just inserted above
             "      cd.customer_number = contact.reference", [
             ':arg1' => $created_at,
         ])->execute();

@@ -68,19 +68,9 @@ $script = <<< JS
           $(this).val(d + $(this).data('value'));
       });
   });
-  \$transactionModal.on('submit', '.transaction-form form', function() {
+  \$transactionModal.on('submit', '.transaction-form form', function(e) {
       var \$form = $(this);
-      $.ajax({
-          url: \$form.attr('action'),
-          type: \$form.attr('method'),
-          data: \$form.serialize(),
-          success: function (response) {                  
-              reload_list = true;
-              \$transactionModal.modal('hide');
-          }, error: function () {
-              console.log('internal server error');
-          }
-      });
+      $.pjax.submit(e, '#p1', {push: false});
       return false;
   });
   $('.transaction-list-item-search form .btn-reset').on('click', function() {
@@ -94,7 +84,10 @@ $script = <<< JS
       $('[data-toggle="tooltip"]').tooltip()
   });
   $('#p1').on('pjax:end', function(xhr, options) {
-      modalDataLoaded();
+      if (options.responseText === 'ok') {
+          reload_list = true;
+          \$transactionModal.modal('hide');
+      } else modalDataLoaded();
   });
   var last_id = -1;
   function modalDataLoaded() {

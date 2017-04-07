@@ -1,0 +1,14 @@
+En este caso necesitamos 4 capturas para la simulación de diferencia en el comisionamiento por facturación tardía.
+
+* Captura 1: situación inicial
+	. el 20% de los 77,00 € de atribución debería ser 9,80 €, pero se ve que se pasó a nómina 4,80 €
+	- por eso, la nómina de dic.16 muestra una diferencia de 5,00 € a favor del asesor (p.ej. la segunda factura se hizo después de pasar a nómina
+* Captura 2: creación de la corrección
+	- los 5,00 € se corrigen en la nómina de dic.16 y se establece su compensación para ene.17 (la nómina de ene.17 aun no existe, esto es lo más lógico, para que cuando se cree incluya este importe)
+	- el motivo se escribe libremente para aclarar la corrección
+* Captura 3: aplicación de la compensación
+	- la nómina de ene.17 ya se ha creado
+	- pero nos fijamos en la corrección creada en el paso anterior, y que aparece en el listado de correcciones de dic.16 (mismo popover)
+	- la diferencia ya es 0,00 € porque la corrección ha cancelado la diferencia
+* Captura 4: situación final
+	- el 20% de los 9.100,00 € atribuidos debería ser 1.820,00 €, pero vemos 1.825,00 € por la compensación de 5,00 € que viene de la diferencia corregida en dic.16

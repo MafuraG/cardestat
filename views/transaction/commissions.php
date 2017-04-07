@@ -7,8 +7,9 @@ use yii\widgets\PjaxAsset;
 
 PjaxAsset::register($this);
 $formatter = Yii::$app->formatter;
+$this->title = Yii::t('app', 'Commission sheets');
 ?>
-<h1 class="page-header"><?= Yii::t('app', 'Commission sheets') ?></h1>
+<h1 class="page-header"><?= $this->title ?></h1>
 <div class="well well-sm">
   <div class="row">
     <form class="form">
@@ -38,7 +39,7 @@ $formatter = Yii::$app->formatter;
     <div class="thumbnail text-center">
       <h5><?= Yii::t('app', 'Invoiced') ?></h5>
       <h4><small><span class="text-info"><?= $formatter->asDecimal($positive_invoiced_euc / 100. , 2) ?></span>
-          / <span class="text-danger"> <?= $formatter->asDecimal($negative_invoiced_euc / 100. , 2) ?></span></small> = <?= $formatter->asDecimal(($positive_invoiced_euc - $negative_invoiced_euc) / 100. , 2) ?> €</h4>
+          <span class="text-danger"> - <?= $formatter->asDecimal($negative_invoiced_euc / 100. , 2) ?></span></small> = <?= $formatter->asDecimal(($positive_invoiced_euc - $negative_invoiced_euc) / 100. , 2) ?> €</h4>
     </div>
   </div>
   <div class="col-xs-6 col-sm-3">
@@ -61,7 +62,7 @@ $formatter = Yii::$app->formatter;
   </div>
 </div>
 <div class="transaction-commissions">
-  <?= $this->render('_commission_tables', ['data' => $data, 'year' => $year, 'expanded' => true]) ?>
+  <?= $this->render('_commission_tables', ['data' => $data, 'year' => $year]) ?>
 </div>
 <?php
 $script = <<< JS
