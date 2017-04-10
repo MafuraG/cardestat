@@ -5,6 +5,7 @@ namespace app\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
+use app\models\Payroll;
 
 /**
  * This is the model class for table "attribution".
@@ -82,14 +83,6 @@ class Attribution extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getTransactionPayroll()
-    {
-        return $this->hasOne(TransactionPayroll::className(), ['id' => 'transaction_payroll_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
     public function getAdvisor()
     {
         return $this->hasOne(Advisor::className(), ['id' => 'advisor_id']);
@@ -122,46 +115,42 @@ class Attribution extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getPayroll()
+    {
+        return $this->hasOne(Payroll::className(), ['transaction_id' => 'id'])
+            ->via('transaction', function($q) {
+                $q->where(['id' => $this->transaction_id]);
+            })->andOnCondition(['advisor_id' => $this->advisor_id]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getTransaction()
     {
         return $this->hasOne(Transaction::className(), ['id' => 'transaction_id']);
     }
 
-    public function afterFind() {
-        parent::afterFind();
-        $this->amount_eu = round($this->amount_euc / 100., 2);
-        
-    }
-
     public function beforeSave($insert) {
         $this->_dbTransaction = Yii::$app->db->beginTransaction();
-        if ($this->transaction->payrolled_at and !$this->transaction_payroll_id) try {
-            $tx_payroll = TransactionPayroll::find()->joinWith('attributions')
+        if ($this->transaction->payroll_month and !$this->is_payrolled) try {
+            $payroll = Payroll::find()
                 ->where(['advisor_id' => $this->advisor_id])
                 ->andWhere(['transaction_id' => $this->transaction_id])
                 ->one();
-            if (!$tx_payroll) {
-                $month = substr($this->transaction->payrolled_at, 0, 7);
-                $year = substr($this->transaction->payrolled_at, 0, 4);
-                $accumulated_attribution_euc = TransactionAttributionSummary::find()
-                    ->select(['sum(total_attributed_sum_euc)'])
-                    ->where(['advisor_id' => $this->advisor_id])
-                    ->andWhere(['to_char(payrolled_at, \'yyyy\')' => $year])
-                    ->andWhere(['<=', 'to_char(payrolled_at, \'yyyy-mm\')', $month])
-                    ->createCommand()->queryColumn()[0];
-                if (!$accumulated_attribution_euc) $accumulated_attribution_euc = 0;
-                $tranche = AdvisorTranche::selectTranche($this->advisor->getTranches()->asArray()->all(),
-                    $accumulated_attribution_euc);
-                $tx_payroll = new TransactionPayroll([
+            if (!$payroll) {
+                $tranche = AdvisorTranche::selectTranche($this->advisor->getTranches()->asArray()->all(), 0);
+                $payroll = new Payroll([
+                    'transaction_id' => $this->transaction_id,
+                    'advisor_id' => $this->advisor_id,
                     'commission_bp' => $tranche['commission_bp'],
-                    'accumulated_euc' => $accumulated_attribution_euc
+                    'accumulated_euc' => 0 
                 ]);
-                if (!$tx_payroll->save()) {
-                    $msg = var_export($tx_payroll->errors, 1);
+                if (!$payroll->save()) {
+                    $msg = var_export($payroll->errors, 1);
                     throw new \Exception($msg);
                 }
             }
-            $this->transaction_payroll_id = $tx_payroll->id;
             $this->amount_euc = 0;
         } catch (\Exception $e) {
             $this->_dbTransaction->rollback();
@@ -173,9 +162,15 @@ class Attribution extends \yii\db\ActiveRecord
         parent::afterSave($insert, $changedAttributes);
         $this->_dbTransaction->commit();
     }
+
+    public function afterFind() {
+        parent::afterFind();
+        $this->amount_eu = round($this->amount_euc / 100., 2);
+        
+    }
     public function beforeDelete() {
         $this->_dbTransaction = Yii::$app->db->beginTransaction();
-        $this->_before_delete_tx_payroll = $this->transactionPayroll;
+        $this->_before_delete_tx_payroll = $this->payroll;
         return parent::beforeDelete();
     }
     public function afterDelete() {

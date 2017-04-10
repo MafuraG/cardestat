@@ -33,7 +33,7 @@ use yii\helpers\ArrayHelper;
  * @property boolean $is_home_staged
  * @property integer $our_fee_euc
  * @property integer $their_fee_euc
- * @property string $payrolled_at
+ * @property string $payroll_month
  * @property string $comments
  * @property boolean $approved_by_direction
  * @property boolean $approved_by_accounting
@@ -41,7 +41,6 @@ use yii\helpers\ArrayHelper;
  * @property string $updated_at
  * @property integer $sale_duration
  * @property string $property_location
- * @property string $?column?
  * @property string $seller_name
  * @property string $buyer_name
  * @property boolean $cardenas100
@@ -71,7 +70,7 @@ class TransactionListItem extends Transaction
     {
         return [
             [['id', 'first_published_price_euc', 'last_published_price_euc', 'sale_price_euc', 'buyer_id', 'seller_id', 'suggested_sale_price_euc', 'passed_to_sales_by', 'property_id', 'our_fee_euc', 'their_fee_euc', 'sale_duration', 'n_invoices', 'our_fee_bp'], 'integer'],
-            [['first_published_at', 'last_published_at', 'option_signed_at', 'search_started_at', 'payrolled_at', 'created_at', 'updated_at', 'first_invoiced_at'], 'safe'],
+            [['first_published_at', 'last_published_at', 'option_signed_at', 'search_started_at', 'payroll_month', 'created_at', 'updated_at', 'first_invoiced_at'], 'safe'],
             [['is_new_buyer', 'is_new_seller', 'is_home_staged', 'approved_by_direction', 'approved_by_accounting', 'cardenas100'], 'boolean'],
             [['comments', 'seller_name', 'buyer_name', 'advisors'], 'string'],
             [['transaction_type', 'lead_type'], 'string', 'max' => 18],

@@ -10,20 +10,22 @@ use yii\db\Expression;
  * This is the model class for table "correction".
  *
  * @property integer $id
- * @property integer $transaction_payroll_id
+ * @property integer $payroll_id
  * @property integer $corrected_euc
  * @property integer $compensated_euc
- * @property string $compensated_at
+ * @property string $compensated_on
  * @property string $reason
  * @property string $created_at
  * @property string $updated_at
  *
- * @property TransactionPayroll $transactionPayroll
+ * @property Payroll $payroll
  */
 class Correction extends \yii\db\ActiveRecord
 {
     const TRANCHES_CHANGED = 0;
     const LATE_INVOICE_PROPAGATION = 1;
+
+    public $compensated_eu, $corrected_eu;
     /**
      * @inheritdoc
      */
@@ -45,11 +47,12 @@ class Correction extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['transaction_payroll_id', 'corrected_euc', 'compensated_at', 'reason'], 'required'],
-            [['transaction_payroll_id', 'corrected_euc', 'compensated_euc'], 'integer'],
-            [['compensated_at'], 'date', 'format' => 'yyyy-MM-dd'],
+            [['payroll_id', 'corrected_eu', 'compensated_on', 'reason'], 'required'],
+            ['payroll_id', 'integer'],
+            [['corrected_eu', 'compensated_eu'], 'number'],
+            [['compensated_on'], 'date', 'format' => 'yyyy-MM-dd'],
             [['reason'], 'string', 'max' => 32],
-            [['transaction_payroll_id'], 'exist', 'skipOnError' => true, 'targetClass' => TransactionPayroll::className(), 'targetAttribute' => ['transaction_payroll_id' => 'id']],
+            [['payroll_id'], 'exist', 'skipOnError' => true, 'targetClass' => Payroll::className(), 'targetAttribute' => ['payroll_id' => 'id']],
         ];
     }
 
@@ -60,10 +63,10 @@ class Correction extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'transaction_payroll_id' => Yii::t('app', 'Transaction Payroll ID'),
-            'corrected_euc' => Yii::t('app', 'Corrected Euc'),
-            'compensated_euc' => Yii::t('app', 'Compensated Euc'),
-            'compensated_at' => Yii::t('app', 'Compensated At'),
+            'payroll_id' => Yii::t('app', 'Payroll ID'),
+            'corrected_eu' => Yii::t('app', 'Correction'),
+            'compensated_eu' => Yii::t('app', 'Compensation'),
+            'compensated_on' => Yii::t('app', 'Compensate On'),
             'reason' => Yii::t('app', 'Reason'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
@@ -73,8 +76,24 @@ class Correction extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getTransactionPayroll()
+    public function getPayroll()
     {
-        return $this->hasOne(TransactionPayroll::className(), ['id' => 'transaction_payroll_id']);
+        return $this->hasOne(Payroll::className(), ['id' => 'payroll_id']);
+    }
+    public function afterFind() {
+        parent::afterFind();
+        $formatter = Yii::$app->formatter;
+        $this->corrected_eu = round($this->corrected_euc / 100., 2);
+        $this->compensated_eu = round($this->compensated_euc / 100., 2);
+        
+    }
+    public function beforeSave($insert) {
+        $this->corrected_euc = round($this->corrected_eu * 100.);
+        $this->compensated_euc = round($this->compensated_eu * 100.);
+        return parent::beforeSave($insert);
+    }
+    public function beforeValidate() {
+        if ($this->compensated_on) $this->compensated_on = substr($this->compensated_on, 0, 7) . '-01';
+        return parent::beforeValidate();
     }
 }

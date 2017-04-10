@@ -45,7 +45,7 @@ use yii\helpers\ArrayHelper;
  * @property boolean $is_home_staged
  * @property integer $our_fee_euc
  * @property integer $their_fee_euc
- * @property string $payrolled_at
+ * @property string $payroll_month
  * @property string $comments
  * @property boolean $approved_by_direction
  * @property boolean $approved_by_accounting
@@ -64,6 +64,7 @@ use yii\helpers\ArrayHelper;
  * @property Property $property
  * @property TransactionType $transactionType
  * @property TransferType $transferType
+ * @property Payroll[] $payrolls
  */
 class Transaction extends \yii\db\ActiveRecord
 {
@@ -98,7 +99,7 @@ class Transaction extends \yii\db\ActiveRecord
     {
         return [
             ['external_id', 'unique'],
-            [['first_published_at', 'last_published_at', 'option_signed_at', 'search_started_at', 'payrolled_at'], 'date', 'format' => 'yyyy-MM-dd'],
+            [['first_published_at', 'last_published_at', 'option_signed_at', 'search_started_at', 'payroll_month'], 'date', 'format' => 'yyyy-MM-dd'],
             [['first_published_price_eu', 'last_published_price_eu', 'sale_price_eu', 'suggested_sale_price_eu', 'our_fee_eu', 'their_fee_eu'], 'number'],
             [['buyer_id', 'seller_id', 'passed_to_sales_by', 'property_id'], 'integer'],
             [['transaction_type', 'option_signed_at', 'buyer_id', 'seller_id', 'property_id'], 'required'],
@@ -153,7 +154,7 @@ class Transaction extends \yii\db\ActiveRecord
             'is_home_staged' => Yii::t('app', 'Home Staging'),
             'our_fee_eu' => Yii::t('app', 'Our Fees'),
             'their_fee_eu' => Yii::t('app', 'Collaborator\'s Fee'),
-            'payrolled_at' => Yii::t('app', 'Date Payrolled'),
+            'payroll_month' => Yii::t('app', 'Payroll Month'),
             'comments' => Yii::t('app', 'Internal Comments'),
             'approved_by_direction' => Yii::t('app', 'Direc. Apprv.'),
             'approved_by_accounting' => Yii::t('app', 'Account. Apprv.'),
@@ -176,6 +177,14 @@ class Transaction extends \yii\db\ActiveRecord
     public function getAttributions()
     {
         return $this->hasMany(Attribution::className(), ['transaction_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPayrolls()
+    {
+        return $this->hasMany(Payroll::className(), ['transaction_id' => 'id']);
     }
 
     /**
@@ -296,21 +305,21 @@ class Transaction extends \yii\db\ActiveRecord
     }
     public function beforeValidate() {
         if (!$this->sale_price_eu) $this->sale_price_eu = null;
-        if ($this->payrolled_at) $this->payrolled_at = substr($this->payrolled_at, 0, 7) . '-01';
+        if ($this->payroll_month) $this->payroll_month = substr($this->payroll_month, 0, 7) . '-01';
         return parent::beforeValidate();
     }
     public function afterSave($insert, $changedAttributes) {
         parent::afterSave($insert, $changedAttributes);
         try {
-            if (array_key_exists('payrolled_at', $changedAttributes) and
-                $changedAttributes['payrolled_at'] !== $this->payrolled_at) {
-                if ($this->payrolled_at) {
-                    $month = substr($this->payrolled_at, 0, 7);
-                    $year = substr($this->payrolled_at, 0, 4);
+            if (array_key_exists('payroll_month', $changedAttributes) and
+                $changedAttributes['payroll_month'] !== $this->payroll_month) {
+                if ($this->payroll_month) {
+                    $month = substr($this->payroll_month, 0, 7);
+                    $year = substr($this->payroll_month, 0, 4);
                     $accumulated_attributions = ArrayHelper::map(TransactionAttributionSummary::find()
                         ->select(['advisor_id', 'sum(total_attributed_sum_euc)'])
-                        ->where(['to_char(payrolled_at, \'yyyy\')' => $year])
-                        ->andWhere(['<=', 'to_char(payrolled_at, \'yyyy-mm\')', $month])
+                        ->where(['to_char(payroll_month, \'yyyy\')' => $year])
+                        ->andWhere(['<=', 'to_char(payroll_month, \'yyyy-mm\')', $month])
                         ->groupBy(['advisor_id'])->createCommand()->queryAll(), 'advisor_id', 'sum');
                     $calc_attributions = $this->getCalculatedAttributions()->with('tranches')->all();
                     $transaction_payrolls = [];
@@ -321,9 +330,11 @@ class Transaction extends \yii\db\ActiveRecord
                             $accumulated_attribution_euc = $accumulated_attributions[$advisor_id];
                             $tranche = AdvisorTranche::selectTranche(
                                 ArrayHelper::toArray($calc_attribution->tranches), $accumulated_attribution_euc);
-                            $transaction_payrolls[$advisor_id] = new TransactionPayroll([
+                            $transaction_payrolls[$advisor_id] = new Payroll([
                                 'commission_bp' => $tranche['commission_bp'],
-                                'accumulated_euc' => $accumulated_attribution_euc
+                                'accumulated_euc' => $accumulated_attribution_euc,
+                                'advisor_id' => $advisor_id,
+                                'transaction_id' => $this->id
                             ]);
                             if (!$transaction_payrolls[$advisor_id]->save()) {
                                 $msg = var_export($transaction_payrolls[$advisor_id]->errors, 1);
@@ -331,27 +342,24 @@ class Transaction extends \yii\db\ActiveRecord
                             }
                         }
                         $attribution->amount_euc = $calc_attribution->amount_euc;
-                        $attribution->transaction_payroll_id = $transaction_payrolls[$advisor_id]->id;
+                        $attribution->is_payrolled = true;
                         if (!$attribution->save(false)) {
                             $msg = var_export($attribution->errors, 1);
                             throw new \Exception($msg);
                         }
                     }
                 } else {
-                    $toDelete = [];
-                    foreach ($this->calculatedAttributions as $calculated_attribution) {
-                        if ($calculated_attribution->attribution->transactionPayroll)
-                            $toDelete[] = $calculated_attribution->attribution->transactionPayroll;
-                        $calculated_attribution->attribution->transaction_payroll_id = null;
-                        $calculated_attribution->attribution->amount_euc = null;
-                        if (!$calculated_attribution->attribution->save(false)) {
-                            $msg = var_export($calculated_attribution->errors, 1);
+                    foreach ($this->payrolls as $payroll) if ($payroll->delete() === false) {
+                        $msg = var_export($payroll->errors, 1);
+                        throw new \Exception($msg);
+                    }
+                    foreach ($this->attributions as $attribution) {
+                        $attribution->is_payrolled = false;
+                        $attribution->amount_euc = null;
+                        if (!$attribution->save(false)) {
+                            $msg = var_export($attribution->errors, 1);
                             throw new \Exception($msg);
                         }
-                    }
-                    foreach ($toDelete as $model) if ($model->delete() === false) {
-                        $msg = var_export($model->errors, 1);
-                        throw new \Exception($msg);
                     }
                 }
             }

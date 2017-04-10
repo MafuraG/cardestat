@@ -350,7 +350,7 @@ $user = Yii::$app->user;
         </div>
       </div>
       <div class="col-md-6">
-        <?= $form->field($model, 'payrolled_at')->widget(DatePicker::classname(), [
+        <?= $form->field($model, 'payroll_month')->widget(DatePicker::classname(), [
             'options' => ['form' => $form->id, 'disabled' => $readonly],
             'size' => 'sm',
             'removeButton' => !$readonly ? [] : false,

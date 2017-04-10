@@ -15,20 +15,24 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
 
   <legend><?= Yii::t('app', 'New correction') ?></legend>
   <?php $form = ActiveForm::begin(); ?>
-    <?= $form->field($model, 'transaction_payroll_id')->hiddenInput()->label(false) ?>
+    <?= $form->field($model, 'payroll_id')->hiddenInput()->label(false) ?>
     <div class="row">
       <div class="col-sm-4">
-        <?= $form->field($model, 'corrected_euc', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
+        <?= $form->field($model, 'corrected_eu', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
             'class' => 'text-right input-sm mask-money',
+        ], 'pluginOptions' => [
+            'allowNegative' => true
         ]]); ?>
       </div>
       <div class="col-sm-4">
-        <?= $form->field($model, 'compensated_euc', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
+        <?= $form->field($model, 'compensated_eu', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
             'class' => 'text-right input-sm mask-money',
+        ], 'pluginOptions' => [
+            'allowNegative' => true
         ]]); ?>
       </div>
       <div class="col-sm-4">
-        <?= $form->field($model, 'compensated_at')->widget(DatePicker::classname(), [
+        <?= $form->field($model, 'compensated_on')->widget(DatePicker::classname(), [
             'size' => 'sm',
             'removeButton' => false,
             'pluginOptions' => [

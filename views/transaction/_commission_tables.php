@@ -41,7 +41,8 @@ $diff_table_end = <<<EOT
   </tbody></table>
 EOT;
 $diff_cause_title = [
-  Correction::TRANCHES_CHANGED => Yii::t('app', 'Tranches changed')
+  Correction::TRANCHES_CHANGED => Yii::t('app', 'Tranches changed'),
+  Correction::LATE_INVOICE_PROPAGATION => Yii::t('app', 'Late invoice propagation')
 ];
 
 if (!isset($expanded)) $expanded = false;
@@ -189,20 +190,27 @@ foreach ($data as $advisor => $advisor_data): ?>
                       <a class="pull-left btn btn-default btn-xs correction-popover" role="button" tabindex="0"
                           data-title="<?= Yii::t('app', 'Corrections') ?>&nbsp;
                             <button type='button' class='close'>&times;</button>"
-                          data-placement="left" data-html="true" data-trigger="click">
-                        <span class="glyphicon glyphicon-info-sign"></span></a>
+                          data-placement="left" data-html="true" data-trigger="click" data-payroll_id="<?= $month_data['payroll_id'] ?>">
+                        <span class="text-warning glyphicon glyphicon-exclamation-sign"></span></a>
                       <span class="<?= $class ?>">
                         <?= $formatter->asDecimal(($month_data['calculated_commission_euc'] - 
                           $month_data['commission_euc'] + $month_data['corrections']['sum']) / 100., 2) ?> €
                       </span>
                       <table class="popover-table hidden"><tbody>
                         <?php foreach ($month_data['difference_causes'] as $cause => $diff_amount_euc): ?>
-                          <?php $amount_eu = $formatter->asDecimal($diff_amount_euc / 100., 2); ?>
                           <tr>
                             <td><?= $diff_cause_title[$cause] ?></td>
-                            <td class="text-right"><?= $amount_eu ?> €</td>
+                            <td class="text-right"><?= $formatter->asDecimal($diff_amount_euc / 100., 2) ?>€</td>
                             <td class="text-right"><?= $zero ?> €</td>
                             <td><?= $fmonth ?></td>
+                          </tr>
+                        <?php endforeach; ?>
+                        <?php foreach ($month_data['corrections']['rows'] as $correction): ?>
+                          <tr>
+                            <td><?= $correction['reason'] ?></td>
+                            <td class="text-right"><?= $formatter->asDecimal($correction['corrected_euc'] / 100., 2) ?>€</td>
+                            <td class="text-right"><?= $formatter->asDecimal($correction['compensated_euc'] / 100., 2) ?> €</td>
+                            <td><?= $formatter->asDate($correction['compensated_on'], 'MMMM') ?></td>
                           </tr>
                         <?php endforeach; ?>
                       </tbody></table>
@@ -267,25 +275,41 @@ foreach ($data as $advisor => $advisor_data): ?>
     </tbody>
   </table>
 </div>
-<div id="foo">ola ke ase</div>
 <?php
+$correction_create_url = Url::to(['/correction/create']);
 $script = <<< JS
   var \$correctionFormWrapper = $('#correction-form-wrapper').detach();
   $('[data-toggle="tooltip"]').tooltip();
   $('[data-toggle="popover"]').popover();
-  $('.correction-popover').on('hide.bs.popover', function(e, x) {
+  $('.correction-popover').on('hide.bs.popover', function() {
       var \$correctionForm = $(this).next('.popover').find('.correction-form').detach();
       \$correctionFormWrapper.append(\$correctionForm);
       \$correctionForm.find('form')[0].reset();
   });
-  $('.correction-popover').on('shown.bs.popover', function(e, x) {
+  $('.correction-popover').on('shown.bs.popover', function() {
       $(this).next('.popover').find('.correction-form').replaceWith(\$correctionFormWrapper.find('.correction-form'));
+      $(this).next('.popover').find('.correction-form').find('input[name="Correction[payroll_id]"]').val($(this).data('payroll_id'));
+      
   });
   $('.correction-popover').popover({
       content: function() {
           return $('#correction-table-wrapper').find('tbody')
               .html($(this).siblings('.popover-table').find('tbody').html()).end().html() + \$correctionFormWrapper.html();
       }
+  });
+  $(document).on('submit', '.correction-form form', function() {
+      $.ajax({
+          url: '$correction_create_url',
+          method: 'post',
+          data: $(this).serialize(),
+          success: function(response) {
+              if (response === '') location.reload(true);
+          }
+      });
+      return false;
+  });
+  $(document).on('click', '.popover .close', function() {
+      $(this).closest('.popover').siblings('.correction-popover').trigger('click');
   });
 JS;
 $this->registerJs($script);

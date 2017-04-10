@@ -7,7 +7,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 
 /**
- * This is the model class for table "transaction_payroll".
+ * This is the model class for table "payroll".
  *
  * @property integer $id
  * @property integer $commission_bp
@@ -18,14 +18,14 @@ use yii\db\Expression;
  * @property Attribution[] $attributions
  * @property Correction[] $corrections
  */
-class TransactionPayroll extends \yii\db\ActiveRecord
+class Payroll extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'transaction_payroll';
+        return 'payroll';
     }
 
     public function behaviors()
@@ -67,7 +67,10 @@ class TransactionPayroll extends \yii\db\ActiveRecord
      */
     public function getAttributions()
     {
-        return $this->hasMany(Attribution::className(), ['transaction_payroll_id' => 'id']);
+        return $this->hasMany(Attribution::className(), ['transaction_id' => 'id'])
+            ->via('transaction', function($q) {
+                $q->where(['id' => $this->transaction_id]);
+            })->andOnCondition(['advisor_id' => $this->advisor_id]);
     }
 
     /**
@@ -75,6 +78,15 @@ class TransactionPayroll extends \yii\db\ActiveRecord
      */
     public function getCorrections()
     {
-        return $this->hasMany(Correction::className(), ['transaction_payroll_id' => 'id']);
+        return $this->hasMany(Correction::className(), ['payroll_id' => 'id']);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTransaction()
+    {
+        return $this->hasOne(Transaction::className(), ['id' => 'transaction_id']);
+    }
+
 }

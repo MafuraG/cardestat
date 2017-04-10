@@ -59,8 +59,8 @@
     {% endif %}
   </small>
   <div class="col-md-2">
-    {% if (model.payrolled_at) %}
-      <span class="text-success">{{ t('app', 'Payrolled') }} {{ app.formatter.asDate(model.payrolled_at, 'LLL \'\'yy') }}</span> 
+    {% if (model.payroll_month) %}
+      <span class="text-success">{{ t('app', 'Payrolled') }} {{ app.formatter.asDate(model.payroll_month, 'LLL \'\'yy') }}</span> 
     {% else %}
       <span class="text-danger">{{ t('app', 'Not payrolled') }}</span>
     {% endif %}

@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\models\Invoice;
 use app\models\Advisor;
+use app\models\Payroll;
 use app\models\AdvisorTranche;
 use app\models\Attribution;
 use app\models\AttributionType;
@@ -54,21 +55,21 @@ class TransactionController extends Controller
     {
         if (!$year) $year = date('Y');
         $data = $this->mkCommissionsViewData($year, $advisor_id);
-        $years = Transaction::find()->select(['to_char(payrolled_at, \'yyyy\')'])
-            ->distinct()->where(['not', ['payrolled_at'=> null]])
+        $years = Transaction::find()->select(['to_char(payroll_month, \'yyyy\')'])
+            ->distinct()->where(['not', ['payroll_month'=> null]])
             ->asArray()->createCommand()->queryColumn();
         $years = array_combine($years, $years);
         $positive_invoiced_euc = Invoice::find()->with(['transaction' => function($q) use ($year) {
-            $q->where(['to_char(payrolled_at, \'yyyy\')' => $year]);
+            $q->where(['to_char(payroll_month, \'yyyy\')' => $year]);
         }])->where('amount_euc > 0')->sum('amount_euc');
         $negative_invoiced_euc = Invoice::find()->with(['transaction' => function($q) use ($year) {
-            $q->where(['to_char(payrolled_at, \'yyyy\')' => $year]);
+            $q->where(['to_char(payroll_month, \'yyyy\')' => $year]);
         }])->where('amount_euc < 0')->sum('amount_euc');
         $our_fees_euc = Transaction::find()
-            ->where(['to_char(payrolled_at, \'yyyy\')' => $year])
+            ->where(['to_char(payroll_month, \'yyyy\')' => $year])
             ->sum('our_fee_euc');
         $their_fees_euc = Transaction::find()
-            ->where(['to_char(payrolled_at, \'yyyy\')' => $year])
+            ->where(['to_char(payroll_month, \'yyyy\')' => $year])
             ->sum('their_fee_euc');
         return $this->render('commissions', [
             'data' => $data,
@@ -238,8 +239,8 @@ class TransactionController extends Controller
     protected function mkCommissionsViewData($year, $advisor_id) {
         $q = TransactionAttributionSummary::find()
             ->with('calculatedSummary')
-            ->where(['to_char(payrolled_at, \'yyyy\')' => $year])
-            ->orderBy('advisor_name asc, payrolled_at asc, transaction_id asc')->asArray();
+            ->where(['to_char(payroll_month, \'yyyy\')' => $year])
+            ->orderBy('advisor_name asc, payroll_month asc, transaction_id asc')->asArray();
         if ($advisor_id) $q->andWhere(['advisor_id' => $advisor_id]);
         $row_set = $q->all();
         $advisor_ids = ArrayHelper::getColumn($row_set, 'advisor_id');
@@ -247,7 +248,7 @@ class TransactionController extends Controller
             ->where(['advisor_id' => $advisor_ids])
             ->orderBy('from_euc desc')
             ->asArray()->all(), null, 'advisor_id');
-        $commissions = ArrayHelper::index($row_set, 'transaction_id', ['advisor_name', 'payrolled_at']);
+        $commissions = ArrayHelper::index($row_set, 'transaction_id', ['advisor_name', 'payroll_month']);
         $data = [];
         foreach ($commissions as $advisor => & $months) {
            $previous_accum_attribution = 0;
@@ -259,12 +260,14 @@ class TransactionController extends Controller
                $mondat['transactions'] = & $tx_summaries; 
                $a_tx_summary= reset($tx_summaries);
                $data[$advisor]['tranches'] = $tranches[$a_tx_summary['advisor_id']];
-               $an_attribution = Attribution::find()->with('transactionPayroll.corrections')
-                   ->where(['transaction_id' => $a_tx_summary['transaction_id']])
-                   ->andWhere(['advisor_id' => $a_tx_summary['advisor_id']])->one();
-               $mondat['commission_bp'] = $an_attribution->transactionPayroll->commission_bp;
-               $mondat['accumulated_attribution_euc'] = $an_attribution->transactionPayroll->accumulated_euc;
-               $mondat['corrections'] = ['sum' => 0, 'rows' => ArrayHelper::toArray($an_attribution->transactionPayroll->corrections)];
+               $payroll = Payroll::findOne([
+                   'transaction_id' => $a_tx_summary['transaction_id'],
+                   'advisor_id' => $a_tx_summary['advisor_id']
+               ]);
+               $mondat['payroll_id'] = $payroll->id;
+               $mondat['commission_bp'] = $payroll->commission_bp;
+               $mondat['accumulated_attribution_euc'] = $payroll->accumulated_euc;
+               $mondat['corrections'] = ['sum' => 0, 'rows' => ArrayHelper::toArray($payroll->corrections)];
                foreach ($mondat['corrections']['rows'] as $correction) $mondat['corrections']['sum'] += $correction['corrected_euc'];
                $mondat['attribution_euc'] = $mondat['accumulated_attribution_euc'] -
                        $previous_accum_attribution;
@@ -281,10 +284,10 @@ class TransactionController extends Controller
                }
                $ctas = TransactionAttributionCalculatedSummary::find()
                    ->select(['sum(calculated_total_attributed_sum_euc)'])
-                   ->where(['to_char(payrolled_at, \'yyyy\')' => $year])
+                   ->where(['to_char(payroll_month, \'yyyy\')' => $year])
                    ->andWhere(['advisor_id' => $a_tx_summary['advisor_id']])
-                   ->andWhere(['<=', 'payrolled_at', $month])
-                   ->groupBy(['to_char(payrolled_at, \'yyyy\')'])->createCommand()->queryColumn();
+                   ->andWhere(['<=', 'payroll_month', $month])
+                   ->groupBy(['to_char(payroll_month, \'yyyy\')'])->createCommand()->queryColumn();
                $mondat['calculated_accumulated_attribution_euc'] = isset($ctas[0]) ? $ctas[0] : 0;
                $mondat['calculated_commission_bp'] = AdvisorTranche::selectTranche($data[$advisor]['tranches'],
                        $mondat['calculated_accumulated_attribution_euc'])['commission_bp'];
@@ -297,27 +300,30 @@ class TransactionController extends Controller
                $mondat['difference_causes'] = [];
                $all_diff = $mondat['calculated_commission_euc'] - $mondat['commission_euc'];
                if ($mondat['commission_bp'] != $mondat['calculated_commission_bp']) {
-                   if ($mondat['accumulated_attribution_euc'] ==
-                       $mondat['calculated_accumulated_attribution_euc'])
-                       $mondat['difference_causes'] = [Correction::TRANCHES_CHANGED => $all_diff];
+                   if ($mondat['accumulated_attribution_euc'] == $mondat['calculated_accumulated_attribution_euc'])
+                       $mondat['difference_causes'][Correction::TRANCHES_CHANGED] = $all_diff;
                    else {
                        if ($mondat['simulated_commission_bp'] == $mondat['commission_bp'])
-                           $mondat['difference_causes'] = [Correction::LATE_INVOICE_PROPAGATION => $all_diff];
+                           $mondat['difference_causes'][Correction::LATE_INVOICE_PROPAGATION] = $all_diff;
                        else {
-                           $mondat['difference_causes'] = [Correction::TRANCHES_CHANGED => 'xxx3'];
-                           if (array_search($previous_difference_causes,
-                               Correction::LATE_INVOICE_PROPAGATION) !== false)
-                               $mondat['difference_causes'][Correction::LATE_INVOICE_PROPAGATION] = 'xxx4';
+                           $mondat['difference_causes'][Correction::TRANCHES_CHANGED] =
+                               $all_diff - $mondat['calculated_accumulated_attribution_euc'] * $mondat['commission_bp'] / 10000.;
+                           if (empty($previous_difference_causes) or
+                               array_search(Correction::LATE_INVOICE_PROPAGATION, $previous_difference_causes) !== false)
+                               $mondat['difference_causes'][Correction::LATE_INVOICE_PROPAGATION] =
+                                   $all_diff - $mondat['difference_causes'][Correction::TRANCHES_CHANGED];
                        }
                    }
-               } else if ($mondat['accumulated_attribution_euc'] !=
-                   $mondat['calculated_accumulated_attribution_euc']) {
+               } else if ($mondat['accumulated_attribution_euc'] != $mondat['calculated_accumulated_attribution_euc']) {
                    if ($mondat['simulated_commission_bp'] == $mondat['commission_bp'])
-                       $mondat['difference_causes'] = [Correction::LATE_INVOICE_PROPAGATION => $all_diff];
+                       $mondat['difference_causes'][Correction::LATE_INVOICE_PROPAGATION] = $all_diff;
                    else {
-                       $mondat['difference_causes'] = [Correction::TRANCHES_CHANGED => 'xxx6'];
-                       if (array_search($previous_difference_causes, Correction::LATE_INVOICE_PROPAGATION) !== false)
-                           $mondat['difference_causes'][Correction::LATE_INVOICE_PROPAGATION] = 'xxx7';
+                       $mondat['difference_causes'][Correction::TRANCHES_CHANGED] =
+                           $all_diff - $mondat['calculated_accumulated_attribution_euc'] * $mondat['commission_bp'] / 10000.;
+                       if (empty($previous_difference_causes) or
+                           array_search(Correction::LATE_INVOICE_PROPAGATION, $previous_difference_causes) !== false)
+                           $mondat['difference_causes'][Correction::LATE_INVOICE_PROPAGATION] =
+                                   $all_diff - $mondat['difference_causes'][Correction::TRANCHES_CHANGED];
                    }
                }
                $previous_difference_causes = $mondat['difference_causes'];

@@ -56,11 +56,10 @@ class AttributionController extends Controller
         $advisor_defaults = ArrayHelper::index(Advisor::find()->with('defaultAttributionType')->asArray()->all(), 'id');
         $attribution_types = ArrayHelper::map(AttributionType::find()->all(), 'id', 'attribution_bp');
 
+        $attribution = new Attribution(['transaction_id' => $transaction_id]);
         return $this->render('index', [
             'dataProvider' => $dataProvider,
-            'model' => new Attribution([
-                'transaction_id' => $transaction_id
-            ]),
+            'model' => $attribution,
             'attribution_types' => $attribution_types,
             'advisor_defaults' => $advisor_defaults,
             'total_invoiced_eu' => $total_invoiced_eu
