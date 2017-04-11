@@ -8,6 +8,8 @@ use yii\widgets\PjaxAsset;
 PjaxAsset::register($this);
 $formatter = Yii::$app->formatter;
 $this->title = Yii::t('app', 'Commission sheets');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Transactions'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 <h1 class="page-header"><?= $this->title ?></h1>
 <div class="well well-sm">

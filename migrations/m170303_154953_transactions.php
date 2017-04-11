@@ -174,34 +174,33 @@ class m170303_154953_transactions extends Migration
             'created_at' => $this->timestamp(2)->notNull()->defaultExpression('now()'),
             'updated_at' => $this->timestamp(2)->notNull()->defaultExpression('now()')
         ]);
+        $this->createTable('payroll', [
+            'id' => $this->primaryKey(),
+            'month' => $this->date()->notNull(),
+            'advisor_id' => $this->integer()->notNull() . ' references advisor(id)',
+            'commission_bp' => $this->integer(),
+            'created_at' => $this->timestamp(2)->notNull()->defaultExpression('now()'),
+            'updated_at' => $this->timestamp(2)->notNull()->defaultExpression('now()')
+        ]);
+        $this->createIndex('idx-unique-month-advisor_id', 'payroll', ['month', 'advisor_id'], true);
         $this->createTable('attribution', [
             'id' => $this->primaryKey(),
             'advisor_id' => $this->integer()->notNull() . ' references advisor(id)',
             'office' => $this->string(18) . ' references office(name)', // null means all/no offices
             'attribution_type_id' => $this->integer()->notNull() . ' references attribution_type(id)',
             'amount_euc' => $this->integer(),
-            'is_payrolled' => $this->boolean()->notNull()->defaultValue(false),
+            'payroll_id' => $this->integer() . ' references payroll(id)',
             'transaction_id' => $this->integer()->notNull() . ' references transaction(id)',
             'comments' => $this->text(),
             'created_at' => $this->timestamp(2)->notNull()->defaultExpression('now()'),
             'updated_at' => $this->timestamp(2)->notNull()->defaultExpression('now()')
         ]);
-        $this->createTable('payroll', [
-            'id' => $this->primaryKey(),
-            'transaction_id' => $this->integer()->notNull() . ' references transaction(id)',
-            'advisor_id' => $this->integer()->notNull() . ' references advisor(id)',
-            'commission_bp' => $this->integer()->notNull(),
-            'accumulated_euc' => $this->integer()->notNull(),
-            'created_at' => $this->timestamp(2)->notNull()->defaultExpression('now()'),
-            'updated_at' => $this->timestamp(2)->notNull()->defaultExpression('now()')
-        ]);
-        $this->createIndex('idx-unique-transaction-advisor', 'payroll', ['transaction_id', 'advisor_id']);
         $this->createTable('correction', [
             'id' => $this->primaryKey(),
             'payroll_id' => $this->integer()->notNull() . ' references payroll(id)',
             'corrected_euc' => $this->integer()->notNull(),
-            'compensated_euc' => $this->integer()->notNull()->defaultValue(0),
-            'compensated_on' => $this->date()->notNull(),
+            'compensation_euc' => $this->integer()->notNull()->defaultValue(0),
+            'compensation_on' => $this->date()->notNull(),
             'reason' => $this->string(32),
             'created_at' => $this->timestamp(2)->notNull()->defaultExpression('now()'),
             'updated_at' => $this->timestamp(2)->notNull()->defaultExpression('now()')
@@ -375,8 +374,8 @@ class m170303_154953_transactions extends Migration
         $this->execute('drop view transaction_list_item');
         $this->execute('drop function array_distinct(anyarray)');
         $this->dropTable('correction');
-        $this->dropTable('payroll');
         $this->dropTable('attribution');
+        $this->dropTable('payroll');
         $this->dropTable('invoice');
         $this->dropTable('transaction');
         $this->dropTable('recipient_category');

@@ -52,6 +52,9 @@ class AdvisorController extends Controller
     {
         $dataProvider = new ActiveDataProvider([
             'query' => Advisor::find(),
+            'sort' => [
+                'defaultOrder' => ['name' => SORT_ASC]
+            ]
         ]);
         return $this->render('index', [
             'dataProvider' => $dataProvider,

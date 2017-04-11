@@ -109,8 +109,8 @@ foreach ($data as $advisor => $advisor_data): ?>
             <th></th>
             <th><?= Yii::t('app', 'Tx') ?></th>
             <th><?= Yii::t('app', 'Invoiced') ?></th>
-            <th><?= Yii::t('app', 'Fees Cárdenas') ?></th>
-            <th><?= Yii::t('app', 'Fees Partner') ?></th>
+            <th><?= Yii::$app->params['company'] ?></th>
+            <th><?= Yii::t('app', 'Partner') ?></th>
             <th><?= Yii::t('app', 'Office') ?></th>
             <th><?= Yii::t('app', 'Attr. type') ?></th>
             <th><?= Yii::t('app', 'Attribution') ?></th>
@@ -125,7 +125,7 @@ foreach ($data as $advisor => $advisor_data): ?>
               <?php $first = true; $rowspan = count($month_data['transactions']); $fmonth = $formatter->asDate($month, 'MMMM') ?>
               <tr>
                 <td rowspan="<?= $rowspan ?>">
-                  <h4><span class="label label-danger monospace"><?= $fmonth ?></span></h4>
+                  <h4><span role="button" class="label label-danger monospace"><?= $fmonth ?> <span class="glyphicon glyphicon-folder-open"></span> </span></h4>
                 </td>
                 <?php foreach ($month_data['transactions'] as $tc): ?>
                   <?php if (!$first): ?>
@@ -180,9 +180,21 @@ foreach ($data as $advisor => $advisor_data): ?>
                         title="<?= $advisor_data['tranches_caption'] ?>" data-html="true" role="button">
                       <?php echo $formatter->asDecimal($month_data['commission_bp'] / 100., 2) ?> %
                     </span></td>
-                    <td rowspan="<?= $rowspan ?>" class="text-right nowrap"><strong>
-                      <?php echo $formatter->asDecimal($month_data['commission_euc'] / 100., 2) ?> €
-                    </strong></td>
+                    <td rowspan="<?= $rowspan ?>" class="text-right nowrap
+                      <?php if ($month_data['compensated_euc']) {
+                          echo 'text-warning'; 
+                          $tt_title = ''; $br = '';
+                          foreach ($month_data['compensations'] as $compensation) {
+                              $tt_title .= $br . "{$compensation['reason']} (" .
+                                  $formatter->asDate($compensation['payroll']['month'], 'MMMM \'\'yy') . '): ' .
+                                  $formatter->asDecimal($compensation['compensation_euc'] / 100., 2) . ' €';
+                              $br = '<br>';
+                          }
+                          $compensation_tooltip = 'data-toggle="tooltip" title="' . $tt_title . '" data-html="true" role="button"';
+                      } else $compensation_tooltip= ''; ?>">
+                      <strong <?= $compensation_tooltip ?>>
+                        <?php echo $formatter->asDecimal(($month_data['commission_euc'] + $month_data['compensated_euc'])/ 100., 2) ?> €
+                      </strong></td>
                     <td rowspan="<?= $rowspan ?>" class="text-right nowrap">
                     <?php if ($month_data['calculated_commission_euc'] != $month_data['commission_euc']): ?>
                       <?php if ($month_data['calculated_commission_euc'] - $month_data['commission_euc'] < 0)
@@ -209,8 +221,8 @@ foreach ($data as $advisor => $advisor_data): ?>
                           <tr>
                             <td><?= $correction['reason'] ?></td>
                             <td class="text-right"><?= $formatter->asDecimal($correction['corrected_euc'] / 100., 2) ?>€</td>
-                            <td class="text-right"><?= $formatter->asDecimal($correction['compensated_euc'] / 100., 2) ?> €</td>
-                            <td><?= $formatter->asDate($correction['compensated_on'], 'MMMM') ?></td>
+                            <td class="text-right"><?= $formatter->asDecimal($correction['compensation_euc'] / 100., 2) ?> €</td>
+                            <td><?= $formatter->asDate($correction['compensation_on'], 'MMMM') ?></td>
                           </tr>
                         <?php endforeach; ?>
                       </tbody></table>
@@ -289,7 +301,6 @@ $script = <<< JS
   $('.correction-popover').on('shown.bs.popover', function() {
       $(this).next('.popover').find('.correction-form').replaceWith(\$correctionFormWrapper.find('.correction-form'));
       $(this).next('.popover').find('.correction-form').find('input[name="Correction[payroll_id]"]').val($(this).data('payroll_id'));
-      
   });
   $('.correction-popover').popover({
       content: function() {

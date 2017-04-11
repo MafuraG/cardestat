@@ -243,7 +243,7 @@ class TransactionController extends Controller
             ->orderBy('advisor_name asc, payroll_month asc, transaction_id asc')->asArray();
         if ($advisor_id) $q->andWhere(['advisor_id' => $advisor_id]);
         $row_set = $q->all();
-        $advisor_ids = ArrayHelper::getColumn($row_set, 'advisor_id');
+        $advisor_ids = ArrayHelper::map($row_set, 'advisor_name', 'advisor_id');
         $tranches = ArrayHelper::index(AdvisorTranche::find()
             ->where(['advisor_id' => $advisor_ids])
             ->orderBy('from_euc desc')
@@ -255,42 +255,47 @@ class TransactionController extends Controller
            $previous_difference_causes = [];
            $data[$advisor]['total_commission_euc'] = 0;
            $data[$advisor]['calculated_total_commission_euc'] = 0;
-           foreach ($months as $month => & $tx_summaries) {
+           $data[$advisor]['tranches'] = $tranches[$advisor_ids[$advisor]];
+           $calc_accum_attrib = 0;
+           foreach ($months as $month => $tx_summaries) {
+               $data[$advisor]['months'][$month] = [];
                $mondat = & $data[$advisor]['months'][$month];
-               $mondat['transactions'] = & $tx_summaries; 
-               $a_tx_summary= reset($tx_summaries);
-               $data[$advisor]['tranches'] = $tranches[$a_tx_summary['advisor_id']];
-               $payroll = Payroll::findOne([
-                   'transaction_id' => $a_tx_summary['transaction_id'],
-                   'advisor_id' => $a_tx_summary['advisor_id']
-               ]);
+               $mondat['transactions'] = & $months[$month]; 
+               $mondat['accumulated_attribution_euc'] = 0;
+               $mondat['commission_bp'] = 0;
+               $mondat['compensated_euc'] = 0;
+               $mondat['compensations'] = Correction::find()->with('payroll')->asArray()->where([
+                   'compensation_on' => $month
+               ])->all();
+               foreach ($mondat['compensations'] as $compensation) $mondat['compensated_euc'] += $compensation['compensation_euc'];
+               $payroll = Payroll::find()->with('corrections')->where([
+                   'advisor_id' => $advisor_ids[$advisor],
+                   'month' => $month
+               ])->one();
                $mondat['payroll_id'] = $payroll->id;
-               $mondat['commission_bp'] = $payroll->commission_bp;
-               $mondat['accumulated_attribution_euc'] = $payroll->accumulated_euc;
+               $mondat['accumulated_attribution_euc'] = $previous_accum_attribution;
+               foreach ($tx_summaries as $tx_summary) {
+                   $mondat['commission_bp'] = $payroll->commission_bp;
+                   $mondat['accumulated_attribution_euc'] += $tx_summary['total_attributed_sum_euc'];
+               }
                $mondat['corrections'] = ['sum' => 0, 'rows' => ArrayHelper::toArray($payroll->corrections)];
                foreach ($mondat['corrections']['rows'] as $correction) $mondat['corrections']['sum'] += $correction['corrected_euc'];
-               $mondat['attribution_euc'] = $mondat['accumulated_attribution_euc'] -
-                       $previous_accum_attribution;
-               $mondat['commission_euc'] = $mondat['attribution_euc'] * $mondat['commission_bp'] / 10000.;
-               $data[$advisor]['total_commission_euc'] += $mondat['attribution_euc'] *
-                       $mondat['commission_bp'] / 10000.;
+               $mondat['attribution_euc'] = $mondat['accumulated_attribution_euc'] - $previous_accum_attribution;
                $previous_accum_attribution = $mondat['accumulated_attribution_euc'];
                $mondat['calculated_attribution_euc'] = 0;
-               foreach ($tx_summaries as & $tx_summary) {
+               foreach ($mondat['transactions'] as $tx_id => $tx_summary) {
                    $tx_summary['calculated_total_attributed_sum_euc'] =
                        $tx_summary['calculatedSummary']['calculated_total_attributed_sum_euc'];
-                   unset($tx_summary['calculatedSummary']);
+                   unset($mondat['transactions'][$tx_id]['calculatedSummary']);
                    $mondat['calculated_attribution_euc'] += $tx_summary['calculated_total_attributed_sum_euc'];
                }
-               $ctas = TransactionAttributionCalculatedSummary::find()
-                   ->select(['sum(calculated_total_attributed_sum_euc)'])
-                   ->where(['to_char(payroll_month, \'yyyy\')' => $year])
-                   ->andWhere(['advisor_id' => $a_tx_summary['advisor_id']])
-                   ->andWhere(['<=', 'payroll_month', $month])
-                   ->groupBy(['to_char(payroll_month, \'yyyy\')'])->createCommand()->queryColumn();
-               $mondat['calculated_accumulated_attribution_euc'] = isset($ctas[0]) ? $ctas[0] : 0;
+               $calc_accum_attrib += $mondat['calculated_attribution_euc'];
+               $mondat['calculated_accumulated_attribution_euc'] = $calc_accum_attrib;
                $mondat['calculated_commission_bp'] = AdvisorTranche::selectTranche($data[$advisor]['tranches'],
                        $mondat['calculated_accumulated_attribution_euc'])['commission_bp'];
+               if (!$mondat['commission_bp']) $mondat['commission_bp'] = $mondat['calculated_commission_bp'];
+               $mondat['commission_euc'] = $mondat['attribution_euc'] * $mondat['commission_bp'] / 10000.;
+               $data[$advisor]['total_commission_euc'] += $mondat['attribution_euc'] * $mondat['commission_bp'] / 10000.;
                $mondat['simulated_commission_bp'] = AdvisorTranche::selectTranche($data[$advisor]['tranches'],
                        $mondat['accumulated_attribution_euc'])['commission_bp'];
                $mondat['calculated_commission_euc'] = $mondat['calculated_attribution_euc'] *

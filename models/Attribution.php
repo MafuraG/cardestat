@@ -5,7 +5,6 @@ namespace app\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
-use app\models\Payroll;
 
 /**
  * This is the model class for table "attribution".
@@ -117,10 +116,7 @@ class Attribution extends \yii\db\ActiveRecord
      */
     public function getPayroll()
     {
-        return $this->hasOne(Payroll::className(), ['transaction_id' => 'id'])
-            ->via('transaction', function($q) {
-                $q->where(['id' => $this->transaction_id]);
-            })->andOnCondition(['advisor_id' => $this->advisor_id]);
+        return $this->hasOne(Payroll::className(), ['id' => 'payroll_id']);
     }
 
     /**
@@ -133,18 +129,15 @@ class Attribution extends \yii\db\ActiveRecord
 
     public function beforeSave($insert) {
         $this->_dbTransaction = Yii::$app->db->beginTransaction();
-        if ($this->transaction->payroll_month and !$this->is_payrolled) try {
+        if ($this->transaction->payroll_month and !$this->payroll_id) try {
             $payroll = Payroll::find()
                 ->where(['advisor_id' => $this->advisor_id])
-                ->andWhere(['transaction_id' => $this->transaction_id])
+                ->andWhere(['month' => $this->transaction->payroll_month])
                 ->one();
             if (!$payroll) {
-                $tranche = AdvisorTranche::selectTranche($this->advisor->getTranches()->asArray()->all(), 0);
                 $payroll = new Payroll([
                     'transaction_id' => $this->transaction_id,
-                    'advisor_id' => $this->advisor_id,
-                    'commission_bp' => $tranche['commission_bp'],
-                    'accumulated_euc' => 0 
+                    'advisor_id' => $this->advisor_i,
                 ]);
                 if (!$payroll->save()) {
                     $msg = var_export($payroll->errors, 1);
@@ -152,6 +145,7 @@ class Attribution extends \yii\db\ActiveRecord
                 }
             }
             $this->amount_euc = 0;
+            $this->payroll_id = $payroll->id;
         } catch (\Exception $e) {
             $this->_dbTransaction->rollback();
             throw new \yii\web\HttpException(500, $e->getMessage());

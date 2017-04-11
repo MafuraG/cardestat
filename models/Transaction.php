@@ -182,9 +182,9 @@ class Transaction extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getPayrolls()
+    public function getPayrolledTransactions()
     {
-        return $this->hasMany(Payroll::className(), ['transaction_id' => 'id']);
+        return $this->hasMany(PayrolledTransaction::className(), ['transaction_id' => 'id']);
     }
 
     /**
@@ -198,7 +198,7 @@ class Transaction extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCalculatedAttributions()
+    public function getEffectiveAttributions()
     {
         return $this->hasMany(TransactionAttribution::className(), ['transaction_id' => 'id']);
     }
@@ -314,53 +314,43 @@ class Transaction extends \yii\db\ActiveRecord
             if (array_key_exists('payroll_month', $changedAttributes) and
                 $changedAttributes['payroll_month'] !== $this->payroll_month) {
                 if ($this->payroll_month) {
-                    $month = substr($this->payroll_month, 0, 7);
-                    $year = substr($this->payroll_month, 0, 4);
-                    $accumulated_attributions = ArrayHelper::map(TransactionAttributionSummary::find()
-                        ->select(['advisor_id', 'sum(total_attributed_sum_euc)'])
-                        ->where(['to_char(payroll_month, \'yyyy\')' => $year])
-                        ->andWhere(['<=', 'to_char(payroll_month, \'yyyy-mm\')', $month])
-                        ->groupBy(['advisor_id'])->createCommand()->queryAll(), 'advisor_id', 'sum');
-                    $calc_attributions = $this->getCalculatedAttributions()->with('tranches')->all();
-                    $transaction_payrolls = [];
-                    foreach ($calc_attributions as $calc_attribution) {
-                        $attribution = $calc_attribution->attribution;
+                    $effective_attributions = $this->getEffectiveAttributions()->with('tranches')->all();
+                    $payrolls = [];
+                    foreach ($effective_attributions as $effective_attribution) {
+                        $attribution = $effective_attribution->attribution;
                         $advisor_id = $attribution->advisor_id;
-                        if (!isset($transaction_payrolls[$advisor_id])) {
-                            $accumulated_attribution_euc = $accumulated_attributions[$advisor_id];
-                            $tranche = AdvisorTranche::selectTranche(
-                                ArrayHelper::toArray($calc_attribution->tranches), $accumulated_attribution_euc);
-                            $transaction_payrolls[$advisor_id] = new Payroll([
-                                'commission_bp' => $tranche['commission_bp'],
-                                'accumulated_euc' => $accumulated_attribution_euc,
+                        $payrolls[$advisor_id] = Payroll::findOne([
+                            'advisor_id' => $advisor_id,
+                            'month' => $this->payroll_month
+                        ]);
+                        if (!isset($payrolls[$advisor_id])) {
+                            $payrolls[$advisor_id] = new Payroll([
                                 'advisor_id' => $advisor_id,
-                                'transaction_id' => $this->id
+                                'month' => $this->payroll_month
                             ]);
-                            if (!$transaction_payrolls[$advisor_id]->save()) {
-                                $msg = var_export($transaction_payrolls[$advisor_id]->errors, 1);
+                            if (!$payrolls[$advisor_id]->save()) {
+                                $msg = var_export($payrolls[$advisor_id]->errors, 1);
                                 throw new \Exception($msg);
                             }
                         }
-                        $attribution->amount_euc = $calc_attribution->amount_euc;
-                        $attribution->is_payrolled = true;
+                        $attribution->amount_euc = $effective_attribution->amount_euc;
+                        $attribution->payroll_id = $payrolls[$advisor_id]->id;
                         if (!$attribution->save(false)) {
                             $msg = var_export($attribution->errors, 1);
                             throw new \Exception($msg);
                         }
                     }
                 } else {
-                    foreach ($this->payrolls as $payroll) if ($payroll->delete() === false) {
-                        $msg = var_export($payroll->errors, 1);
-                        throw new \Exception($msg);
-                    }
                     foreach ($this->attributions as $attribution) {
-                        $attribution->is_payrolled = false;
+                        $attribution->payroll_id = null;
                         $attribution->amount_euc = null;
                         if (!$attribution->save(false)) {
                             $msg = var_export($attribution->errors, 1);
                             throw new \Exception($msg);
                         }
                     }
+                    foreach (Payroll::find()->joinWith('attributions')
+                        ->where(['payroll_id' => null])->each() as $zombie_payroll) $zombie_payroll->delete();
                 }
             }
             $this->_dbTransaction->commit();

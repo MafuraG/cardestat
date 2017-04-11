@@ -25,14 +25,14 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
         ]]); ?>
       </div>
       <div class="col-sm-4">
-        <?= $form->field($model, 'compensated_eu', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
+        <?= $form->field($model, 'compensation_eu', ['template' => $euTpl])->widget(MaskMoney::classname(), ['options' => [
             'class' => 'text-right input-sm mask-money',
         ], 'pluginOptions' => [
             'allowNegative' => true
         ]]); ?>
       </div>
       <div class="col-sm-4">
-        <?= $form->field($model, 'compensated_on')->widget(DatePicker::classname(), [
+        <?= $form->field($model, 'compensation_on')->widget(DatePicker::classname(), [
             'size' => 'sm',
             'removeButton' => false,
             'pluginOptions' => [
