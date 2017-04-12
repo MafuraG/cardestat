@@ -366,10 +366,10 @@ $user = Yii::$app->user;
         <hr style="border-top: 1px solid #ddd">
         <?= $form->field($model, 'comments')
             ->textarea(['rows' => 6, 'form' => $form->id, 'disabled' => $readonly]) ?>
-        <?= $form->field($model, 'approved_by_direction')
-            ->checkbox(['form' => $form->id, 'disabled' => $readonly or !$user->can('admin')]) ?>
         <?= $form->field($model, 'approved_by_accounting')
             ->checkbox(['form' => $form->id, 'disabled' => $readonly]) ?>
+        <?= $form->field($model, 'approved_by_direction')
+            ->checkbox(['form' => $form->id, 'disabled' => $readonly or !$user->can('admin')]) ?>
       </div>
     <?php endif; ?>
   </div>

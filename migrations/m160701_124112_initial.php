@@ -16,10 +16,6 @@ class m160701_124112_initial extends Migration {
             'username' => 'admin',
             'hash' => '$2y$13$yQ0zD/9LKz76Jlifsus8jeMXLXWtQG5AuFyF.cwzjNGFv1Ajeewiq' // password 'secret'
         ]);
-        $this->insert('user', [
-            'username' => 'pepe',
-            'hash' => '$2y$13$yQ0zD/9LKz76Jlifsus8jeMXLXWtQG5AuFyF.cwzjNGFv1Ajeewiq' // password 'secret'
-        ]);
         $this->createTable('item', [
             'id' => Schema::TYPE_PK,
             'name' => 'varchar(48) not null',

@@ -32,13 +32,16 @@
   </div>
   <div class="col-md-2 text-right">
     {{ app.formatter.asDecimal(model.sale_price_euc/100, 2) }} € &nbsp;
-    <button type="button" class="btn btn-default btn-xs pull-right dropdown-toggle" data-toggle="dropdown" role="button"><span class="glyphicon glyphicon-cog"></span></button>
-    <ul class="dropdown-menu">
+    <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+      <span class="glyphicon glyphicon-cog"></span></button>
+    <ul class="dropdown-menu pull-right">
       <li><a class="transaction-details" href="javascript:void(0)">{{ t('app', 'See details') }}</a></li>
-      <li><a class="transaction-edit" href="javascript:void(0)">{{ t('app', 'Edit') }}</a></li>
-      <li><a class="transaction-remove" href="javascript:void(0)">{{ t('app', 'Delete') }}</a></li>
-      <li role="separator" class="divider"></li>
-      <li><a class="transaction-approve" href="javascript:void(0)">{{ t('app', 'Approve') }}</a></li>
+      {% if app.user().can('admin') or
+          not model.approved_by_direction and app.user().can('accounting') or
+          not model.approved_by_accounting and app.user().can('contracts') %}
+        <li><a class="transaction-edit" href="javascript:void(0)">{{ t('app', 'Edit') }}</a></li>
+        <li><a class="transaction-remove" href="javascript:void(0)">{{ t('app', 'Delete') }}</a></li>
+      {% endif %}
     </ul>
   </div>
   <div class="col-md-2">
@@ -75,6 +78,8 @@
   <div class="col-md-2 text-right">
     <small class="text-muted">({{ app.formatter.asDecimal(model.our_fee_bp, 2) }}%)</small> {{ app.formatter.asDecimal(model.our_fee_euc/100, 2) }} € &nbsp;
     {% if (model.approved_by_direction) %}
+      <span class="text-danger glyphicon glyphicon-ban-circle"></span>&nbsp;
+    {% elseif (model.approved_by_accounting) %}
       <span class="text-success glyphicon glyphicon-ok-sign"></span>&nbsp;
     {% else %}
       <span class="text-warning glyphicon glyphicon-alert"></span>&nbsp;

@@ -24,7 +24,7 @@ class InvoiceController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [[
                     'allow' => true,
-                    'roles' => ['@']
+                    'roles' => ['accounting']
                 ]]
             ],
             'verbs' => [
@@ -63,24 +63,25 @@ class InvoiceController extends Controller
     {
         $model = new Invoice();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->actionIndex($model->transaction_id);
-        } else {
-            $dataProvider = new ActiveDataProvider([
-                'query' => Invoice::find()->where(['transaction_id' => $model->transaction_id])
-            ]);
-            return $this->render('index', [
-                'model' => $model,
-                'dataProvider' => $dataProvider,
-                'formExpanded' => true
-            ]);
+        if ($model->load(Yii::$app->request->post())) {
+            if (!Yii::$app->user->can('admin') and $model->transaction->approved_by_direction) throw new ForbiddenHttpException();
+            else if ($model->save()) return $this->actionIndex($model->transaction_id);
         }
+        $dataProvider = new ActiveDataProvider([
+            'query' => Invoice::find()->where(['transaction_id' => $model->transaction_id])
+        ]);
+        return $this->render('index', [
+            'model' => $model,
+            'dataProvider' => $dataProvider,
+            'formExpanded' => true
+        ]);
     }
     /**
      */
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
+        if (!Yii::$app->user->can('admin') and $model->transaction->approved_by_direction) throw new ForbiddenHttpException();
         $transaction_id = $model->transaction_id;
         $model->delete();
         if (Yii::$app->request->isAjax)

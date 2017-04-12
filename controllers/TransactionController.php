@@ -19,6 +19,7 @@ use app\models\TransactionListItemSearch;
 use yii\helpers\ArrayHelper;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use kartik\mpdf\Pdf;
@@ -53,6 +54,7 @@ class TransactionController extends Controller
      */
     public function actionCommissions($year = '', $advisor_id = '')
     {
+        if (!Yii::$app->user->can('accounting')) throw new ForbiddenHttpException();
         if (!$year) $year = date('Y');
         $data = $this->mkCommissionsViewData($year, $advisor_id);
         $years = Transaction::find()->select(['to_char(payroll_month, \'yyyy\')'])
@@ -138,10 +140,15 @@ class TransactionController extends Controller
      */
     public function actionCreate()
     {
+        if (!Yii::$app->user->can('contracts')) throw new ForbiddenHttpException();
         $model = new Transaction();
+        if (Yii::$app->user->can('admin')) $model->scenario = 'admin';
+        else if (Yii::$app->user->can('accounting')) $model->scenario = 'accounting';
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            if (Yii::$app->request->isAjax)
+                return 'ok';
+            else return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('create', [
                 'model' => $model,
@@ -180,6 +187,11 @@ class TransactionController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id, true);
+        if (Yii::$app->user->can('admin')) $model->scenario = 'admin';
+        else if (Yii::$app->user->can('accounting')) $model->scenario = 'accounting';
+        if (!Yii::$app->user->can('contracts') or 
+            !Yii::$app->user->can('accounting') and $model->approved_by_accounting or 
+            !Yii::$app->user->can('admin') and $model->approved_by_direction) throw new ForbiddenHttpException();
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             if (Yii::$app->request->isAjax)
                 return 'ok';

@@ -13,16 +13,18 @@ Select2::widget([
     'name' => 'foo',
     'value' => '',
 ]);
+$user = Yii::$app->user;
 ?>
 
 <h1 class="page-header"><?= Yii::t('app', 'Transactions')?></h1>
 
 <div class="transaction-index">
-  <p>
-  <?= Html::a(Yii::t('app', 'Create Transaction'), ['transaction/create'], [
-      'class' => 'btn btn-success',
-  ]) ?>
-  </p>
+  <?php if ($user->can('contracts')): ?>
+  <p><?= Html::a(Yii::t('app', 'Create Transaction'), ['transaction/create'], [
+      'class' => 'btn btn-success btn-create',
+  ]) ?></p>
+  <?php endif; ?>
+
   <?= $this->render('_search', [
       'model' => $searchModel
   ]) ?>
@@ -49,6 +51,7 @@ Select2::widget([
   <?php Modal::end() ?>
 </div>
 <?php
+$newTransactionLbl = Yii::t('app', 'Create Transaction');
 $transactionLbl = Yii::t('app', 'Transaction');
 $txUpdateUrl = Url::to(['transaction/update', 'id' => '_id_']);
 $txViewUrl = Url::to(['transaction/view', 'id' => '_id_']);
@@ -89,9 +92,11 @@ $script = <<< JS
           \$transactionModal.modal('hide');
       } else modalDataLoaded();
   });
-  var last_id = -1;
+  var last_id;
   function modalDataLoaded() {
-      \$transactionModal.find('.modal-header h3').html('{$transactionLbl} #' + last_id);
+      if (last_id)
+          \$transactionModal.find('.modal-header h3').html('{$transactionLbl} #' + last_id);
+      else \$transactionModal.find('.modal-header h3').html('{$newTransactionLbl}');
       \$transactionModal.modal('show');
   }
   $('[data-toggle="tooltip"]').tooltip()
@@ -120,6 +125,11 @@ $script = <<< JS
     var id = $(this).closest('.transaction').data('key');
     $.pjax({container: '#p1', url: txViewUrl.replace('_id_', id), scrollTo: false, push: false});
     last_id = id;
+  });
+  $('.transaction-index .btn-create').on('click', function() {
+      last_id = null;
+      $.pjax({container: '#p1', url: $(this).attr('href'), scrollTo: false, push: false});
+      return false;
   });
   var reload_list = false;
   \$transactionModal.on('pjax:end', '#invoice-index-p0, #attribution-index-p0', function() {
