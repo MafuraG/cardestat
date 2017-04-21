@@ -10,7 +10,7 @@ use yii\filters\VerbFilter;
 use app\models\Advisor;
 use app\models\Invoice;
 use app\models\Attribution;
-use app\models\TransactionAttribution;
+use app\models\EffectiveAttribution;
 use app\models\AttributionType;
 use yii\helpers\ArrayHelper;
 
@@ -48,7 +48,7 @@ class AttributionController extends Controller
     public function actionIndex($transaction_id)
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => TransactionAttribution::find()->where(['transaction_id' => $transaction_id])
+            'query' => EffectiveAttribution::find()->where(['transaction_id' => $transaction_id])
         ]);
         $total_invoiced_eu = Invoice::find()
             ->where(['transaction_id' => $transaction_id])
@@ -80,7 +80,7 @@ class AttributionController extends Controller
             else if ($model->save()) return $this->actionIndex($model->transaction_id);
         }
         $dataProvider = new ActiveDataProvider([
-            'query' => TransactionAttribution::find()
+            'query' => EffectiveAttribution::find()
                 ->where(['transaction_id' => $model->transaction_id])
         ]);
         return $this->render('index', [

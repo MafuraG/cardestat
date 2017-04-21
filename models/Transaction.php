@@ -100,6 +100,7 @@ class Transaction extends \yii\db\ActiveRecord
         return [
             ['external_id', 'unique'],
             [['first_published_at', 'last_published_at', 'option_signed_at', 'search_started_at', 'payroll_month'], 'date', 'format' => 'yyyy-MM-dd'],
+            ['payroll_month', 'checkPayrollMonth'],
             [['first_published_price_eu', 'last_published_price_eu', 'sale_price_eu', 'suggested_sale_price_eu', 'our_fee_eu', 'their_fee_eu'], 'number'],
             [['buyer_id', 'seller_id', 'passed_to_sales_by', 'property_id'], 'integer'],
             [['transaction_type', 'option_signed_at', 'buyer_id', 'seller_id', 'property_id', 'sale_price_eu'], 'required'],
@@ -124,6 +125,15 @@ class Transaction extends \yii\db\ActiveRecord
         ];
     }
 
+    public function checkPayrollMonth($attribute, $params) 
+    {
+        $advisor_ids = ArrayHelper::getColumn($this->attributions, 'advisor_id');
+        $n = Payroll::find()->where([
+            'month' => $this->payroll_month,
+            'advisor_id' => $advisor_ids
+        ])->andWhere(['not', ['commission_bp' => null]])->count();
+        if ($n > 0) $this->addError($attribute, Yii::t('app', 'Some adviser has its payroll closed already for this month.'));
+    }
     /**
      * @inheritdoc
      */
@@ -202,7 +212,7 @@ class Transaction extends \yii\db\ActiveRecord
      */
     public function getEffectiveAttributions()
     {
-        return $this->hasMany(TransactionAttribution::className(), ['transaction_id' => 'id']);
+        return $this->hasMany(EffectiveAttribution::className(), ['transaction_id' => 'id']);
     }
 
     /**
@@ -373,5 +383,33 @@ class Transaction extends \yii\db\ActiveRecord
         $this->our_fee_euc = round($this->our_fee_eu * 100.);
         $this->their_fee_euc = round($this->their_fee_eu * 100.);
         return parent::beforeSave($insert);
+    }
+    public static function getVolume($from = null, $to = null, $months = 1, $transaction_type = null, $sum_alias = 'sum')
+    {
+        if ($months == 12) $interval = 'year';
+        else if ($months == 3) $interval = 'quarter';
+        else $interval = 'month';
+        $joinArgs = [
+            ':arg0' => $interval,
+            ':arg1' => $from,
+            ':arg2' => $to,
+            ':arg3' => "$months month",
+            ':arg4' => $interval,
+            ':arg5' => $from,
+            ':arg6' => $to,
+        ];
+        $joinCondition = "series.period = date_trunc(:arg4, option_signed_at)::date and option_signed_at between :arg5 and :arg6";
+        if ($transaction_type) {
+            $joinCondition .=  ' and transaction_type = :arg7';
+            $joinArgs[':arg7'] = $transaction_type;
+        }
+        return static::find()
+            ->select(['period', "round(sum(sale_price_euc) / 100., 2) as {$sum_alias}"])
+            ->rightJoin("(
+                select date_trunc(:arg0, d)::date as period
+                from generate_series(:arg1::date, :arg2, :arg3) d) series", $joinCondition, $joinArgs)
+            ->groupBy('period')
+            ->orderBy('period')
+            ->createCommand()->queryAll();
     }
 }

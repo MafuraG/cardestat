@@ -53,7 +53,11 @@ $f$ language sql immutable;
 
 --
 
-select load_csv_file('firmas', '/home/claudio/Downloads/Firmas incl. colab. 2017.csv', 21);
+drop table if exists firmas;
+select load_csv_file('firmas', '/home/claudio/projects/cardestat/Firmas incl. colab. 2017.csv', 21);
+
+insert into property (reference, entry_date, active_date, inactive_date, property_type, location, geo_coordinates, plot_area_dm2, built_area_dm2, n_bedrooms)
+    values ('23447-RS', '2016-08-01', '2016-08-01', '2016-09-01', 'Villa', 'Maspalomas_Meloneras', '27.744695, -15.610053', 66800, 39100, 5);
 
 insert into partner (name)
     select distinct upper(colab_comprador)
@@ -76,7 +80,6 @@ insert into transaction (
     buyer_id,
     seller_id,
     property_id,
-    created_at,
     transaction_type,
     buyer_provider,
     seller_provider)
@@ -87,7 +90,6 @@ select distinct on (f.id)
     b.id,
     s.id,
     p.id,
-    now(),
     coalesce(upper(asesoramiento), 'COMPRAVENTA'),
     upper(colab_comprador),
     upper(colab_vendedor)
@@ -95,6 +97,42 @@ from firmas f
          join contact s on (f.ref_vendedor = s.reference)
          join contact b on (f.ref_comprador = b.reference)
          join property p on (f.ref_prop = p.reference);
+
+insert into transaction(
+    external_id,
+    option_signed_at,
+    sale_price_euc,
+    buyer_id,
+    seller_id,
+    property_id,
+    transaction_type,
+    buyer_provider,
+    seller_provider)
+select 689, '2016-06-16', 236000, b.id, s.id, p.id, 'COMPRAVENTA', null, null
+from contact s,
+     contact b,
+     property p
+where s.reference = '21774' and
+      b.reference = '1937' and 
+      p.reference = '23008-RK';
+
+insert into transaction(
+    external_id,
+    option_signed_at,
+    sale_price_euc,
+    buyer_id,
+    seller_id,
+    property_id,
+    transaction_type,
+    buyer_provider,
+    seller_provider)
+select 690, '2016-07-21', 144500, b.id, s.id, p.id, 'COMPRAVENTA', null, null
+from contact s,
+     contact b,
+     property p
+where s.reference = '21774' and
+      b.reference = '1937' and 
+      p.reference = '23008-RK';
 
 insert into attribution (advisor_id, attribution_type_id, amount_euc, transaction_id, created_at)
     select ad.id, at.id, 0, t.id, now()
@@ -106,7 +144,7 @@ insert into attribution (advisor_id, attribution_type_id, amount_euc, transactio
           'GG' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'GILBERTO GIL' or
           'LL' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'LONNIE LINDQUIST' or
           'LM' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'LEONOR MARTÍN' or
-          'CG' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'CAROLINA GARCÍA' or
+          'CG' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'CARLOS GÓMEZ' or
           'AK' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'AXEL KUBISCH' or
           'DG' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'DANIEL GARCÍA' or
           'SB' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'STEPHAN BERGONJE' or

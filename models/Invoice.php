@@ -95,4 +95,29 @@ class Invoice extends \yii\db\ActiveRecord
         $this->amount_euc = round($this->amount_eu * 100.);
         return parent::beforeSave($insert);
     }
+    public static function getRevenue($from = null, $to = null, $months = 1, $transaction_type = null, $sum_alias = 'sum')
+    {
+        if ($months == 12) $interval = 'year';
+        else if ($months == 3) $interval = 'quarter';
+        else $interval = 'month';
+        $query = static::find()
+            ->select(['period', "round(sum(amount_euc) / 100., 2) as {$sum_alias}"])
+            ->rightJoin("(
+                select date_trunc(:arg0, d)::date as period 
+                from generate_series(:arg1::date, :arg2, :arg3) d) series",
+                "series.period = date_trunc(:arg4, issued_at)::date and issued_at between :arg5 and :arg6", [
+                ':arg0' => $interval,
+                ':arg1' => $from,
+                ':arg2' => $to,
+                ':arg3' => "$months month",
+                ':arg4' => $interval,
+                ':arg5' => $from,
+                ':arg6' => $to,
+            ])->groupBy('period')
+            ->orderBy('period');
+        if ($transaction_type) $query->innerJoinWith(['transaction' => function($q) use ($transaction_type) {
+            $q->onCondition(['transaction_type' => $transaction_type]);
+        }]);
+        return $query->createCommand()->queryAll();
+    }
 }

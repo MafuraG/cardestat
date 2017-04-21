@@ -102,6 +102,14 @@ class Advisor extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getEffectiveAttributions()
+    {
+        return $this->hasMany(EffectiveAttribution::className(), ['advisor_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getAttributions()
     {
         return $this->hasMany(Attribution::className(), ['advisor_id' => 'id']);
@@ -134,5 +142,50 @@ class Advisor extends \yii\db\ActiveRecord
     public static function listAll()
     {
         return ArrayHelper::map(static::find()->orderBy('name')->all(), 'id', 'name');
+    }
+    /**
+     */
+    public static function getAttributionSum($from, $to, $sum_alias = 'sum', $count_alias = 'count')
+    {
+        return static::find()
+            ->joinWith(['effectiveAttributions.transaction' => function($q) use ($from, $to) {
+                $q->where('option_signed_at between :from and :to', [
+                    ':from' => $from,
+                    ':to' => $to
+                ]);
+            }])->select(['name', "round(sum(amount_euc / 100.), 2) as {$sum_alias}", "count(*) as {$count_alias}"])
+            ->orderBy('name')
+            ->groupBy('name')
+            ->createCommand()->queryAll();
+    }
+    /**
+     */
+    public static function getProratedOperationCount($from, $to, $sum_alias = 'sum', $count_alias = 'count')
+    {
+        return static::find()
+            ->joinWith(['effectiveAttributions.attributionType', 'effectiveAttributions.transaction' => function($q) use ($from, $to) {
+                $q->where('option_signed_at between :from and :to', [
+                    ':from' => $from,
+                    ':to' => $to
+                ])->andWhere(['<>', 'attribution_bp', 0]);
+            }])->select(['advisor.name', "round(sum(attribution_type.attribution_bp / 10000.), 4) as {$sum_alias}", "count(*) as {$count_alias}"])
+            ->orderBy('advisor.name')
+            ->groupBy('advisor.name')
+            ->createCommand()->queryAll();
+    }
+    /**
+     */
+    public static function getAttributionOverOperationCount($from, $to, $sum_alias = 'sum', $count_alias = 'count')
+    {
+        return static::find()
+            ->joinWith(['effectiveAttributions.attributionType', 'effectiveAttributions.transaction' => function($q) use ($from, $to) {
+                $q->where('option_signed_at between :from and :to', [
+                    ':from' => $from,
+                    ':to' => $to
+                ])->andWhere(['<>', 'attribution_bp', 0]);
+            }])->select(['advisor.name', "round(sum(amount_euc)/count(*) * 100, 2) as {$sum_alias}", "count(*) as {$count_alias}"])
+            ->orderBy('advisor.name')
+            ->groupBy('advisor.name')
+            ->createCommand()->queryAll();
     }
 }

@@ -7,16 +7,22 @@ $formatter = Yii::$app->formatter;
 $sellerLbl = Yii::t('app', 'Seller');
 $buyerLbl = Yii::t('app', 'Buyer');
 $propertyLbl = Yii::t('app', 'Property');
-$salePriceLbl = Yii::t('app', 'Sale price');
+$salePriceLbl = Yii::t('app', 'Sale Price');
 $commentsLbl = Yii::t('app', 'Comments');
 
-function mkInvoiceTooltip($tc) {
-    $icodes = explode(', ', $tc['invoice_codes']);
-    $idates = explode(', ', $tc['invoice_issuance_dates']);
-    $icd = array_combine($icodes, $idates);
+function mkAttributionComments($tc) {
+    $comments = $br = '';
+    foreach ($tc['attributions'] as $attr) {
+        $comments .= "$br{$attr['comments']}";
+        if ($attr['comments']) $br = '<br>';
+        else $br = '';
+    }
+    return $comments;
+}
+function mkInvoiceTooltip($tc, $formatter) {
     $invoices = $br = '';
-    foreach ($icd as $code => $date) {
-        $invoices .= "$br$code ($date)";
+    foreach ($tc['invoices'] as $i) {
+        $invoices .= "$br{$i['code']} ({$i['issued_at']}): " . $formatter->asDecimal($i['amount_euc'] / 100., 2) . ' €';
         $br = '<br>';
     }
     return $invoices;
@@ -60,27 +66,27 @@ foreach ($data as $advisor => $advisor_data): ?>
       <br>
     </div>
     <div class="col-sm-2 col-xs-2">
-      <h4><span class="label label-info col-md-12"><?= $formatter->asDecimal($advisor_data['total_commission_euc'] / 100., 2) ?> €</span></h4>
+      <h4><span class="label label-info col-md-12">
+        <?= $formatter->asDecimal(($advisor_data['total_commission_euc'] + $advisor_data['total_compensated_euc'])/ 100., 2) ?> €
+      </span></h4>
     </div>
     <?php $prev = null; $br = ''; $advisor_data['tranches_caption'] = '';
-    foreach (array_reverse($advisor_data['tranches']) as $i => $tranche) {
+    foreach (array_reverse($advisor_data['tranches']) as $i => & $tranche_discard) {
         $tranche = & $advisor_data['tranches'][$i];
         $tranche['commission_pct'] = $formatter->asDecimal($tranche['commission_bp'] / 100., 2);
         $tranche['from_eu'] = $formatter->asDecimal($tranche['from_euc'] / 100., 2);
-        $tranches[$i] = $tranche;
         if ($prev !== null) {
-            $tranches[$prev]['to_eu'] = $formatter->asDecimal(($tranche['from_euc'] - 1) / 100., 2);
+            $tranche['to_eu'] = $formatter->asDecimal(($prev['from_euc'] - 1) / 100., 2);
             $advisor_data['tranches_caption'] .=
                 "{$br}{$tranche['from_eu']} - {$tranche['to_eu']} €: {$tranche['commission_pct']} %";
             $br = '<br>';
         }
-        $prev = $i;
-    } if ($prev !== null) {
-        $tranche = & $advisor_data['tranches'][$prev];
-        $tranche['to_eu'] = '&infin;';
-        $advisor_data['tranches_caption'] .=
-            "{$br}{$tranche['from_eu']} - {$tranche['to_eu']} €: {$tranche['commission_pct']} %";
-    } ?>
+        $prev = & $tranche;
+    }
+    $tranche = & $advisor_data['tranches'][0];
+    $tranche['to_eu'] = '&infin;';
+    $advisor_data['tranches_caption'] .=
+        "{$br}{$tranche['from_eu']} - {$tranche['to_eu']} €: {$tranche['commission_pct']} %"; ?>
     <?php if ($expanded): ?>
       <div class="col-xs-4">
         <table class="table table-condensed table-striped text-right">
@@ -107,25 +113,29 @@ foreach ($data as $advisor => $advisor_data): ?>
         <table class="table table-condensed">
           <thead class="text-center"><tr>
             <th></th>
-            <th><?= Yii::t('app', 'Tx') ?></th>
-            <th><?= Yii::t('app', 'Invoiced') ?></th>
-            <th><?= Yii::$app->params['company'] ?></th>
-            <th><?= Yii::t('app', 'Partner') ?></th>
-            <th><?= Yii::t('app', 'Office') ?></th>
-            <th><?= Yii::t('app', 'Attr. type') ?></th>
-            <th><?= Yii::t('app', 'Attribution') ?></th>
-            <th><?= Yii::t('app', 'Total Attrib.') ?></th>
-            <th><?= Yii::t('app', 'Accumulated') ?></th>
-            <th><?= Yii::t('app', 'Tranche') ?></th>
-            <th><?= Yii::t('app', 'Commission') ?></th>
-            <th><?= Yii::t('app', 'Difference') ?></th>
+            <th class="nowrap"><?= Yii::t('app', 'Tx') ?></th>
+            <th class="nowrap"><?= Yii::t('app', 'Invoiced') ?></th>
+            <th class="nowrap"><?= Yii::$app->params['company'] ?></th>
+            <th class="nowrap"><?= Yii::t('app', 'Partner') ?></th>
+            <th class="nowrap"><?= Yii::t('app', 'Effective Attribution') ?></th>
+            <th class="nowrap"><?= Yii::t('app', 'Total Attrib.') ?></th>
+            <th class="nowrap"><?= Yii::t('app', 'Accumulated') ?></th>
+            <th class="nowrap"><?= Yii::t('app', 'Tranche') ?></th>
+            <th class="nowrap"><?= Yii::t('app', 'Commission') ?></th>
+            <th class="nowrap"><?= Yii::t('app', 'Difference') ?></th>
           </tr></thead>
           <tbody>
             <?php foreach ($advisor_data['months'] as $month => $month_data): ?>
-              <?php $first = true; $rowspan = count($month_data['transactions']); $fmonth = $formatter->asDate($month, 'MMMM') ?>
+              <?php $first = true; $rowspan = count($month_data['transactions']); $fmonth = $formatter->asDate($month, 'MMM') ?>
               <tr>
                 <td rowspan="<?= $rowspan ?>">
-                  <h4><span role="button" class="label label-danger monospace"><?= $fmonth ?> <span class="glyphicon glyphicon-folder-open"></span> </span></h4>
+                  <h4><span role="button" class="label label-danger monospace toggle-payroll"
+                    data-payroll_id="<?= $month_data['payroll']['id'] ?>"><?= $fmonth ?> 
+                  <?php if (isset($month_data['payroll']['commission_bp'])): ?>
+                    <span class="glyphicon glyphicon-folder-close"></span> 
+                  <?php else: ?>
+                    <span class="glyphicon glyphicon-folder-open"></span> 
+                  <?php endif; ?></span></h4>
                 </td>
                 <?php foreach ($month_data['transactions'] as $tc): ?>
                   <?php if (!$first): ?>
@@ -146,35 +156,30 @@ foreach ($data as $advisor => $advisor_data): ?>
                     " <dt>$salePriceLbl</dt> " .
                     " <dd>{$salePriceEu} €</dd> " .
                     " <dt>$commentsLbl</dt> " .
-                    " <dd>{$tc['attribution_comments']}</dd></dl>"); ?>
+                    " <dd>comments !!??</dd></dl>"); ?>
                   <td><a class="btn btn-default btn-xs btn-popover" data-title="<?= Yii::t('app', 'Transaction details') ?>" data-content="<?= $popoverContent ?>" data-toggle="popover" data-placement="bottom" data-html="true" tabindex="0" role="button" data-trigger="focus">
                     <span class="glyphicon glyphicon-info-sign">
                   </span></a> <a href="<?= Url::to(['transaction/view', 'id' => $tc['transaction_id']]) ?>">#<?= $tc['transaction_id']?></a></td>
                   <td class="text-right nowrap">
                     <?php $class = ($tc['total_invoiced_euc'] < $tc['our_fee_euc']) ? 'text-warning' : '' ?>
-                    <?php $invoices = mkInvoiceTooltip($tc); ?>
+                    <?php $invoices = mkInvoiceTooltip($tc, $formatter); ?>
                     <span class="badge" data-toggle="tooltip" data-title="<?= $invoices ?>" data-html="true"><?= $tc['n_invoices'] ?></span> <span class="<?= $class ?>"><?= $formatter->asDecimal($tc['total_invoiced_euc'] / 100., 2) ?> €</span></td>
                   <td class="text-right nowrap"><?= $formatter->asDecimal($tc['our_fee_euc'] / 100., 2) ?> €</td>
                   <td class="text-right nowrap"><?= $formatter->asDecimal($tc['their_fee_euc'] / 100., 2) ?> €</td>
-                  <td><small><?= str_replace('$$', '<br>', $tc['attribution_offices']) ?></small></td>
-                  <td class="text-center"><small>
-                    <?php
-                        $attrtt = explode('$$', $tc['attribution_type_names']);
-                        $attrbps = explode('$$', $tc['attribution_type_bps']);
-                        for ($i = 0; $i < count($attrtt); $i++) {
-                            echo $attrtt[$i] . ' ' . $formatter->asDecimal($attrbps[$i] / 100., 2) . '%' . '<br>';
-                        } ?>
-                  </small></td>
-                  <td class="text-right nowrap">
-                    <?php $tas = explode('$$', $tc['total_attributed_euc']);
-                      foreach ($tas as $ta)
-                          echo $formatter->asDecimal($ta / 100., 2) . ' €<br>'; ?>
-                  </td>
+                  <td class="text-center"><?php $br = ''; foreach ($tc['attributions'] as $attr): ?>
+                    <?= $br ?>
+                    <small class="text-muted">
+                    <?= $attr['type_name'] . ' ' . $formatter->asDecimal($attr['type_bp'] / 100., 2) . '% ' .
+                      "({$attr['office']}): " ?>
+                    </small>
+                    <?= $formatter->asDecimal($attr['amount_euc'] / 100., 2) ?> €
+                    <?php $br = '<br>'; ?>
+                  <?php endforeach; ?></small></td>
                   <?php if ($first): ?>
                     <td rowspan="<?= $rowspan ?>" class="text-right text-success nowrap">
-                      <?= $formatter->asDecimal($month_data['attribution_euc'] / 100., 2) ?> €</td>
+                      <?= $formatter->asDecimal($month_data['calculated_attribution_euc'] / 100., 2) ?> €</td>
                     <td rowspan="<?= $rowspan ?>" class="text-right nowrap">
-                      <?= $formatter->asDecimal($month_data['accumulated_attribution_euc'] / 100., 2) ?> €</td>
+                      <?= $formatter->asDecimal($month_data['calculated_accumulated_attribution_euc'] / 100., 2) ?> €</td>
                     <td rowspan="<?= $rowspan ?>" class="text-center">
                       <span class="label label-success" data-toggle="tooltip" 
                         title="<?= $advisor_data['tranches_caption'] ?>" data-html="true" role="button">
@@ -186,11 +191,11 @@ foreach ($data as $advisor => $advisor_data): ?>
                           $tt_title = ''; $br = '';
                           foreach ($month_data['compensations'] as $compensation) {
                               $tt_title .= $br . "{$compensation['reason']} (" .
-                                  $formatter->asDate($compensation['payroll']['month'], 'MMMM \'\'yy') . '): ' .
+                                  $formatter->asDate($compensation['payroll']['month'], 'MMM \'\'yy') . '): ' .
                                   $formatter->asDecimal($compensation['compensation_euc'] / 100., 2) . ' €';
                               $br = '<br>';
                           }
-                          $compensation_tooltip = 'data-toggle="tooltip" title="' . $tt_title . '" data-html="true" role="button"';
+                          $compensation_tooltip = 'data-toggle="tooltip" title="' . $tt_title . '" data-html="true"';
                       } else $compensation_tooltip= ''; ?>">
                       <strong <?= $compensation_tooltip ?>>
                         <?php echo $formatter->asDecimal(($month_data['commission_euc'] + $month_data['compensated_euc'])/ 100., 2) ?> €
@@ -200,13 +205,13 @@ foreach ($data as $advisor => $advisor_data): ?>
                       <?php if ($month_data['calculated_commission_euc'] - $month_data['commission_euc'] < 0)
                         $class = 'text-danger'; else $class = 'text-info'; ?>
                       <a class="pull-left btn btn-default btn-xs correction-popover" role="button" tabindex="0"
-                          data-title="<?= Yii::t('app', 'Corrections') ?>&nbsp;
-                            <button type='button' class='close'>&times;</button>"
-                          data-placement="left" data-html="true" data-trigger="click" data-payroll_id="<?= $month_data['payroll_id'] ?>">
+                        data-title="<?= Yii::t('app', 'Corrections') ?>&nbsp;
+                          <button type='button' class='close'>&times;</button>"
+                        data-placement="left" data-html="true" data-trigger="click" data-payroll_id="<?= $month_data['payroll']['id'] ?>">
                         <span class="text-warning glyphicon glyphicon-exclamation-sign"></span></a>
                       <span class="<?= $class ?>">
                         <?= $formatter->asDecimal(($month_data['calculated_commission_euc'] - 
-                          $month_data['commission_euc'] + $month_data['corrections']['sum']) / 100., 2) ?> €
+                          $month_data['commission_euc'] + $month_data['payroll']['corrections_sum']) / 100., 2) ?> €
                       </span>
                       <table class="popover-table hidden"><tbody>
                         <?php foreach ($month_data['difference_causes'] as $cause => $diff_amount_euc): ?>
@@ -217,7 +222,7 @@ foreach ($data as $advisor => $advisor_data): ?>
                             <td><?= $fmonth ?></td>
                           </tr>
                         <?php endforeach; ?>
-                        <?php foreach ($month_data['corrections']['rows'] as $correction): ?>
+                        <?php foreach ($month_data['payroll']['corrections'] as $correction): ?>
                           <tr>
                             <td><?= $correction['reason'] ?></td>
                             <td class="text-right"><?= $formatter->asDecimal($correction['corrected_euc'] / 100., 2) ?>€</td>
@@ -262,8 +267,9 @@ foreach ($data as $advisor => $advisor_data): ?>
                 <td><?= $tc['buyer_name'] ?></td>
                 <td><?= $tc['property_reference'] ?></td>
                 <td class="nowrap"><?= $formatter->asDecimal($tc['sale_price_euc'] / 100., 2) ?> €</td>
-                <td class="break-all"><?= $tc['invoice_codes'] ?></td>
-                <td><?= $tc['attribution_comments'] ?></td>
+                <?php $invoices = mkInvoiceTooltip($tc, $formatter); ?>
+                <td class="break-all"><?= $invoices ?></td>
+                <td><?= mkAttributionComments($tc) ?></td>
               </tr>
             <?php endforeach; ?>
           <?php endforeach; ?>
@@ -289,8 +295,10 @@ foreach ($data as $advisor => $advisor_data): ?>
 </div>
 <?php
 $correction_create_url = Url::to(['/correction/create']);
+$toggle_payroll_url = Url::to(['toggle-payroll']);
 $script = <<< JS
   var \$correctionFormWrapper = $('#correction-form-wrapper').detach();
+  var togglePayrollUrl = '$toggle_payroll_url';
   $('[data-toggle="tooltip"]').tooltip();
   $('[data-toggle="popover"]').popover();
   $('.correction-popover').on('hide.bs.popover', function() {
@@ -315,12 +323,32 @@ $script = <<< JS
           data: $(this).serialize(),
           success: function(response) {
               if (response === '') location.reload(true);
+              $('input[name="Correction[payroll_id]"]').next('.help-block')
+                  .html($(response).find('input[name="Correction[payroll_id]"]').next('.help-block').html())
+                  .closest('.form-group').removeClass('has-success').addClass('has-error');
           }
       });
       return false;
   });
   $(document).on('click', '.popover .close', function() {
       $(this).closest('.popover').siblings('.correction-popover').trigger('click');
+  });
+  $('.toggle-payroll').on('click', function() {
+      var \$glyph = $(this).find('.glyphicon');
+      var payroll_id = $(this).data('payroll_id');
+      $.ajax({
+         url: togglePayrollUrl,
+         data: 'id=' + payroll_id,
+         success: function(payroll) {
+             if (payroll.commission_bp) // closed payroll
+                 \$glyph.removeClass('glyphicon-folder-open').addClass('glyphicon-folder-close');
+             else // open payroll
+                 \$glyph.removeClass('glyphicon-folder-close').addClass('glyphicon-folder-open');
+         },
+         error: function(jqXHR, textStatus, errorThrown) {
+             console.log(textStatus);
+         }
+      });
   });
 JS;
 $this->registerJs($script);

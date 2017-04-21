@@ -13,13 +13,15 @@ use app\models\Correction;
 use app\models\Transaction;
 use app\models\TransactionAttributionSummary;
 use app\models\TransactionAttributionCalculatedSummary;
-use app\models\TransactionAttribution;
+use app\models\EffectiveAttribution;
 use app\models\TransactionListItem;
 use app\models\TransactionListItemSearch;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
+use yii\web\Response;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use kartik\mpdf\Pdf;
@@ -38,6 +40,10 @@ class TransactionController extends Controller
             'access' => [
                 'class' => AccessControl::className(),
                 'rules' => [[
+                    'actions' => ['toggle-payroll'],
+                    'allow' => true,
+                    'roles' => ['admin']
+                ], [
                     'allow' => true,
                     'roles' => ['@']
                 ]]
@@ -52,14 +58,33 @@ class TransactionController extends Controller
     }
     /**
      */
+    public function actionTogglePayroll($id)
+    {
+        $model = Payroll::find()->where(['id' => $id])->with('advisor.tranches')->one();
+        if (isset($model->commission_bp)) $model->commission_bp = null;
+        else {
+            $calculated_accumulated_attribution_euc = TransactionAttributionCalculatedSummary::find()
+                ->where(['advisor_id' => $model->advisor_id])
+                ->andWhere(['<=', 'payroll_month', $model->month])
+                ->andWhere(['>=', 'to_char(payroll_month, \'yyyy\')', substr($model->month, 0, 4)])
+                ->sum('calculated_total_attributed_sum_euc');
+            $commission_bp = AdvisorTranche::selectTranche(ArrayHelper::toArray($model->advisor->tranches),
+                $calculated_accumulated_attribution_euc)['commission_bp'];
+            $model->commission_bp = $commission_bp;
+        }
+        Yii::$app->response->format = Response::FORMAT_JSON; 
+        if ($model->save(false)) return $model;
+        else throw HttpException(500, \Yii::t('app', 'Could not toggle the payroll state'));
+    }
+    /**
+     */
     public function actionCommissions($year = '', $advisor_id = '')
     {
         if (!Yii::$app->user->can('accounting')) throw new ForbiddenHttpException();
         if (!$year) $year = date('Y');
         $data = $this->mkCommissionsViewData($year, $advisor_id);
-        $years = Transaction::find()->select(['to_char(payroll_month, \'yyyy\')'])
-            ->distinct()->where(['not', ['payroll_month'=> null]])
-            ->asArray()->createCommand()->queryColumn();
+        $years = Payroll::find()->select(['to_char(month, \'yyyy\')'])
+            ->distinct()->asArray()->createCommand()->queryColumn();
         $years = array_combine($years, $years);
         $positive_invoiced_euc = Invoice::find()->with(['transaction' => function($q) use ($year) {
             $q->where(['to_char(payroll_month, \'yyyy\')' => $year]);
@@ -88,7 +113,7 @@ class TransactionController extends Controller
     public function actionPrintCommissions($year = '', $advisor_id = '') {
         $this->layout = 'print';
         if (!$year) $year = date('Y');
-        $data = $this->mkCommissionsViewData($year, $advisor_id);
+        $data = $this->mkCommissionsViewData($year, $advisor_id, true);
         $content = $this->render('_commission_tables', [
             'data' => $data,
             'year' => $year,
@@ -103,7 +128,7 @@ class TransactionController extends Controller
             'marginBottom' => 6,
             'marginLeft' => 3,
             'marginRight' => 2,
-            'cssInline' => '.col-xs-3 { width: 22.0% } .col-xs-2 { width: 12.87% } .col-xs-8 { width: 62.87%; } .col-xs-4 { width: 29.55%; } ',
+            'cssInline' => 'body { font-size: 12px; } .col-xs-3 { width: 22.0% } .col-xs-2 { width: 12.87% } .col-xs-8 { width: 62.87%; } .col-xs-4 { width: 29.55%; } ',
             'content' => $content,   
         ]);
         return $pdf->render();
@@ -130,7 +155,7 @@ class TransactionController extends Controller
      */
     public function actionView($id)
     {
-        return $this->render('view', $this->mkFormData($this->findListModel($id)));
+        return $this->render('view', $this->mkFormData($this->findModel($id)));
     }
 
     /**
@@ -167,7 +192,7 @@ class TransactionController extends Controller
         ]);
         $total_invoiced_eu = $query->sum('amount_euc') / 100.;
         $attribution = new Attribution(['transaction_id' => $id]);
-        $transaction_attribution = new TransactionAttribution(['transaction_id' => $id]);
+        $transaction_attribution = new EffectiveAttribution(['transaction_id' => $id]);
         $attributionDataProvider = new ActiveDataProvider([
             'query' => $transaction_attribution->find()->where(['transaction_id' => $id])
         ]);
@@ -248,12 +273,15 @@ class TransactionController extends Controller
 
     /**
      */
-    protected function mkCommissionsViewData($year, $advisor_id) {
+    protected function mkCommissionsViewData($year, $advisor_id, $only_closed = false) {
         $q = TransactionAttributionSummary::find()
             ->with('calculatedSummary')
             ->where(['to_char(payroll_month, \'yyyy\')' => $year])
             ->orderBy('advisor_name asc, payroll_month asc, transaction_id asc')->asArray();
-        if ($advisor_id) $q->andWhere(['advisor_id' => $advisor_id]);
+        if ($advisor_id) $q->andWhere(['transaction_attribution_summary.advisor_id' => $advisor_id]);
+        if ($only_closed) $q->innerJoinWith(['payroll' => function($q) {
+            $q->where(['not', ['commission_bp' => null]]);
+        }]);
         $row_set = $q->all();
         $advisor_ids = ArrayHelper::map($row_set, 'advisor_name', 'advisor_id');
         $tranches = ArrayHelper::index(AdvisorTranche::find()
@@ -263,11 +291,12 @@ class TransactionController extends Controller
         $commissions = ArrayHelper::index($row_set, 'transaction_id', ['advisor_name', 'payroll_month']);
         $data = [];
         foreach ($commissions as $advisor => & $months) {
+           $advisor_id = $advisor_ids[$advisor];
            $previous_accum_attribution = 0;
-           $previous_difference_causes = [];
            $data[$advisor]['total_commission_euc'] = 0;
+           $data[$advisor]['total_compensated_euc'] = 0;
            $data[$advisor]['calculated_total_commission_euc'] = 0;
-           $data[$advisor]['tranches'] = $tranches[$advisor_ids[$advisor]];
+           $data[$advisor]['tranches'] = $tranches[$advisor_id];
            $calc_accum_attrib = 0;
            foreach ($months as $month => $tx_summaries) {
                $data[$advisor]['months'][$month] = [];
@@ -276,26 +305,34 @@ class TransactionController extends Controller
                $mondat['accumulated_attribution_euc'] = 0;
                $mondat['commission_bp'] = 0;
                $mondat['compensated_euc'] = 0;
-               $mondat['compensations'] = Correction::find()->with('payroll')->asArray()->where([
+               $mondat['compensations'] = Correction::find()->joinWith(['payroll' => function($q) use ($advisor_id) {
+                   $q->where(['advisor_id' => $advisor_id]);
+               }])->asArray()->where([
                    'compensation_on' => $month
                ])->all();
                foreach ($mondat['compensations'] as $compensation) $mondat['compensated_euc'] += $compensation['compensation_euc'];
+               $data[$advisor]['total_compensated_euc'] += $mondat['compensated_euc'];
                $payroll = Payroll::find()->with('corrections')->where([
-                   'advisor_id' => $advisor_ids[$advisor],
+                   'advisor_id' => $advisor_id,
                    'month' => $month
-               ])->one();
-               $mondat['payroll_id'] = $payroll->id;
+               ])->asArray()->one();
+               $mondat['payroll'] = $payroll;
                $mondat['accumulated_attribution_euc'] = $previous_accum_attribution;
                foreach ($tx_summaries as $tx_summary) {
-                   $mondat['commission_bp'] = $payroll->commission_bp;
+                   $mondat['commission_bp'] = $payroll['commission_bp'];
                    $mondat['accumulated_attribution_euc'] += $tx_summary['total_attributed_sum_euc'];
                }
-               $mondat['corrections'] = ['sum' => 0, 'rows' => ArrayHelper::toArray($payroll->corrections)];
-               foreach ($mondat['corrections']['rows'] as $correction) $mondat['corrections']['sum'] += $correction['corrected_euc'];
+               $mondat['payroll']['corrections_sum'] = 0;
+               foreach ($mondat['payroll']['corrections'] as $correction)
+                   $mondat['payroll']['corrections_sum'] += $correction['corrected_euc'];
                $mondat['attribution_euc'] = $mondat['accumulated_attribution_euc'] - $previous_accum_attribution;
                $previous_accum_attribution = $mondat['accumulated_attribution_euc'];
                $mondat['calculated_attribution_euc'] = 0;
                foreach ($mondat['transactions'] as $tx_id => $tx_summary) {
+                   $mondat['transactions'][$tx_id]['attributions'] = Json::decode($mondat['transactions'][$tx_id]['attributions_json']);
+                   unset($mondat['transactions'][$tx_id]['attributions_json']);
+                   $mondat['transactions'][$tx_id]['invoices'] = Json::decode($mondat['transactions'][$tx_id]['invoices_json']);
+                   unset($mondat['transactions'][$tx_id]['invoices_json']);
                    $tx_summary['calculated_total_attributed_sum_euc'] =
                        $tx_summary['calculatedSummary']['calculated_total_attributed_sum_euc'];
                    unset($mondat['transactions'][$tx_id]['calculatedSummary']);
@@ -324,29 +361,30 @@ class TransactionController extends Controller
                            $mondat['difference_causes'][Correction::LATE_INVOICE_PROPAGATION] = $all_diff;
                        else {
                            $mondat['difference_causes'][Correction::TRANCHES_CHANGED] =
-                               $all_diff - $mondat['calculated_accumulated_attribution_euc'] * $mondat['commission_bp'] / 10000.;
-                           if (empty($previous_difference_causes) or
-                               array_search(Correction::LATE_INVOICE_PROPAGATION, $previous_difference_causes) !== false)
-                               $mondat['difference_causes'][Correction::LATE_INVOICE_PROPAGATION] =
-                                   $all_diff - $mondat['difference_causes'][Correction::TRANCHES_CHANGED];
+                               $all_diff - $mondat['attribution_euc'] * ($mondat['calculated_commission_bp'] - $mondat['simulated_commission_bp']) / 10000.;
+                           $mondat['difference_causes'][Correction::LATE_INVOICE_PROPAGATION] =
+                               $all_diff - $mondat['difference_causes'][Correction::TRANCHES_CHANGED];
                        }
                    }
                } else if ($mondat['accumulated_attribution_euc'] != $mondat['calculated_accumulated_attribution_euc']) {
                    if ($mondat['simulated_commission_bp'] == $mondat['commission_bp'])
                        $mondat['difference_causes'][Correction::LATE_INVOICE_PROPAGATION] = $all_diff;
                    else {
-                       $mondat['difference_causes'][Correction::TRANCHES_CHANGED] =
-                           $all_diff - $mondat['calculated_accumulated_attribution_euc'] * $mondat['commission_bp'] / 10000.;
-                       if (empty($previous_difference_causes) or
-                           array_search(Correction::LATE_INVOICE_PROPAGATION, $previous_difference_causes) !== false)
-                           $mondat['difference_causes'][Correction::LATE_INVOICE_PROPAGATION] =
-                                   $all_diff - $mondat['difference_causes'][Correction::TRANCHES_CHANGED];
+                       if ($mondat['commission_bp'] != $mondat['calculated_commission_bp'])
+                           $mondat['difference_causes'][Correction::TRANCHES_CHANGED] =
+                               $all_diff - $mondat['attribution_euc'] * ($mondat['calculated_commission_bp'] - $mondat['simulated_commission_bp']) / 10000.;
+                       else $mondat['difference_causes'][Correction::TRANCHES_CHANGED] = 0;
+                       $mondat['difference_causes'][Correction::LATE_INVOICE_PROPAGATION] =
+                           $all_diff - $mondat['difference_causes'][Correction::TRANCHES_CHANGED];
                    }
                }
-               $previous_difference_causes = $mondat['difference_causes'];
+               if (empty($mondat['difference_causes'][Correction::TRANCHES_CHANGED]))
+                   unset($mondat['difference_causes'][Correction::TRANCHES_CHANGED]);
+               if (empty($mondat['difference_causes'][Correction::LATE_INVOICE_PROPAGATION]))
+                   unset($mondat['difference_causes'][Correction::LATE_INVOICE_PROPAGATION]);
            }
         }
-        //\yii\helpers\VarDumper::dump($data, 7, true); die;
+        //\yii\helpers\VarDumper::dump($data, 9, true); die;
         return $data;
     }
 }

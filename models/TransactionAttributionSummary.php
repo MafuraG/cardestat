@@ -41,6 +41,11 @@ class TransactionAttributionSummary extends \yii\db\ActiveRecord
         return 'transaction_attribution_summary';
     }
 
+    public static function primaryKey() 
+    {
+        return ['advisor_id', 'transaction_id'];
+    }
+
     /**
      * @inheritdoc
      */
@@ -85,6 +90,13 @@ class TransactionAttributionSummary extends \yii\db\ActiveRecord
             'attribution_type_bps' => Yii::t('app', 'Attribution Type Bps'),
             'total_attributed_sum_euc' => Yii::t('app', 'Total Attributed Euc'),
         ];
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPayroll()
+    {
+        return $this->hasOne(Payroll::className(), ['month' => 'payroll_month', 'advisor_id' => 'advisor_id']);
     }
     /**
      * @return \yii\db\ActiveQuery

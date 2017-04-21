@@ -20,14 +20,14 @@ use Yii;
  * @property Office $office0
  * @property Transaction $transaction
  */
-class TransactionAttribution extends Attribution
+class EffectiveAttribution extends Attribution
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'transaction_attribution';
+        return 'effective_attribution';
     }
 
     /**

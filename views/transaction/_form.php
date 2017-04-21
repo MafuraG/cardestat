@@ -407,28 +407,29 @@ $script = <<< JS
       $.pjax.reload('#attribution-index-p0', {url: attrIndexUrl, push: false, replace: false, timeout: 6000});
   });
   \$salePriceEuMM = $('input[name="Transaction[sale_price_eu]"]').siblings('.mask-money');
+  salePriceEu = \$salePriceEuMM.maskMoney('unmasked')[0];
   \$ourFeeEuMM = $('input[name="Transaction[our_fee_eu]"]').siblings('.mask-money');
   \$ourFeePctMM = $('input[name="our_fee_pct"]').siblings('.mask-money');
   \$ourFeePctMM.on('blur', function() {
       \$ourFeeEuMM.maskMoney('mask',
-          \$ourFeePctMM.maskMoney('unmasked')[0] / 100. * \$salePriceEuMM.maskMoney('unmasked')[0]);
+          \$ourFeePctMM.maskMoney('unmasked')[0] / 100. * salePriceEu);
       \$ourFeeEuMM.blur();
   });
   \$ourFeeEuMM.on('blur', function() {
       \$ourFeePctMM.maskMoney('mask',
-           \$ourFeeEuMM.maskMoney('unmasked')[0] * 100. / \$salePriceEuMM.maskMoney('unmasked')[0]);
+           \$ourFeeEuMM.maskMoney('unmasked')[0] * 100. / salePriceEu);
   });
   \$ourFeeEuMM.blur();
   \$theirFeeEuMM = $('input[name="Transaction[their_fee_eu]"]').siblings('.mask-money');
   \$theirFeePctMM = $('input[name="their_fee_pct"]').siblings('.mask-money');
   \$theirFeePctMM.on('blur', function() {
       \$theirFeeEuMM.maskMoney('mask',
-          \$theirFeePctMM.maskMoney('unmasked')[0] / 100. * \$salePriceEuMM.maskMoney('unmasked')[0]);
+          \$theirFeePctMM.maskMoney('unmasked')[0] / 100. * salePriceEu);
       \$theirFeeEuMM.blur();
   });
   \$theirFeeEuMM.on('blur', function() {
       \$theirFeePctMM.maskMoney('mask',
-           \$theirFeeEuMM.maskMoney('unmasked')[0] * 100. / \$salePriceEuMM.maskMoney('unmasked')[0]);
+           \$theirFeeEuMM.maskMoney('unmasked')[0] * 100. / salePriceEu);
   });
   \$theirFeeEuMM.blur();
 JS;

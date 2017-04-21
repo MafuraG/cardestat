@@ -3,7 +3,7 @@
 
 <div class="row">
   <div class="col-md-2">
-    <span class="label label-primary uppercase" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>ID #{{ model.id}}</br>{{ model.custom_type }}</br>{{ model.transfer_type }}</br>{{ model.development_type }}</div>">{{ model.transaction_type }}</span> <small>{{ app.formatter.asDate(model.option_signed_at, 'dd MMM \'\'yy') }}</small>
+    <span class="label label-primary uppercase" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>{{ model.custom_type }}</br>{{ model.transfer_type }}</br>{{ model.development_type }}</div>">{{ model.transaction_type }}</span> <small>{{ app.formatter.asDate(model.option_signed_at, 'dd MMM \'\'yy') }}</small>
   </div>
   <div class="col-md-3 uppercase">
     <div class="ellipsis">
@@ -49,17 +49,19 @@
       <span class="label label-default">100% Cárdenas</span>
     {% else %}
       <span class="label label-warning" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>50% CANARINVEST</div>">50% Cárdenas</span>
-    {% endif %}
-    {% if (model.sale_duration) %}
-      <small><span class="glyphicon glyphicon-time"></span> {{ model.sale_duration }} {{ t('app', 'days') }}</small>
-    {% endif %}
+    {% endif %}<small>#{{ model.id}}, {{ t('app', 'Ref.') }} {{ model.external_id}}</small>
   </div>
   <small class="col-md-4 text-warning">
-    {% if (model.advisors) %}
-      {{ model.advisors }}
-    {% else %}
-      <em class="text-danger">{{ t('app', 'No advisors found') }}</em>
-    {% endif %}
+    <div class="ellipsis">
+      {% if (model.advisors) %}
+        <span title="{{ model.advisors }}">{{ model.advisors }}</span>
+      {% else %}
+        <em class="text-danger">{{ t('app', 'No advisors found') }}</em>
+      {% endif %}
+      {% if (model.sale_duration) %}
+        <span class="text-success"><span class="glyphicon glyphicon-time"></span> {{ model.sale_duration }} {{ t('app', 'days') }}</span>
+      {% endif %}
+    </div>
   </small>
   <div class="col-md-2">
     {% if (model.payroll_month) %}
@@ -70,7 +72,7 @@
   </div>
   <div class="col-md-2">
     {% if (model.n_invoices) %}
-      <small class="label label-success">{{ model.first_invoiced_at }}</small>
+      <small class="label label-success">{{ t('app', 'Invoiced') }} &times;{{ model.n_invoices }}</small> <small>{{ t('app', '1st') }} {{ model.first_invoiced_at }}</small>
     {% else %}
       <small class="label label-danger">{{ t('app', 'Not invoiced') }}</small>
     {% endif %}
@@ -78,11 +80,11 @@
   <div class="col-md-2 text-right">
     <small class="text-muted">({{ app.formatter.asDecimal(model.our_fee_bp, 2) }}%)</small> {{ app.formatter.asDecimal(model.our_fee_euc/100, 2) }} € &nbsp;
     {% if (model.approved_by_direction) %}
-      <span class="text-danger glyphicon glyphicon-ban-circle"></span>&nbsp;
+      <span class="glyphicon glyphicon-lock"></span>&nbsp;
     {% elseif (model.approved_by_accounting) %}
       <span class="text-success glyphicon glyphicon-ok-sign"></span>&nbsp;
     {% else %}
-      <span class="text-warning glyphicon glyphicon-alert"></span>&nbsp;
+      <span class="text-warning glyphicon glyphicon-exclamation-sign"></span>&nbsp;
     {% endif %}
     </button>
   </div>

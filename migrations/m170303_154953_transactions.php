@@ -37,22 +37,23 @@ class m170303_154953_transactions extends Migration
             'id' => $this->primaryKey(),
             'name' => $this->string(32)->notNull(),
             'active' => $this->boolean()->notNull()->defaultValue(false),
+            'category' => $this->smallInteger(),
             'attribution_bp' => $this->integer()->notNull(),
         ]);
-        $this->batchInsert('attribution_type', ['name', 'attribution_bp', 'active'], [[
-            'DESCONOCIDO', 0, false
+        $this->batchInsert('attribution_type', ['name', 'attribution_bp', 'active', 'category'], [[
+            'DESCONOCIDO', 0, false, null
         ], [
-            'GESTIÓN FIRMAS', 0, true
+            'GESTIÓN FIRMAS', 0, true, null
         ], [
-            'GESTIÓN LEAD', 0, true
+            'GESTIÓN LEAD', 0, true, null
         ], [
-            'VENTA', 7000, true
+            'VENTA', 7000, true, 0
         ], [
-            'CAPTACIÓN', 3000, true
+            'CAPTACIÓN', 3000, true, 0
         ], [
-            'REFERIDO COMPRADOR', 1000, true
+            'REFERIDO COMPRADOR', 1000, true, null
         ], [
-            'REFERIDO VENDEDOR', 1000, true
+            'REFERIDO VENDEDOR', 1000, true, null
         ]]);
         $this->createIndex('attribution_type-name-attribution_bp-uidx', 'attribution_type', ['name', 'attribution_bp'], true);
         $this->createTable('advisor', [
@@ -108,6 +109,20 @@ class m170303_154953_transactions extends Migration
             'NATHALIE PARADIS', 'ARGUINEGUÍN', $unknown0_id, true, false
         ], [
             'CRISTINA CARUSO', 'ARGUINEGUÍN', $unknown0_id, false, false
+        ], [
+            'PAOLA BUSCEMI', 'ARGUINEGUÍN', $unknown0_id, true, false
+        ], [
+            'TONI CASTELLANO', 'ARGUINEGUÍN', $unknown0_id, true, false
+        ], [
+            'JUANA VEGA', 'ARGUINEGUÍN', $unknown0_id, true, false
+        ], [
+            'PILAR GAGO', 'ARGUINEGUÍN', $unknown0_id, true, false
+        ], [
+            'LUCY EVANS', 'ARGUINEGUÍN', $unknown0_id, true, false
+        ], [
+            'MIGUEL ÁNGEL GONZÁLEZ', 'ARGUINEGUÍN', $unknown0_id, false, false
+        ], [
+            'METTE ZIB', 'ARGUINEGUÍN', $unknown0_id, false, false
         ]]);
         $this->createTable('advisor_tranche', [
             'id' => $this->primaryKey(),
@@ -129,7 +144,7 @@ class m170303_154953_transactions extends Migration
         $this->createTable('recipient_category', [
             'name' => $this->string(32) . ' primary key',
         ]);
-        $this->batchInsert('recipient_category', ['name'], [['COMPRADOR'], ['VENDEDOR'], ['COLABORADOR']]);
+        $this->batchInsert('recipient_category', ['name'], [['COMPRADOR'], ['VENDEDOR'], ['COLABORADOR'], ['BANCO']]);
         $this->createTable('transaction', [
             'id' => $this->primaryKey(),
             'external_id' => $this->string(12)->unique(),
@@ -218,12 +233,12 @@ class m170303_154953_transactions extends Migration
                        p.building_complex as property_building_complex,
                        p.reference as property_reference,
                        s.reference as seller_reference,
-                       coalesce(nullif(s.first_name, \'\') || \' \', \'\') ||
-                           coalesce(nullif(s.last_name, \'\') || \' \', \'\') as seller_name,
+                       coalesce(nullif(s.last_name, \'\') || \', \', \'\') ||
+                           coalesce(nullif(s.first_name, \'\') || \' \', \'\') as seller_name,
                        b.reference as buyer_reference,
-                       coalesce(nullif(b.first_name, \'\') || \' \', \'\') ||
-                           coalesce(nullif(b.last_name, \'\') || \' \', \'\') as buyer_name,
-                       buyer_provider is null and seller_provider is null as cardenas100,
+                       coalesce(nullif(b.last_name, \'\') || \', \', \'\') ||
+                           coalesce(nullif(b.first_name, \'\') || \' \', \'\') as buyer_name,
+                       their_fee_euc is null or their_fee_euc = 0 as cardenas100,
                        array_to_string(array_distinct(array_agg(ad.name)), \', \') as advisors,
                        i.count as n_invoices,
                        fi.first_issued_at as first_invoiced_at,
@@ -245,7 +260,7 @@ class m170303_154953_transactions extends Migration
                            group by transaction_id) fi on (fi.transaction_id = t.id)
                 group by t.id, p.reference, p.location, p.building_complex, s.reference, s.first_name, s.last_name, b.reference, b.first_name, b.last_name, i.count, fi.first_issued_at, t.buyer_provider, t.seller_provider');
         $this->execute('
-            create view transaction_attribution as
+            create view effective_attribution as
                 select a.id,
                        a.advisor_id,
                        a.office,
@@ -273,7 +288,6 @@ class m170303_154953_transactions extends Migration
                 select 
                     advisor_id,
                     advisor_name,
-                    attribution_comments,
                     t.id as transaction_id,
                     t.payroll_month,
                     buyer_id,
@@ -291,15 +305,12 @@ class m170303_154953_transactions extends Migration
                         when array_agg(i.issued_at) = \'{NULL}\' then 0
                         else count(*)
                     end as n_invoices,
-                    array_to_string(array_agg(i.issued_at), \', \') as invoice_issuance_dates,
-                    array_to_string(array_agg(i.code), \', \') as invoice_codes,
+                    json_agg(row_to_json((select foo from (select i.code, i.issued_at, i.amount_euc, i.recipient_category) foo)))
+                        as invoices_json,
                     sum(i.amount_euc) as total_invoiced_euc,
                     our_fee_euc,
                     their_fee_euc,
-                    attribution_offices,
-                    attribution_type_names,
-                    attribution_type_bps,
-                    total_attributed_euc,
+                    attributions_json::text,
                     total_attributed_sum_euc
                 from 
                     transaction t
@@ -311,14 +322,10 @@ class m170303_154953_transactions extends Migration
                             at.transaction_id,
                             ad.id as advisor_id,
                             ad.name as advisor_name,
-                            array_to_string(array_agg(at.comments), \' -- \') as attribution_comments,
-                            array_to_string(array_agg(at.office), \', \', \'NULL\') as attribution_offices,
-                            array_to_string(array_agg(att.name), \', \', \'NULL\') as attribution_type_names,
-                            array_to_string(array_agg(att.attribution_bp), \', \', \'NULL\') as attribution_type_bps,
-                            array_to_string(array_agg(at.amount_euc), \', \', \'NULL\') as total_attributed_euc,
+                            json_agg(row_to_json((select foo2 from (select at.comments, at.office, att.name as type_name, att.attribution_bp as type_bp, at.amount_euc) foo2))) as attributions_json,
                             sum(at.amount_euc) as total_attributed_sum_euc
                         from
-                            transaction_attribution at
+                            effective_attribution at
                             join attribution_type att on (att.id = at.attribution_type_id)
                             join advisor ad on (ad.id = at.advisor_id)
                         group by
@@ -342,12 +349,8 @@ class m170303_154953_transactions extends Migration
                     sale_price_euc,
                     our_fee_euc,
                     their_fee_euc,
-                    attribution_offices,
-                    attribution_type_names,
-                    attribution_type_bps,
-                    total_attributed_euc,
-                    total_attributed_sum_euc,
-                    attribution_comments
+                    attributions_json::text,
+                    total_attributed_sum_euc
         ');
         $this->execute('
             create view transaction_attribution_calculated_summary as
@@ -370,7 +373,7 @@ class m170303_154953_transactions extends Migration
     public function safeDown() {
         $this->execute('drop view transaction_attribution_calculated_summary');
         $this->execute('drop view transaction_attribution_summary');
-        $this->execute('drop view transaction_attribution');
+        $this->execute('drop view effective_attribution');
         $this->execute('drop view transaction_list_item');
         $this->execute('drop function array_distinct(anyarray)');
         $this->dropTable('correction');

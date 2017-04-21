@@ -49,6 +49,7 @@ class Correction extends \yii\db\ActiveRecord
         return [
             [['payroll_id', 'corrected_eu', 'compensation_on', 'reason'], 'required'],
             ['payroll_id', 'integer'],
+            ['payroll_id', 'checkPayrollMonth'],
             [['corrected_eu', 'compensation_eu'], 'number'],
             [['compensation_on'], 'date', 'format' => 'yyyy-MM-dd'],
             [['reason'], 'string', 'max' => 32],
@@ -56,6 +57,15 @@ class Correction extends \yii\db\ActiveRecord
         ];
     }
 
+    public function checkPayrollMonth($attribute, $params) 
+    {
+        $n = Payroll::find()->where([
+            'month' => $this->compensation_on,
+            'advisor_id' => $this->payroll->advisor_id
+        ])->andWhere(['not', ['commission_bp' => null]])->count();
+        if ($n > 0)
+            $this->addError($attribute, Yii::t('app', 'The month for the correction to be compensated is already closed.'));
+    }
     /**
      * @inheritdoc
      */

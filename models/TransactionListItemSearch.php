@@ -108,6 +108,7 @@ class TransactionListItemSearch extends TransactionListItem
         if (intval($this->search_any)) $search_id = intval($this->search_any);
         $query->andFilterWhere(['or', 
             ['id' => $search_id],
+            ['ilike', 'external_id', $this->search_any],
             ['ilike', 'custom_type', $this->search_any],
             ['ilike', 'transfer_type', $this->search_any],
             ['ilike', 'development_type', $this->search_any],

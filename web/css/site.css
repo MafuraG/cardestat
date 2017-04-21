@@ -37,6 +37,21 @@ body {
     font-style: italic;
 }
 
+.range-value {
+    width: 176px;
+    display: inline-block;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.form-inline label {
+    margin-right: 6px;
+}
+
+.form-inline .form-group {
+    margin-right: 12px;
+}
+
 /* add sorting icons to gridview sort links */
 a.asc:after, a.desc:after {
     position: relative;
@@ -283,7 +298,7 @@ td.actions .btn .glyphicon-eye-open {
 }
 
 .text-warning {
-  color: #b75700;
+  color: #da6800;
 } 
 .advanced-input {
   padding: 12px;

@@ -136,8 +136,8 @@ class Attribution extends \yii\db\ActiveRecord
                 ->one();
             if (!$payroll) {
                 $payroll = new Payroll([
-                    'transaction_id' => $this->transaction_id,
-                    'advisor_id' => $this->advisor_i,
+                    'month' => $this->transaction->payroll_month,
+                    'advisor_id' => $this->advisor_id,
                 ]);
                 if (!$payroll->save()) {
                     $msg = var_export($payroll->errors, 1);
