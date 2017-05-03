@@ -112,7 +112,7 @@ class Office extends \yii\db\ActiveRecord
                     ':from' => $from,
                     ':to' => $to
                 ]);
-            }])->select(['office.name', "round(sum(amount_euc)/count(*) * 100, 2) as {$sum_alias}", "count(*) as {$count_alias}"])
+            }])->select(['office.name', "round(sum(amount_euc)/count(*) / 100, 2) as {$sum_alias}", "count(*) as {$count_alias}"])
             ->orderBy('office.name')
             ->groupBy('office.name')
             ->createCommand()->queryAll();

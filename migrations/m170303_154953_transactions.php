@@ -8,7 +8,7 @@ class m170303_154953_transactions extends Migration
         $this->createTable('transaction_type', [
             'name' => $this->string(32) . ' primary key'
         ]);
-        $this->batchInsert('transaction_type', ['name'], [['COMPRAVENTA'], ['ALQUILER'], ['ASESORAMIENTO']]);
+        $this->batchInsert('transaction_type', ['name'], [['COMPRAVENTA'], ['ALQUILER'], ['ASESORAMIENTO'], ['COMISIÓN']]);
         $this->createTable('custom_type', [
             'name' => $this->string(32) . ' primary key'
         ]);
@@ -24,7 +24,7 @@ class m170303_154953_transactions extends Migration
         $this->createTable('partner', [
             'name' => $this->string(32) . ' primary key'
         ]);
-        $this->batchInsert('partner', ['name'], [['CANARINVEST'], ['REAL INVEST'], ['DREAM HOMES']]);
+        $this->batchInsert('partner', ['name'], [['CANARINVEST'], ['REAL INVEST'], ['DREAM HOMES'], ['THE SELLER'], ['RECOMMENDED (PASSIVE)']]);
         $this->createTable('lead_type', [
             'name' => $this->string(18) . ' primary key'
         ]);
@@ -108,6 +108,30 @@ class m170303_154953_transactions extends Migration
         ], [
             'NATHALIE PARADIS', 'ARGUINEGUÍN', $unknown0_id, true, false
         ], [
+            'MARKUS SCHULZ', 'PUERTO RICO', $unknown0_id, false, false
+        ], [
+            'SIRPA H.', 'ARGUINEGUÍN', $unknown0_id, false, false
+        ], [
+            'VIBEKE NICKELSEN', 'ARGUINEGUÍN', $unknown0_id, false, false
+        ], [
+            'MARTA VASARHELYI', 'PUERTO RICO', $unknown0_id, false, false
+        ], [
+            'MARY HIERRO', 'ARGUINEGUÍN', $unknown0_id, false, false
+        ], [
+            'LICKEN BAGGER', 'ARGUINEGUÍN', $unknown0_id, false, false
+        ], [
+            'ISABEL ÁLVAREZ', null, $unknown0_id, false, false
+        ], [
+            'JEANNETE ZEHNTEL', 'ARGUINEGUÍN', $unknown0_id, false, false
+        ], [
+            'ANNE GRUDE-NIELSEN', 'ARGUINEGUÍN', $unknown0_id, false, false
+        ], [
+            'MAIKEN SONDERGAARD', 'PUERTO DE MOGÁN', $unknown0_id, false, false
+        ], [
+            'HENRIETTE B. THOMSEN', 'PUERTO RICO', $unknown0_id, false, false
+        ], [
+            'OLIVER MAIKATH', 'ARGUINEGUÍN', $unknown0_id, false, false
+        ], [
             'CRISTINA CARUSO', 'ARGUINEGUÍN', $unknown0_id, false, false
         ], [
             'PAOLA BUSCEMI', 'ARGUINEGUÍN', $unknown0_id, true, false
@@ -153,22 +177,22 @@ class m170303_154953_transactions extends Migration
             'transfer_type' => $this->string(32) . ' references transfer_type(name)',
             'development_type' => $this->string(32) . ' references development_type(name)',
             'first_published_at' => $this->date(),
-            'first_published_price_euc' => $this->integer(),
+            'first_published_price_euc' => $this->bigInteger(),
             'last_published_at' => $this->date(),
-            'last_published_price_euc' => $this->integer(),
+            'last_published_price_euc' => $this->bigInteger(),
             'option_signed_at' => $this->date()->notNull(),
-            'sale_price_euc' => $this->integer()->notNull(),
-            'buyer_id' => $this->integer()->notNull() . ' references contact(id)',
+            'sale_price_euc' => $this->bigInteger()->notNull(),
+            'buyer_id' => $this->integer() . ' references contact(id)',
             'is_new_buyer' => $this->boolean(),
             'buyer_provider' => $this->string(32) . ' references partner(name)',
-            'seller_id' => $this->integer()->notNull() . ' references contact(id)',
+            'seller_id' => $this->integer() . ' references contact(id)',
             'is_new_seller' => $this->boolean(),
             'seller_provider' => $this->string(32) . ' references partner(name)',
             'lead_type' => $this->string(18)->notNull()->defaultValue('NC') . ' references lead_type(name)',
             'search_started_at' => $this->date(),
-            'suggested_sale_price_euc' => $this->integer(),
+            'suggested_sale_price_euc' => $this->bigInteger(),
             'passed_to_sales_by' => $this->integer() . ' references advisor(id)',
-            'property_id' => $this->integer()->notNull() . ' references property(id)',
+            'property_id' => $this->integer() . ' references property(id)',
             'is_home_staged' => $this->boolean(),
             'our_fee_euc' => $this->integer(),
             'their_fee_euc' => $this->integer(),
@@ -219,6 +243,39 @@ class m170303_154953_transactions extends Migration
             'reason' => $this->string(32),
             'created_at' => $this->timestamp(2)->notNull()->defaultExpression('now()'),
             'updated_at' => $this->timestamp(2)->notNull()->defaultExpression('now()')
+        ]);
+        $this->createTable('archive_subject', [
+            'name' => $this->string(32) . ' primary key'
+        ]);
+        $this->batchInsert('archive_subject', ['name'], [
+            ['CÁRDENAS 1'],
+            ['CÁRDENAS 100'],
+            ['COLABORADOR 1'],
+            ['COLABORADOR 100'],
+            ['GESTIÓN 1'],
+            ['GESTIÓN 100'],
+            ['ADMINISTRACIÓN 1'],
+            ['ADMINISTRACIÓN 100'],
+            ['BANCO 1'],
+            ['BANCO 100']
+        ]);
+        $this->createTable('archived_invoice', [
+            'id' => $this->primaryKey(),
+            'year' => $this->smallInteger()->notNull(),
+            'amount_euc' => $this->integer()->notNull(),
+            'office' => $this->string(18) . ' references office(name)', // null means all/no offices
+            'transaction_type' => $this->string(18)->notNull() . ' references transaction_type(name)',
+            'subject' => $this->string(32)->notNull() . ' references archive_subject (name)',
+            'n_operations_c' => $this->integer()->notNull(),
+        ]);
+        $this->createIndex('archived_invoice-year-office-subject-uidx', 'archived_invoice', ['year', 'office', 'subject'], true);
+        $this->createTable('archived_attribution', [
+            'id' => $this->primaryKey(),
+            'archived_invoice_id' => $this->integer() . ' references archived_invoice(id)',
+            'attributed_euc' => $this->integer()->notNull(),
+            'advisor_id' => $this->integer()->notNull() . ' references advisor(id)',
+            'commission_euc' => $this->integer()->notNull(),
+            'n_operations_c' => $this->integer()->notNull()
         ]);
         $this->execute('
             create or replace function array_distinct(anyarray) returns anyarray as $$
@@ -376,6 +433,9 @@ class m170303_154953_transactions extends Migration
         $this->execute('drop view effective_attribution');
         $this->execute('drop view transaction_list_item');
         $this->execute('drop function array_distinct(anyarray)');
+        $this->dropTable('archived_attribution');
+        $this->dropTable('archived_invoice');
+        $this->dropTable('archive_subject');
         $this->dropTable('correction');
         $this->dropTable('attribution');
         $this->dropTable('payroll');

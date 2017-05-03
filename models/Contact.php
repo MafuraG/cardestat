@@ -52,7 +52,8 @@ class Contact extends \yii\db\ActiveRecord
             [['created_at', 'updated_at'], 'safe'],
             ['birth_date', 'date', 'format' => 'YYYY-mm-dd'],
             [['reference'], 'string', 'max' => 20],
-            [['first_name', 'last_name', 'nationality', 'type_of_data', 'contact_source', 'internet', 'country_of_residence'], 'string', 'max' => 42],
+            [['first_name', 'last_name', 'nationality', 'contact_source', 'internet', 'country_of_residence'], 'string', 'max' => 42],
+            ['type_of_data', 'string', 'max' => 54],
             [['reference'], 'unique'],
         ];
     }

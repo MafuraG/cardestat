@@ -32,19 +32,18 @@ class ChartController extends Controller
     }
     /**
      */
-    public function actionVolume($from = null, $to = null, $interval_months = 1, $transaction_type = null)
+    public function actionTransactions($from = null, $to = null, $interval_months = 1, $transaction_type = null)
     {
         extract($this->getDoubleSumDefaultPeriods($from, $to));
-        $aux1 = ArrayHelper::index(Transaction::getVolume($from, $to, $interval_months, $transaction_type, 'sum1_eu'), 'period');
-        $aux2 = ArrayHelper::index(Invoice::getRevenue($from, $to, $interval_months, $transaction_type, 'sum2_eu'), 'period');
+        $aux1 = ArrayHelper::index(Transaction::countAll($from, $to, $interval_months, $transaction_type, 'sum1_eu'), 'period');
+        $aux2 = ArrayHelper::index(Transaction::countShared($from, $to, $interval_months, $transaction_type, 'sum2_eu'), 'period');
         $turnover = ArrayHelper::merge($aux1, $aux2);
-        //\yii\helpers\VarDumper::dump($turnover, 6, true); die;
         $intervals = [
             1 => Yii::t('app', 'Monthly'),
             3 => Yii::t('app', 'Quarterly'),
             12 => Yii::t('app', 'Yearly'),
         ];
-        $title= Yii::t('app', 'Transactions vs. Revenue');
+        $title= Yii::t('app', 'No. transactions');
         $data = [
             'sums' => $turnover,
             'from' => $from,
@@ -53,8 +52,71 @@ class ChartController extends Controller
             'interval_months' => $interval_months,
             'intervals' => $intervals,
             'transaction_type' => $transaction_type,
-            'label1' => Yii::t('app', 'Transactions'),
-            'label2' => Yii::t('app', 'Revenue'),
+            'label1' => Yii::t('app', 'All transactions'),
+            'label2' => Yii::t('app', 'Shared transactions'),
+            'title' => $title
+        ];
+        if (Yii::$app->request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return $data;
+        } else return $this->render('double_period_sum', $data);
+    }
+    /**
+     */
+    public function actionVolume($from = null, $to = null, $interval_months = 1, $transaction_type = null)
+    {
+        extract($this->getDoubleSumDefaultPeriods($from, $to));
+        $aux1 = ArrayHelper::index(Transaction::getVolume($from, $to, $interval_months, $transaction_type, 'sum1_eu'), 'period');
+        $aux2 = ArrayHelper::index(Invoice::getRevenue($from, $to, $interval_months, $transaction_type, 'sum2_eu'), 'period');
+        $turnover = ArrayHelper::merge($aux1, $aux2);
+        $intervals = [
+            1 => Yii::t('app', 'Monthly'),
+            3 => Yii::t('app', 'Quarterly'),
+            12 => Yii::t('app', 'Yearly'),
+        ];
+        $title= Yii::t('app', 'Transactions vs. Revenues');
+        $data = [
+            'sums' => $turnover,
+            'from' => $from,
+            'to' => $to,
+            'period' => $label,
+            'interval_months' => $interval_months,
+            'intervals' => $intervals,
+            'transaction_type' => $transaction_type,
+            'label1' => Yii::t('app', 'Transactions') . ' €',
+            'label2' => Yii::t('app', 'Revenue') . ' €',
+            'title' => $title
+        ];
+        if (Yii::$app->request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return $data;
+        } else return $this->render('double_period_sum', $data);
+    }
+    /**
+     */
+    public function actionAvgVolume($from = null, $to = null, $interval_months = 1, $transaction_type = null)
+    {
+        extract($this->getDoubleSumDefaultPeriods($from, $to));
+        $aux1 = ArrayHelper::index(Transaction::getAvgVolume($from, $to, $interval_months, $transaction_type, 'sum1_eu'), 'period');
+        $aux2 = ArrayHelper::index(Invoice::getAvgRevenue($from, $to, $interval_months, $transaction_type, 'sum2_eu'), 'period');
+        $turnover = ArrayHelper::merge($aux1, $aux2);
+        //\yii\helpers\VarDumper::dump($turnover, 6, true); die;
+        $intervals = [
+            1 => Yii::t('app', 'Monthly'),
+            3 => Yii::t('app', 'Quarterly'),
+            12 => Yii::t('app', 'Yearly'),
+        ];
+        $title= Yii::t('app', 'Avg. Transaction vs. Avg. Revenue');
+        $data = [
+            'sums' => $turnover,
+            'from' => $from,
+            'to' => $to,
+            'period' => $label,
+            'interval_months' => $interval_months,
+            'intervals' => $intervals,
+            'transaction_type' => $transaction_type,
+            'label1' => Yii::t('app', 'Transactions') . ' €',
+            'label2' => Yii::t('app', 'Revenue') . ' €',
             'title' => $title
         ];
         if (Yii::$app->request->isAjax) {
@@ -78,7 +140,8 @@ class ChartController extends Controller
             'groupings' => $offices,
             'period1' => $period1,
             'period2' => $period2,
-            'title' => $title
+            'title' => $title,
+            'label' => Yii::t('app', 'No. operations')
         ];
         if (Yii::$app->request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -96,12 +159,13 @@ class ChartController extends Controller
             Office::getAttributionSum($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'name');
         $offices = ArrayHelper::merge($aux1, $aux2);
         ksort($offices);
-        $title= Yii::t('app', 'Attributions by office');
+        $title= Yii::t('app', 'Attributed by office');
         $data = [
             'groupings' => $offices,
             'period1' => $period1,
             'period2' => $period2,
-            'title' => $title
+            'title' => $title,
+            'label' => Yii::t('app', 'Attributed') . ' €'
         ];
         if (Yii::$app->request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -119,12 +183,13 @@ class ChartController extends Controller
             Office::getAttributionOverOperationCount($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'name');
         $offices = ArrayHelper::merge($aux1, $aux2);
         ksort($offices);
-        $title= Yii::t('app', 'Attributions/Operation by office');
+        $title= Yii::t('app', 'Attributed/Operation by office');
         $data = [
             'groupings' => $offices,
             'period1' => $period1,
             'period2' => $period2,
-            'title' => $title
+            'title' => $title,
+            'label' => Yii::t('app', 'Attributed') . ' €'
         ];
         if (Yii::$app->request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -147,7 +212,8 @@ class ChartController extends Controller
             'groupings' => $advisors,
             'period1' => $period1,
             'period2' => $period2,
-            'title' => $title
+            'title' => $title,
+            'label' => Yii::t('app', 'No. operations')
         ];
         if (Yii::$app->request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -164,13 +230,14 @@ class ChartController extends Controller
         $aux2 = ArrayHelper::index(
             Advisor::getAttributionSum($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'name');
         $advisors = ArrayHelper::merge($aux1, $aux2);
-        $title= Yii::t('app', 'Attributions by advisor');
+        $title= Yii::t('app', 'Attributed by advisor');
         ksort($advisors);
         $data = [
             'groupings' => $advisors,
             'period1' => $period1,
             'period2' => $period2,
-            'title' => $title
+            'title' => $title,
+            'label' => Yii::t('app', 'Attributed') . ' €'
         ];
         if (Yii::$app->request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -188,12 +255,13 @@ class ChartController extends Controller
             Advisor::getAttributionOverOperationCount($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'name');
         $advisors = ArrayHelper::merge($aux1, $aux2);
         ksort($advisors);
-        $title= Yii::t('app', 'Attributions/Operation by advisor');
+        $title= Yii::t('app', 'Attributed/Operation by advisor');
         $data = [
             'groupings' => $advisors,
             'period1' => $period1,
             'period2' => $period2,
-            'title' => $title
+            'title' => $title,
+            'label' => Yii::t('app', 'Attributed') . ' €'
         ];
         if (Yii::$app->request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -204,12 +272,13 @@ class ChartController extends Controller
      */
     protected function getSumByCountDefaultPeriods($from1 = null, $to1 = null, $label1 = null, $from2 = null, $to2 = null, $label2 = null)
     {
-        if (!$label1) $label1 = Yii::t('app', 'Current month');
+        if (!$label1) $label1 = Yii::t('app', 'Current quarter');
         if (!$label2) $label2 = Yii::t('app', 'Current year');
+        $current_quarter = ceil(date('n') / 3);
         $periods = [[
             'label' => $label1,
-            'default_from' => date('Y-m-d', mktime(0, 0, 0, date('m'), 1, date('Y'))),
-            'default_to' => date('Y-m-d', mktime(0, 0, 0, date('m'), date('t'), date('Y')))
+            'default_from' => date('Y-m-d', mktime(0, 0, 0, $current_quarter * 3 - 2, 1, date('Y'))),
+            'default_to' => date('Y-m-d', mktime(0, 0, 0, $current_quarter * 3, date('t'), date('Y')))
         ], [
             'label' => $label2,
             'default_from' => date('Y-m-d', mktime(0, 0, 0, 1, 1, date('Y'))),

@@ -183,7 +183,7 @@ class Advisor extends \yii\db\ActiveRecord
                     ':from' => $from,
                     ':to' => $to
                 ])->andWhere(['<>', 'attribution_bp', 0]);
-            }])->select(['advisor.name', "round(sum(amount_euc)/count(*) * 100, 2) as {$sum_alias}", "count(*) as {$count_alias}"])
+            }])->select(['advisor.name', "round(sum(amount_euc)/count(*) / 100, 2) as {$sum_alias}", "count(*) as {$count_alias}"])
             ->orderBy('advisor.name')
             ->groupBy('advisor.name')
             ->createCommand()->queryAll();

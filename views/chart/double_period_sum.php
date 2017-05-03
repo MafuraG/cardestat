@@ -48,7 +48,6 @@ $this->params['breadcrumbs'][] = $this->title;
             'endInputOptions' => ['value' => $to],
             'pluginOptions' => [
                 'locale' => ['format' => 'Y-m-d', 'separator' => ' → '],
-                'autoApply' => true,
                 'ranges' => $presetRanges
             ]
         ]) ?>
@@ -153,7 +152,7 @@ $script = <<<JS
                   position: 'left',
                   scaleLabel: {
                       display: true,
-                      labelString: '$label1 €'
+                      labelString: '$label1'
                   },
                   ticks: {
                       userCallback: ticksCallback,
@@ -166,7 +165,7 @@ $script = <<<JS
                   position: 'right',
                   scaleLabel: {
                       display: true,
-                      labelString: '$label2 €',
+                      labelString: '$label2',
                   },
                   ticks: {
                       userCallback: ticksCallback,

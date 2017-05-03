@@ -235,9 +235,17 @@ class TransactionController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        if (!Yii::$app->user->can('contracts') or 
+            !Yii::$app->user->can('accounting') and $model->approved_by_accounting or 
+            !Yii::$app->user->can('admin') and $model->approved_by_direction) throw new ForbiddenHttpException();
 
-        return $this->redirect(['index']);
+        $model = $this->findModel($id);
+        if (count($model->invoices)) return Yii::t('app', 'This transaction has invoices associated; please remove them first');
+        if (count($model->attributions)) return Yii::t('app', 'This transaction has attributions associated; please remove them first');
+        $model->delete();
+
+        if (Yii::$app->request->isAjax) return 'ok';
+        else return $this->redirect(['index']);
     }
 
     /**

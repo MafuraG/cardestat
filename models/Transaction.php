@@ -384,7 +384,7 @@ class Transaction extends \yii\db\ActiveRecord
         $this->their_fee_euc = round($this->their_fee_eu * 100.);
         return parent::beforeSave($insert);
     }
-    public static function getVolume($from = null, $to = null, $months = 1, $transaction_type = null, $sum_alias = 'sum')
+    public static function getVolume($from = null, $to = null, $months = 1, $transaction_type = null, $sum_alias = 'sum', $avg = false)
     {
         if ($months == 12) $interval = 'year';
         else if ($months == 3) $interval = 'quarter';
@@ -403,13 +403,61 @@ class Transaction extends \yii\db\ActiveRecord
             $joinCondition .=  ' and transaction_type = :arg7';
             $joinArgs[':arg7'] = $transaction_type;
         }
-        return static::find()
-            ->select(['period', "round(sum(sale_price_euc) / 100., 2) as {$sum_alias}"])
-            ->rightJoin("(
+        $query = static::find();
+        if ($avg) $query->select(['period', "round(sum(sale_price_euc)/count(*) / 100., 2) as {$sum_alias}"]);
+        else $query->select(['period', "round(sum(sale_price_euc) / 100., 2) as {$sum_alias}"]);
+        return $query->rightJoin("(
                 select date_trunc(:arg0, d)::date as period
                 from generate_series(:arg1::date, :arg2, :arg3) d) series", $joinCondition, $joinArgs)
             ->groupBy('period')
             ->orderBy('period')
             ->createCommand()->queryAll();
+    }
+    public static function getAvgVolume($from = null, $to = null, $months = 1, $transaction_type = null, $sum_alias = 'sum')
+    {
+        return static::getVolume($from, $to, $months, $transaction_type, $sum_alias, true);
+    }
+    public static function getCount($from = null, $to = null, $months = 1, $transaction_type = null, $sum_alias = 'sum', $shared = false)
+    {
+        if ($months == 12) $interval = 'year';
+        else if ($months == 3) $interval = 'quarter';
+        else $interval = 'month';
+        $joinArgs = [
+            ':arg0' => $interval,
+            ':arg1' => $from,
+            ':arg2' => $to,
+            ':arg3' => "$months month",
+            ':arg4' => $interval,
+            ':arg5' => $from,
+            ':arg6' => $to,
+        ];
+        $joinCondition = "series.period = date_trunc(:arg4, option_signed_at)::date and option_signed_at between :arg5 and :arg6";
+        if ($transaction_type) {
+            $joinCondition .=  ' and transaction_type = :arg7';
+            $joinArgs[':arg7'] = $transaction_type;
+        }
+        $query = static::find()
+            ->select(['period', "case when sum(id) is null then 0 else count(*) end as {$sum_alias}"])
+            ->rightJoin("(
+                select date_trunc(:arg0, d)::date as period
+                from generate_series(:arg1::date, :arg2, :arg3) d) series", $joinCondition, $joinArgs)
+            ->groupBy('period')
+            ->orderBy('period');
+        if ($shared) $query->where(['or',
+            ['not', ['our_fee_euc' => null]],
+            ['<=', 'our_fee_euc', 0]
+        ])->andWhere(['or',
+            ['not', ['their_fee_euc' => null]],
+            ['<=', 'their_fee_euc', 0]
+        ]);
+        return $query->createCommand()->queryAll();
+    }
+    public static function countAll($from = null, $to = null, $months = 1, $transaction_type = null, $sum_alias = 'sum')
+    {
+        return static::getCount($from, $to, $months, $transaction_type, $sum_alias, false);
+    }
+    public static function countShared($from = null, $to = null, $months = 1, $transaction_type = null, $sum_alias = 'sum')
+    {
+        return static::getCount($from, $to, $months, $transaction_type, $sum_alias, true);
     }
 }

@@ -18,12 +18,15 @@ $this->params['breadcrumbs'][] = $this->title;
       <?= Html::hiddenInput('label2', $period2['label']) ?>
       <label><?= Yii::t('app', 'Period') ?> 1</label>
       <?php $presetRanges = [
-          Yii::t('app', 'Current month') => ["moment().startOf('month')", "moment().endOf('month')"],
-          Yii::t('app', 'Previous month') => ["moment().subtract(1, 'month').startOf('month')", "moment().subtract(1, 'month').endOf('month')"],
-          Yii::t('app', 'Same month previous year') => ["moment().startOf('month').subtract(1, 'year')", "moment().endOf('month').subtract(1, 'year')"],
+          Yii::t('app', 'Current quarter') => ["moment().startOf('quarter')", "moment().endOf('quarter')"],
+          Yii::t('app', 'Previous quarter') => ["moment().subtract(1, 'quarter').startOf('quarter')", "moment().subtract(1, 'quarter').endOf('quarter')"],
+          Yii::t('app', 'Same quarter previous year') => ["moment().startOf('quarter').subtract(1, 'year')", "moment().endOf('quarter').subtract(1, 'year')"],
           Yii::t('app', 'Current year') => ["moment().startOf('year')", "moment().endOf('year')"],
           Yii::t('app', 'Previous year') => ["moment().subtract(1, 'year').startOf('year')", "moment().subtract(1, 'year').endOf('year')"],
           Yii::t('app', 'Trailing twelve months') => ["moment().subtract(1, 'year').add(1, 'month')", "moment()"],
+          Yii::t('app', 'Trailing twenty-four months') => ["moment().subtract(2, 'year').add(1, 'month')", "moment()"],
+          Yii::t('app', 'Previous three years') => ["moment().subtract(3, 'year').startOf('year')", "moment().subtract(1, 'year').endOf('year')"],
+          Yii::t('app', 'Previous five years') => ["moment().subtract(5, 'year').startOf('year')", "moment().subtract(1, 'year').endOf('year')"],
       ] ?>
       <?= DateRangePicker::widget([
           'name' => 'daterange1',
@@ -55,7 +58,6 @@ $this->params['breadcrumbs'][] = $this->title;
           'endInputOptions' => ['value' => $period1['to']],
           'pluginOptions' => [
               'locale' => ['format' => 'Y-m-d', 'separator' => ' → '],
-              'autoApply' => true,
               'ranges' => $presetRanges
           ]
       ]) ?>
@@ -90,7 +92,6 @@ $this->params['breadcrumbs'][] = $this->title;
           'endInputOptions' => ['value' => $period2['to']],
           'pluginOptions' => [
               'locale' => ['format' => 'Y-m-d', 'separator' => ' → '],
-              'autoApply' => true,
               'ranges' => $presetRanges
           ]
       ]) ?>
@@ -198,6 +199,11 @@ $script = <<<JS
      chart.config.options.horizontalLines[1].y = period2avg;
      chart.update();
   }
+  function ticksCallback(value, index, values) {
+      if (value >= 1000000) return (value/1000000).toFixed(2) + 'M'; 
+      else if (value >= 1000) return (value/1000).toFixed(2) + 'k';
+      else return value.toFixed(2);
+  }
   var chart = new Chart(ctx, {
       type: 'bar',
       data: data,
@@ -215,7 +221,12 @@ $script = <<<JS
                   position: 'bottom',
               }],
               yAxes: [{
+                  scaleLabel: {
+                      display: true,
+                      labelString: '$label',
+                  },
                   ticks: {
+                      userCallback: ticksCallback,
                       min: 0,
                       //max: 100,
                   },

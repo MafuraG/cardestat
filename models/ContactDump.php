@@ -34,7 +34,8 @@ class ContactDump extends \yii\db\ActiveRecord
     {
         return [
             [['customer_number', 'birth_date'], 'string', 'max' => 20],
-            [['first_name', 'last_name', 'nationality', 'type_of_data', 'contact_source', 'internet', 'country_of_residence'], 'string', 'max' => 42],
+            [['first_name', 'last_name', 'nationality', 'contact_source', 'internet', 'country_of_residence'], 'string', 'max' => 42],
+            ['type_of_data', 'string', 'max' => 54],
             [['customer_number'], 'unique'],
         ];
     }

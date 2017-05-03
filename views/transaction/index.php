@@ -55,9 +55,13 @@ $newTransactionLbl = Yii::t('app', 'Create Transaction');
 $transactionLbl = Yii::t('app', 'Transaction');
 $txUpdateUrl = Url::to(['transaction/update', 'id' => '_id_']);
 $txViewUrl = Url::to(['transaction/view', 'id' => '_id_']);
+$txRemoveUrl = Url::to(['transaction/delete', 'id' => '_id_']);
+$areYouSure = Yii::t('app', 'Are you sure you want to delete this transaction?');
 $script = <<< JS
   var txUpdateUrl = '$txUpdateUrl';
   var txViewUrl = '$txViewUrl';
+  var txRemoveUrl = '$txRemoveUrl';
+  var areYouSure = '$areYouSure';
   var \$transactionModal = $('#transaction-modal');
   $.pjax.defaults.timeout = 6000;
   $('.transaction-index').on('submit', '.transaction-list-item-search form', function(e) {
@@ -116,6 +120,21 @@ $script = <<< JS
       $(document).off('click', closeAdvancedSearch);
     }
   }
+  $('#p0').on('click', 'a.transaction-remove', function() {
+    if (!confirm(areYouSure)) return false;
+    var id = $(this).closest('.transaction').data('key');
+    $.ajax({
+        url: txRemoveUrl.replace('_id_', id),
+        method: 'post',
+        success: function(data) {
+            if (data == 'ok') $.pjax.reload('#p0');
+            else alert(data);
+        }, error: function(jqXHR, textStatus, errorThrown) {
+            alert(textStatus + ': ' + errorThrown);
+        }
+    });
+    return false;
+  });
   $('#p0').on('click', 'a.transaction-edit', function() {
     var id = $(this).closest('.transaction').data('key');
     $.pjax({container: '#p1', url: txUpdateUrl.replace('_id_', id), scrollTo: false, push: false});

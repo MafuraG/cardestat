@@ -53,37 +53,37 @@ $f$ language sql immutable;
 
 --
 
-drop table if exists firmas;
-select load_csv_file('firmas', '/home/claudio/projects/cardestat/Firmas incl. colab. 2017.csv', 21);
-update firmas set ref_prop = null where ref_prop = 'Sin referencia';
+drop table if exists firmas17;
+select load_csv_file('firmas17', '/home/claudio/projects/cardestat/Copia de FIRMAS 2017 (2).csv', 12);
+update firmas17 set ref_prop = null where ref_prop = 'Sin referencia';
 
 insert into property (reference, entry_date, active_date, inactive_date, property_type, location, building_complex, geo_coordinates, plot_area_dm2, built_area_dm2, n_bedrooms) values 
-    --('23447-RS', '2016-08-01', '2016-08-01', '2016-09-01', 'Villa', 'Maspalomas_Meloneras', null, '27.744695, -15.610053', 66800, 39100, 5),
+    ('23447-RS', '2016-08-01', '2016-08-01', '2016-09-01', 'Villa', 'Maspalomas_Meloneras', null, '27.744695, -15.610053', 66800, 39100, 5),
     ('0B-V11574', '2013-05-01', '2013-05-01', '2013-05-08', 'Apartment', 'Playa del Inglés', 'Ecuador', '27.754808, -15.572702', null, 3464, 1),
     ('0B-V32483', '2016-05-13', '2016-05-13', '2017-04-03', 'Duplex', 'Meloneras', null, '27.754808, -15.572702', null, 8990, 2);
 
 --insert into contact (reference, first_name, last_name, nationality, type_of_data, contact_source, country_of_residence) values 
---    ('24332', 'Victor', 'Basistyi', 'Russia', 'Buyer Gestoría_client,Fiscalidad_client,+500', 'Internet', 'Rusia'),
---    ('24322', 'Igor', 'Necajev', 'Lithuania', 'Buyer', null, 'Lithuania'),
---    ('24348', 'Siri Andestad', 'Skarpnes', 'Norway', 'Buyer', 'Collaboration', 'Noruega'),
---    ('24453', 'Merete', 'Björnsen', 'Sweden', 'Buyer', 'Internet', 'Suecia'),
---    ('24511', 'Ramon Bernardo', 'Rodriguez Cabral', 'Spain', 'Buyer', 'Collaborator - ACEGI', 'España'),
---    ('24537', null, 'MACARONESIA REAL ESTATE', null, 'Client', 'Collaboration', 'España'),
---    ('24550', 'Alejandro', 'Rodriguez Hernandez', 'Spain', 'Seller', 'Collaborator - ACEGI', 'España');
+    --('24332', 'Victor', 'Basistyi', 'Russia', 'Buyer Gestoría_client,Fiscalidad_client,+500', 'Internet', 'Rusia'),
+    --('24322', 'Igor', 'Necajev', 'Lithuania', 'Buyer', null, 'Lithuania'),
+    --('24348', 'Siri Andestad', 'Skarpnes', 'Norway', 'Buyer', 'Collaboration', 'Noruega'),
+    --('24453', 'Merete', 'Björnsen', 'Sweden', 'Buyer', 'Internet', 'Suecia'),
+    --('24511', 'Ramon Bernardo', 'Rodriguez Cabral', 'Spain', 'Buyer', 'Collaborator - ACEGI', 'España'),
+    --('24537', null, 'MACARONESIA REAL ESTATE', null, 'Client', 'Collaboration', 'España'),
+    --('24550', 'Alejandro', 'Rodriguez Hernandez', 'Spain', 'Seller', 'Collaborator - ACEGI', 'España');
 
-insert into partner (name)
-    select distinct upper(colab_comprador)
-    from firmas f
-         left join partner p on (p.name = upper(colab_comprador))
-    where colab_comprador is not null and
-          p.name is null;
-
-insert into partner (name)
-    select distinct upper(colab_vendedor)
-    from firmas f
-         left join partner p on (p.name = upper(colab_vendedor))
-    where colab_vendedor is not null and
-          p.name is null;
+--insert into partner (name)
+--    select distinct upper(colab_comprador)
+--    from firmas17 f
+--         left join partner p on (p.name = upper(colab_comprador))
+--    where colab_comprador is not null and
+--          p.name is null;
+--
+--insert into partner (name)
+--    select distinct upper(colab_vendedor)
+--    from firmas17 f
+--         left join partner p on (p.name = upper(colab_vendedor))
+--    where colab_vendedor is not null and
+--          p.name is null;
 
 insert into transaction (
     external_id,
@@ -92,9 +92,9 @@ insert into transaction (
     buyer_id,
     seller_id,
     property_id,
-    transaction_type,
-    buyer_provider,
-    seller_provider)
+    transaction_type)
+    --buyer_provider,
+    --seller_provider)
 select distinct on (f.id)
     f.id,
     f.fecha_firma::date,
@@ -102,14 +102,16 @@ select distinct on (f.id)
     b.id,
     s.id,
     p.id,
-    coalesce(upper(asesoramiento), 'COMPRAVENTA'),
-    upper(colab_comprador),
-    upper(colab_vendedor)
-from firmas f
+    --coalesce(upper(asesoramiento), 'COMPRAVENTA')--,
+    'COMPRAVENTA'--,
+    --upper(colab_comprador),
+    --upper(colab_vendedor)
+from firmas17 f
     join contact s on (f.ref_vendedor = s.reference)
     join contact b on (f.ref_comprador = b.reference)
     join property p on (f.ref_prop = p.reference)
-where f.ref_prop is not null; -- redundant, but kept for clarity
+where f.ref_prop is not null--; -- redundant, but kept for clarity
+    and fecha_firma is not null; -- QUITARRRRRRRRRR!!!!!!!!!!!!!!!!!!!!!!!
 
 insert into transaction (
     external_id,
@@ -118,9 +120,9 @@ insert into transaction (
     buyer_id,
     seller_id,
     property_id,
-    transaction_type,
-    buyer_provider,
-    seller_provider)
+    transaction_type)
+    --buyer_provider,
+    --seller_provider)
 select distinct on (f.id)
     f.id,
     f.fecha_firma::date,
@@ -128,90 +130,92 @@ select distinct on (f.id)
     b.id,
     s.id,
     p.id,
-    coalesce(upper(asesoramiento), 'COMPRAVENTA'),
-    upper(colab_comprador),
-    upper(colab_vendedor)
-from firmas f
+    --coalesce(upper(asesoramiento), 'COMPRAVENTA')--,
+    'COMPRAVENTA'--,
+    --upper(colab_comprador),
+    --upper(colab_vendedor)
+from firmas17 f
     join contact s on (f.ref_vendedor = s.reference)
     join contact b on (f.ref_comprador = b.reference)
     left join property p on (f.ref_prop = p.reference)
-where f.ref_prop is null;
+where f.ref_prop is null--;
+    and fecha_firma is not null; -- QUITARRRRRRRRRR!!!!!!!!!!!!!!!!!!!!!!!
 
-insert into transaction(
-    external_id,
-    option_signed_at,
-    sale_price_euc,
-    buyer_id,
-    seller_id,
-    property_id,
-    transaction_type)
-select 689, '2016-06-16', 23600000, b.id, s.id, p.id, 'COMPRAVENTA'
-from contact s,
-     contact b,
-     property p
-where s.reference = '21774' and
-      b.reference = '1937' and 
-      p.reference = '23008-RK';
-
-delete from transaction where external_id = '690';
-insert into transaction(
-    external_id,
-    option_signed_at,
-    sale_price_euc,
-    buyer_id,
-    seller_id,
-    property_id,
-    transaction_type)
-select 690, '2016-07-21', 14450000, b.id, s.id, p.id, 'COMPRAVENTA'
-from contact s,
-     contact b,
-     property p
-where s.reference = '21774' and
-      b.reference = '1937' and 
-      p.reference = '23008-RK';
-
-insert into transaction(
-    external_id,
-    option_signed_at,
-    sale_price_euc,
-    buyer_id,
-    seller_id,
-    property_id,
-    transaction_type)
-select '563', '2016-04-22', 23900000, b.id, s.id, p.id, 'COMPRAVENTA'
-from contact s,
-     contact b,
-     property p
-where s.reference = '4249' and
-      b.reference = '7534' and 
-      p.reference = '23091-RK';
-
-insert into transaction (
-    external_id,
-    option_signed_at,
-    sale_price_euc,
-    seller_id,
-    property_id,
-    transaction_type,
-    custom_type,
-    transfer_type,
-    development_type,
-    first_published_price_euc,
-    last_published_price_euc,
-    suggested_sale_price_euc,
-    is_new_buyer,
-    our_fee_euc,
-    buyer_provider,
-    seller_provider)
-select '559', '2016-12-27', 29800000, s.id, p.id, 'COMPRAVENTA', 'MULTIEXCLUSIVA', 'NUEVA CONSTRUCCIÓN', 'EN CONSTRUCCIÓN', 31250000, 31250000, 29800000, true, 5960, 'THE SELLER', 'RECOMMENDED (PASSIVE)'
-from contact s,
-     property p
-where s.reference = '20798' and
-      p.reference = '22833-RK';
+--insert into transaction(
+--    external_id,
+--    option_signed_at,
+--    sale_price_euc,
+--    buyer_id,
+--    seller_id,
+--    property_id,
+--    transaction_type)
+--select 689, '2016-06-16', 23600000, b.id, s.id, p.id, 'COMPRAVENTA'
+--from contact s,
+--     contact b,
+--     property p
+--where s.reference = '21774' and
+--      b.reference = '1937' and 
+--      p.reference = '23008-RK';
+--
+--delete from transaction where external_id = '690';
+--insert into transaction(
+--    external_id,
+--    option_signed_at,
+--    sale_price_euc,
+--    buyer_id,
+--    seller_id,
+--    property_id,
+--    transaction_type)
+--select 690, '2016-07-21', 14450000, b.id, s.id, p.id, 'COMPRAVENTA'
+--from contact s,
+--     contact b,
+--     property p
+--where s.reference = '21774' and
+--      b.reference = '1937' and 
+--      p.reference = '23008-RK';
+--
+--insert into transaction(
+--    external_id,
+--    option_signed_at,
+--    sale_price_euc,
+--    buyer_id,
+--    seller_id,
+--    property_id,
+--    transaction_type)
+--select '563', '2016-04-22', 23900000, b.id, s.id, p.id, 'COMPRAVENTA'
+--from contact s,
+--     contact b,
+--     property p
+--where s.reference = '4249' and
+--      b.reference = '7534' and 
+--      p.reference = '23091-RK';
+--
+--insert into transaction (
+--    external_id,
+--    option_signed_at,
+--    sale_price_euc,
+--    seller_id,
+--    property_id,
+--    transaction_type,
+--    custom_type,
+--    transfer_type,
+--    development_type,
+--    first_published_price_euc,
+--    last_published_price_euc,
+--    suggested_sale_price_euc,
+--    is_new_buyer,
+--    our_fee_euc,
+--    buyer_provider,
+--    seller_provider)
+--select '559', '2016-12-27', 29800000, s.id, p.id, 'COMPRAVENTA', 'MULTIEXCLUSIVA', 'NUEVA CONSTRUCCIÓN', 'EN CONSTRUCCIÓN', 31250000, 31250000, 29800000, true, 5960, 'THE SELLER', 'RECOMMENDED (PASSIVE)'
+--from contact s,
+--     property p
+--where s.reference = '20798' and
+--      p.reference = '22833-RK';
 
 insert into attribution (advisor_id, attribution_type_id, amount_euc, transaction_id, created_at)
     select ad.id, at.id, 0, t.id, now()
-    from firmas f
+    from firmas17 f
          join transaction t on (t.external_id = f.id)
          join attribution_type at on (at.name = 'DESCONOCIDO' and attribution_bp = 0),
          advisor ad

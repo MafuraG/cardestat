@@ -6,7 +6,7 @@ class m170221_133734_contacts extends Migration
 {
     public function safeUp() {
         $this->createTable('contact_dump', [
-            'customer_number' => $this->string(20)->unique(),
+            'customer_number' => $this->string(20),
             'first_name' => $this->string(42),
             'last_name' => $this->string(42),
             'nationality' => $this->string(42),
@@ -22,7 +22,7 @@ class m170221_133734_contacts extends Migration
             'first_name' => $this->string(42),
             'last_name' => $this->string(42),
             'nationality' => $this->string(42),
-            'type_of_data' => $this->string(42),
+            'type_of_data' => $this->string(54),
             'contact_source' => $this->string(42),
             'internet' => $this->string(42),
             'birth_date' => $this->string(20),
@@ -46,7 +46,7 @@ class m170221_133734_contacts extends Migration
         ]);
         $this->createTable('property', [
             'id' => $this->primaryKey(),
-            'reference' => $this->string(12),
+            'reference' => $this->string(12)->notNull()->unique(),
             'entry_date' => $this->string(24),
             'active_date' => $this->string(12),
             'inactive_date' => $this->string(12),
@@ -116,15 +116,15 @@ class m170221_133734_contacts extends Migration
         ], [
             'ONOFFICE_CSV2PROPERTY',
             'plot_area_m2',
-            '96',
+            '99',//'96',
         ], [
             'ONOFFICE_CSV2PROPERTY',
             'built_area_m2',
-            '97',
+            '100'//'97',
         ], [
             'ONOFFICE_CSV2PROPERTY',
             'n_bedrooms',
-            '102',
+            '105',//'102',
         ], [
             'ONOFFICE_CSV2CONTACT',
             'first_name',
