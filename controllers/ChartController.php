@@ -74,7 +74,9 @@ class ChartController extends Controller
             3 => Yii::t('app', 'Quarterly'),
             12 => Yii::t('app', 'Yearly'),
         ];
-        $title= Yii::t('app', 'Transactions vs. Revenues');
+        $title= Yii::t('app', 'Volume vs. Revenues');
+        $subtitle = Yii::t('app', 'Price of the traded property vs. fees invoiced');
+        $comments = Yii::t('app', 'A spread between the curves is normally caused by transactions made in colaboration.');
         $data = [
             'sums' => $turnover,
             'from' => $from,
@@ -83,9 +85,11 @@ class ChartController extends Controller
             'interval_months' => $interval_months,
             'intervals' => $intervals,
             'transaction_type' => $transaction_type,
-            'label1' => Yii::t('app', 'Transactions') . ' €',
-            'label2' => Yii::t('app', 'Revenue') . ' €',
-            'title' => $title
+            'label1' => Yii::t('app', 'Price of properties traded') . ' €',
+            'label2' => Yii::t('app', 'Fees invoiced') . ' €',
+            'title' => $title,
+            'subtitle' => $subtitle,
+            'comments' => $comments
         ];
         if (Yii::$app->request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -106,7 +110,8 @@ class ChartController extends Controller
             3 => Yii::t('app', 'Quarterly'),
             12 => Yii::t('app', 'Yearly'),
         ];
-        $title= Yii::t('app', 'Avg. Transaction vs. Avg. Revenue');
+        $title= Yii::t('app', 'Avg. Volume vs. Avg. Revenue');
+        $subtitle = Yii::t('app', 'Property price per transaction vs. fees invoiced per transaction');
         $data = [
             'sums' => $turnover,
             'from' => $from,
@@ -115,9 +120,11 @@ class ChartController extends Controller
             'interval_months' => $interval_months,
             'intervals' => $intervals,
             'transaction_type' => $transaction_type,
-            'label1' => Yii::t('app', 'Transactions') . ' €',
-            'label2' => Yii::t('app', 'Revenue') . ' €',
-            'title' => $title
+            'label1' => Yii::t('app', 'Avg. price of properties traded') . ' €',
+            'label2' => Yii::t('app', 'Avg. fees invoiced') . ' €',
+            'title' => $title,
+            'subtitle' => $subtitle,
+            'comments' => ''
         ];
         if (Yii::$app->request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -226,9 +233,9 @@ class ChartController extends Controller
     {
         list($period1, $period2) = $this->getSumByCountDefaultPeriods($from1, $to1, $label1, $from2, $to2, $label2);
         $aux1 = ArrayHelper::index(
-            Advisor::getAttributionSum($period1['from'], $period1['to'], 'sum1_eu', 'count1'), 'name');
+            Advisor::getAttributionSum($period1['from'], $period1['to'], 'sum1_eu', 'count1'), 'joined_name');
         $aux2 = ArrayHelper::index(
-            Advisor::getAttributionSum($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'name');
+            Advisor::getAttributionSum($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'joined_name');
         $advisors = ArrayHelper::merge($aux1, $aux2);
         $title= Yii::t('app', 'Attributed by advisor');
         ksort($advisors);

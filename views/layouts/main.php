@@ -54,11 +54,11 @@ AppAsset::register($this);
             ]],
             ['label' => \Yii::t('app', 'Charts'), 'active' => Yii::$app->controller->id == 'chart', 'items' => [
                 ['label' => Yii::t('app', 'Trading volume'), 'options' => ['class' => 'dropdown-header']],
-                ['label' => \Yii::t('app', 'Transactions vs. Revenues'), 'url' => ['/chart/volume']],
-                /*
-                ['label' => \Yii::t('app', 'Avg. Transaction vs. Avg. Revenue'), 'url' => ['/chart/avg-volume']],
-                ['label' => Yii::t('app', 'Attributed'), 'options' => ['class' => 'dropdown-header']],
+                ['label' => \Yii::t('app', 'Volume vs. Revenues'), 'url' => ['/chart/volume']],
+                ['label' => \Yii::t('app', 'Avg. Volume vs. Avg. Revenue'), 'url' => ['/chart/avg-volume']],
+                ['label' => Yii::t('app', 'Attributions'), 'options' => ['class' => 'dropdown-header']],
                 ['label' => \Yii::t('app', 'Attributed by advisor'), 'url' => ['/chart/attribution-by-advisor']],
+                /*
                 ['label' => \Yii::t('app', 'Attributed by office'), 'url' => ['/chart/attribution-by-office']],
                 ['label' => Yii::t('app', 'Transactions'), 'options' => ['class' => 'dropdown-header']],
                 ['label' => \Yii::t('app', 'No. transactions'), 'url' => ['/chart/transactions']],

@@ -25,7 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
           Yii::t('app', 'Previous ten years') => ["moment().subtract(10, 'year').startOf('year')", "moment().subtract(1, 'year').endOf('year')"],
       ] ?>
       <div class="form-group">
-        <label><?= Yii::t('app', 'Period') ?> </label>
+        <label><?= Yii::t('app', 'Period') ?></label>
         <?= DateRangePicker::widget([
             'name' => 'daterange',
             'hideInput' => true,
@@ -63,7 +63,9 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::dropDownList('interval_months', $interval_months, $intervals, ['class' => 'form-control input-sm']) ?>
       </div>
   </div>
+  <p class="lead text-center"><?= $subtitle ?></p>
   <canvas height="100%"></canvas>
+  <p class="text-center"><?= $comments ?></p>
 </div>
 <?php
 $sums_json = Json::encode($sums);
@@ -122,8 +124,8 @@ $script = <<<JS
      chart.update();
   }
   function ticksCallback(value, index, values) {
-      if (value >= 1000000) return (value/1000000).toFixed(2) + 'M'; 
-      else if (value >= 1000) return (value/1000).toFixed(2) + 'k';
+      if (value >= 1000000) return (value/1000000).toFixed(0) + 'M'; 
+      else if (value >= 1000) return (value/1000).toFixed(0) + 'k';
       else return value.toFixed(2);
   }
   var chart = new Chart(ctx, {

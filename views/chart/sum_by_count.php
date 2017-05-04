@@ -16,85 +16,89 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= Html::beginForm('', 'get', ['class' => 'form form-inline']) ?>
       <?= Html::hiddenInput('label1', $period1['label']) ?>
       <?= Html::hiddenInput('label2', $period2['label']) ?>
-      <label><?= Yii::t('app', 'Period') ?> 1</label>
-      <?php $presetRanges = [
-          Yii::t('app', 'Current quarter') => ["moment().startOf('quarter')", "moment().endOf('quarter')"],
-          Yii::t('app', 'Previous quarter') => ["moment().subtract(1, 'quarter').startOf('quarter')", "moment().subtract(1, 'quarter').endOf('quarter')"],
-          Yii::t('app', 'Same quarter previous year') => ["moment().startOf('quarter').subtract(1, 'year')", "moment().endOf('quarter').subtract(1, 'year')"],
-          Yii::t('app', 'Current year') => ["moment().startOf('year')", "moment().endOf('year')"],
-          Yii::t('app', 'Previous year') => ["moment().subtract(1, 'year').startOf('year')", "moment().subtract(1, 'year').endOf('year')"],
-          Yii::t('app', 'Trailing twelve months') => ["moment().subtract(1, 'year').add(1, 'month')", "moment()"],
-          Yii::t('app', 'Trailing twenty-four months') => ["moment().subtract(2, 'year').add(1, 'month')", "moment()"],
-          Yii::t('app', 'Previous three years') => ["moment().subtract(3, 'year').startOf('year')", "moment().subtract(1, 'year').endOf('year')"],
-          Yii::t('app', 'Previous five years') => ["moment().subtract(5, 'year').startOf('year')", "moment().subtract(1, 'year').endOf('year')"],
-      ] ?>
-      <?= DateRangePicker::widget([
-          'name' => 'daterange1',
-          'hideInput' => true,
-          'convertFormat' => true,
-          'startAttribute' => 'from1',
-          'callback' => 'function(startDate, endDate, label) {
-              var picker2 = $(\'[name="daterange2"]\')
-                  .closest(\'.drp-container\')
-                  .data(\'daterangepicker\');
-              $(\'[name="label1"]\').val(label);
-              var label2 = $(\'[name="label2"]\').val();
-              $(\'#w0-container\').find(\'.range-value\').html(label);
-              $.ajax({
-                  data: {
-                      from1: startDate.format(\'YYYY-MM-DD\'),
-                      to1: endDate.format(\'YYYY-MM-DD\'),
-                      label1: label,
-                      from2: picker2.startDate.format(\'YYYY-MM-DD\'),
-                      to2: picker2.endDate.format(\'YYYY-MM-DD\'),
-                      label2: label2
-                  }, success: function(data) {
-                      updateChart(data);
-                  }
-              });
-          }',
-          'endAttribute' => 'to1',
-          'startInputOptions' => ['value' => $period1['from']],
-          'endInputOptions' => ['value' => $period1['to']],
-          'pluginOptions' => [
-              'locale' => ['format' => 'Y-m-d', 'separator' => ' → '],
-              'ranges' => $presetRanges
-          ]
-      ]) ?>
-      <label><?= Yii::t('app', 'Period') ?> 2</label>
-      <?= DateRangePicker::widget([
-          'name' => 'daterange2',
-          'hideInput' => true,
-          'convertFormat' => true,
-          'startAttribute' => 'from2',
-          'callback' => 'function(startDate, endDate, label) {
-              var picker1 = $(\'[name="daterange1"]\')
-                  .closest(\'.drp-container\')
-                  .data(\'daterangepicker\');
-              $(\'[name="label2"]\').val(label);
-              var label1 = $(\'[name="label1"]\').val();
-              $(\'#w1-container\').find(\'.range-value\').html(label);
-              $.ajax({
-                  data: {
-                      from1: picker1.startDate.format(\'YYYY-MM-DD\'),
-                      to1: picker1.endDate.format(\'YYYY-MM-DD\'),
-                      label1: label1,
-                      from2: startDate.format(\'YYYY-MM-DD\'),
-                      to2: endDate.format(\'YYYY-MM-DD\'),
-                      label2: label
-                  }, success: function(data) {
-                      updateChart(data);
-                  }
-              });
-          }',
-          'endAttribute' => 'to2',
-          'startInputOptions' => ['value' => $period2['from']],
-          'endInputOptions' => ['value' => $period2['to']],
-          'pluginOptions' => [
-              'locale' => ['format' => 'Y-m-d', 'separator' => ' → '],
-              'ranges' => $presetRanges
-          ]
-      ]) ?>
+      <div class="form-group">
+        <label><?= Yii::t('app', 'Period') ?> 1</label>
+        <?php $presetRanges = [
+            Yii::t('app', 'Current quarter') => ["moment().startOf('quarter')", "moment().endOf('quarter')"],
+            Yii::t('app', 'Previous quarter') => ["moment().subtract(1, 'quarter').startOf('quarter')", "moment().subtract(1, 'quarter').endOf('quarter')"],
+            Yii::t('app', 'Same quarter previous year') => ["moment().startOf('quarter').subtract(1, 'year')", "moment().endOf('quarter').subtract(1, 'year')"],
+            Yii::t('app', 'Current year') => ["moment().startOf('year')", "moment().endOf('year')"],
+            Yii::t('app', 'Previous year') => ["moment().subtract(1, 'year').startOf('year')", "moment().subtract(1, 'year').endOf('year')"],
+            Yii::t('app', 'Trailing twelve months') => ["moment().subtract(1, 'year').add(1, 'month')", "moment()"],
+            Yii::t('app', 'Trailing twenty-four months') => ["moment().subtract(2, 'year').add(1, 'month')", "moment()"],
+            Yii::t('app', 'Previous three years') => ["moment().subtract(3, 'year').startOf('year')", "moment().subtract(1, 'year').endOf('year')"],
+            Yii::t('app', 'Previous five years') => ["moment().subtract(5, 'year').startOf('year')", "moment().subtract(1, 'year').endOf('year')"],
+        ] ?>
+        <?= DateRangePicker::widget([
+            'name' => 'daterange1',
+            'hideInput' => true,
+            'convertFormat' => true,
+            'startAttribute' => 'from1',
+            'callback' => 'function(startDate, endDate, label) {
+                var picker2 = $(\'[name="daterange2"]\')
+                    .closest(\'.drp-container\')
+                    .data(\'daterangepicker\');
+                $(\'[name="label1"]\').val(label);
+                var label2 = $(\'[name="label2"]\').val();
+                $(\'#w0-container\').find(\'.range-value\').html(label);
+                $.ajax({
+                    data: {
+                        from1: startDate.format(\'YYYY-MM-DD\'),
+                        to1: endDate.format(\'YYYY-MM-DD\'),
+                        label1: label,
+                        from2: picker2.startDate.format(\'YYYY-MM-DD\'),
+                        to2: picker2.endDate.format(\'YYYY-MM-DD\'),
+                        label2: label2
+                    }, success: function(data) {
+                        updateChart(data);
+                    }
+                });
+            }',
+            'endAttribute' => 'to1',
+            'startInputOptions' => ['value' => $period1['from']],
+            'endInputOptions' => ['value' => $period1['to']],
+            'pluginOptions' => [
+                'locale' => ['format' => 'Y-m-d', 'separator' => ' → '],
+                'ranges' => $presetRanges
+            ]
+        ]) ?>
+      </div>
+      <div class="form-group">
+        <label><?= Yii::t('app', 'Period') ?> 2</label>
+        <?= DateRangePicker::widget([
+            'name' => 'daterange2',
+            'hideInput' => true,
+            'convertFormat' => true,
+            'startAttribute' => 'from2',
+            'callback' => 'function(startDate, endDate, label) {
+                var picker1 = $(\'[name="daterange1"]\')
+                    .closest(\'.drp-container\')
+                    .data(\'daterangepicker\');
+                $(\'[name="label2"]\').val(label);
+                var label1 = $(\'[name="label1"]\').val();
+                $(\'#w1-container\').find(\'.range-value\').html(label);
+                $.ajax({
+                    data: {
+                        from1: picker1.startDate.format(\'YYYY-MM-DD\'),
+                        to1: picker1.endDate.format(\'YYYY-MM-DD\'),
+                        label1: label1,
+                        from2: startDate.format(\'YYYY-MM-DD\'),
+                        to2: endDate.format(\'YYYY-MM-DD\'),
+                        label2: label
+                    }, success: function(data) {
+                        updateChart(data);
+                    }
+                });
+            }',
+            'endAttribute' => 'to2',
+            'startInputOptions' => ['value' => $period2['from']],
+            'endInputOptions' => ['value' => $period2['to']],
+            'pluginOptions' => [
+                'locale' => ['format' => 'Y-m-d', 'separator' => ' → '],
+                'ranges' => $presetRanges
+            ]
+        ]) ?>
+      </div>
     <?= Html::endForm() ?>
   </div>
   <canvas height="100%"></canvas>

@@ -139,9 +139,7 @@ class Invoice extends \yii\db\ActiveRecord
                     ':arg13' => $archive_to,
                 ])->groupBy('period')
                 ->orderBy('period');
-            if ($transaction_type) $query_archive->innerJoinWith(['transaction' => function($q) use ($transaction_type) {
-                $q->onCondition(['transaction_type' => $transaction_type]);
-            }]);
+            if ($transaction_type) $query_archive->where(['transaction_type' => $transaction_type]);
             $query->union($query_archive);
         }
         return $query->createCommand()->queryAll();
@@ -151,6 +149,10 @@ class Invoice extends \yii\db\ActiveRecord
         if ($months == 12) $interval = 'year';
         else if ($months == 3) $interval = 'quarter';
         else $interval = 'month';
+        $min_issued_at = static::find()->min('issued_at');
+        if (!$min_issued_at) $min_issued_at = date('Y-m-d'); 
+        else $min_issued_at = date('Y-m-01', strtotime($min_issued_at));
+        if ($min_issued_at < $from) $min_issued_at = $from;
         $query = static::find()
             ->select(['period', "round(sum(amount_euc)/count(*) / 100., 2) as {$sum_alias}"])
             ->rightJoin("(
@@ -158,17 +160,37 @@ class Invoice extends \yii\db\ActiveRecord
                 from generate_series(:arg1::date, :arg2, :arg3) d) series",
                 "series.period = date_trunc(:arg4, issued_at)::date and issued_at between :arg5 and :arg6", [
                 ':arg0' => $interval,
-                ':arg1' => $from,
+                ':arg1' => $min_issued_at,
                 ':arg2' => $to,
                 ':arg3' => "$months month",
                 ':arg4' => $interval,
-                ':arg5' => $from,
+                ':arg5' => $min_issued_at,
                 ':arg6' => $to,
             ])->groupBy('period')
             ->orderBy('period');
         if ($transaction_type) $query->innerJoinWith(['transaction' => function($q) use ($transaction_type) {
             $q->onCondition(['transaction_type' => $transaction_type]);
         }]);
+        if ($min_issued_at >= $from) {
+            $archive_to = date('Y-m-d', strtotime($min_issued_at) - 1);
+            $query_archive = ArchivedInvoice::find()
+                ->select(['period', "round(sum(amount_euc)/count(*) / 100., 2) as {$sum_alias}"])
+                ->rightJoin("(
+                    select date_trunc(:arg7, d)::date as period 
+                    from generate_series(:arg8::date, :arg9, :arg10) d) series",
+                    "series.period = date_trunc(:arg11, month)::date and month between :arg12 and :arg13", [
+                    ':arg7' => $interval,
+                    ':arg8' => $from,
+                    ':arg9' => $archive_to,
+                    ':arg10' => "$months month",
+                    ':arg11' => $interval,
+                    ':arg12' => $from,
+                    ':arg13' => $archive_to,
+                ])->groupBy('period')
+                ->orderBy('period');
+            if ($transaction_type) $query_archive->where(['transaction_type' => $transaction_type]);
+            $query->union($query_archive);
+        }
         return $query->createCommand()->queryAll();
     }
 }

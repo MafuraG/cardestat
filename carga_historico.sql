@@ -46,17 +46,17 @@ insert into archived_attribution (archived_invoice_id, attributed_euc, advisor_i
              select 11, 0.1 union
              select 12, 0.1
          ) mw
-         join archived_invoice ai on (make_date(ha.year::int, mw.month, 1) = ai.month and ha.office = ai.office)
+         join archived_invoice ai on (make_date(ha.year::int, mw.month, 1) = ai.month and coalesce(ha.office, '') = coalesce(ai.office, ''))
          join (
              select month, office, sum(amount_euc::int)
              from archived_invoice
              where transaction_type in ('COMPRAVENTA', 'ALQUILER')
              group by month, office
-         ) ai_s on (ai.month = ai_s.month and ai.office = ai_s.office)
+         ) ai_s on (ai.month = ai_s.month and coalesce(ai.office, '') = coalesce(ai_s.office, ''))
          join (
              select month, office, transaction_type, sum(n_operations_c::int)
              from archived_invoice
              where transaction_type in ('COMPRAVENTA', 'ALQUILER')
              group by month, office, transaction_type
-         ) ai_op on (ai.month = ai_op.month and ai.office = ai_op.office and ai.transaction_type = ai_op.transaction_type)
+         ) ai_op on (ai.month = ai_op.month and coalesce(ai.office, '') = coalesce(ai_op.office, '') and ai.transaction_type = ai_op.transaction_type)
          join advisor ad on (ad.name = ha.advisor);
