@@ -261,7 +261,7 @@ class m170303_154953_transactions extends Migration
         ]);
         $this->createTable('archived_invoice', [
             'id' => $this->primaryKey(),
-            'year' => $this->smallInteger()->notNull(),
+            'month' => $this->date()->notNull(),
             'amount_euc' => $this->integer()->notNull(),
             'office' => $this->string(18) . ' references office(name)', // null means all/no offices
             'transaction_type' => $this->string(18)->notNull() . ' references transaction_type(name)',

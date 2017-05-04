@@ -100,6 +100,7 @@ return [
     'Previous two years' => 'Dos años anteriores',
     'Previous three years' => 'Tres años anteriores',
     'Previous five years' => 'Cinco años anteriores',
+    'Previous ten years' => 'Diez años anteriores',
     'Properties' => 'Propiedades',
     'Prorated operations' => 'Operaciones prorrateadas',
     'Quarterly' => 'Trimestral',

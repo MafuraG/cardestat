@@ -22,6 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
           Yii::t('app', 'Previous two years') => ["moment().subtract(2, 'year').startOf('year')", "moment().subtract(1, 'year').endOf('year')"],
           Yii::t('app', 'Previous three years') => ["moment().subtract(3, 'year').startOf('year')", "moment().subtract(1, 'year').endOf('year')"],
           Yii::t('app', 'Previous five years') => ["moment().subtract(5, 'year').startOf('year')", "moment().subtract(1, 'year').endOf('year')"],
+          Yii::t('app', 'Previous ten years') => ["moment().subtract(10, 'year').startOf('year')", "moment().subtract(1, 'year').endOf('year')"],
       ] ?>
       <div class="form-group">
         <label><?= Yii::t('app', 'Period') ?> </label>

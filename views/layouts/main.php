@@ -55,6 +55,7 @@ AppAsset::register($this);
             ['label' => \Yii::t('app', 'Charts'), 'active' => Yii::$app->controller->id == 'chart', 'items' => [
                 ['label' => Yii::t('app', 'Trading volume'), 'options' => ['class' => 'dropdown-header']],
                 ['label' => \Yii::t('app', 'Transactions vs. Revenues'), 'url' => ['/chart/volume']],
+                /*
                 ['label' => \Yii::t('app', 'Avg. Transaction vs. Avg. Revenue'), 'url' => ['/chart/avg-volume']],
                 ['label' => Yii::t('app', 'Attributed'), 'options' => ['class' => 'dropdown-header']],
                 ['label' => \Yii::t('app', 'Attributed by advisor'), 'url' => ['/chart/attribution-by-advisor']],
@@ -66,6 +67,7 @@ AppAsset::register($this);
                 ['label' => Yii::t('app', 'Ratios'), 'options' => ['class' => 'dropdown-header']],
                 ['label' => \Yii::t('app', 'Attributed/Operation by advisor'), 'url' => ['/chart/attribution-over-operation-by-advisor']],
                 ['label' => \Yii::t('app', 'Attributed/Operation by office'), 'url' => ['/chart/attribution-over-operation-by-office']],
+                */
             ]],
             ['label' => \Yii::t('app', 'Presentations'), 'items' => [
                 ['label' => \Yii::t('app', 'Salesmeter'), 'url' => ['/presentation/n-sales']],
