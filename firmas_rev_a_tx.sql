@@ -59,8 +59,8 @@ update firmas set ref_prop = null where ref_prop = 'Sin referencia';
 
 insert into property (reference, entry_date, active_date, inactive_date, property_type, location, building_complex, geo_coordinates, plot_area_dm2, built_area_dm2, n_bedrooms) values 
     --('23447-RS', '2016-08-01', '2016-08-01', '2016-09-01', 'Villa', 'Maspalomas_Meloneras', null, '27.744695, -15.610053', 66800, 39100, 5),
-    ('0B-V11574', '2013-05-01', '2013-05-01', '2013-05-08', 'Apartment', 'Playa del Inglés', 'Ecuador', '27.754808, -15.572702', null, 3464, 1),
-    ('0B-V32483', '2016-05-13', '2016-05-13', '2017-04-03', 'Duplex', 'Meloneras', null, '27.754808, -15.572702', null, 8990, 2);
+    ('OB-V11574', '2013-05-01', '2013-05-01', '2013-05-08', 'Apartment', 'Playa del Inglés', 'Ecuador', '27.754808, -15.572702', null, 3464, 1),
+    ('OB-V32483', '2016-05-13', '2016-05-13', '2017-04-03', 'Duplex', 'Meloneras', null, '27.754808, -15.572702', null, 8990, 2);
 
 --insert into contact (reference, first_name, last_name, nationality, type_of_data, contact_source, country_of_residence) values 
 --    ('24332', 'Victor', 'Basistyi', 'Russia', 'Buyer Gestoría_client,Fiscalidad_client,+500', 'Internet', 'Rusia'),
@@ -162,7 +162,7 @@ insert into transaction(
     seller_id,
     property_id,
     transaction_type)
-select 690, '2016-07-21', 14450000, b.id, s.id, p.id, 'COMPRAVENTA'
+select 679, '2016-07-21', 14450000, b.id, s.id, p.id, 'COMPRAVENTA'
 from contact s,
      contact b,
      property p

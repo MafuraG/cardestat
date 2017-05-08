@@ -28,10 +28,10 @@ insert into invoice(
     transaction_id)
 --select distinct on (num) -- there are repeated invoices at the moment
 select
-     num || '-comprador',
+     num || '-100',
      round(regexp_replace(r100, '[, € ]', '', 'g')::float*100),
      fecha::date,
-     'COMPRADOR',
+     'VENDEDOR',
      t.id
 from facturas f 
      join firmas_facturas ff on (f.num = ff.factura)
@@ -55,6 +55,24 @@ from facturas f
      join firmas_facturas ff on (f.num = ff.factura)
      join transaction t on (ff.firma = t.external_id)
 where colab1 is not null;
+
+insert into invoice(
+    code,
+    amount_euc,
+    issued_at,
+    recipient_category,
+    transaction_id)
+--select distinct on (num) -- there are repeated invoices at the moment
+select
+     num || '-colab100',
+     -round(regexp_replace(colab100, '[, € ]', '', 'g')::float*100),
+     fecha::date,
+     'COLABORADOR',
+     t.id
+from facturas f 
+     join firmas_facturas ff on (f.num = ff.factura)
+     join transaction t on (ff.firma = t.external_id)
+where colab100 is not null;
 
 insert into invoice(
     code,

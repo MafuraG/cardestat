@@ -13,3 +13,9 @@ select option_signed_at, round(sale_price_euc/100., 2) as sale_price_eu, s.last_
 
 -- distribucion mensual de volumen de transacciones:
 select extract(month from option_signed_at) as month, round(sum(sale_price_euc)/total.yearly*100, 2) || '%' monthly_ratio from transaction cross join (select sum(sale_price_euc) as yearly from transaction where option_signed_at between '2016-01-01' and '2016-12-31') total where option_signed_at between '2016-01-01' and '2016-12-31' group by month, total.yearly order by month;
+
+-- firmas importadas vs. firmas para importar, comprobación por ID de firma
+select f17.id, t.external_id, f17.fecha_firma::date, t.option_signed_at, f17.ref_vendedor, s.reference, f17.ref_comprador, b.reference, f17.ref_prop, p.reference, f17.precio, round(t.sale_price_euc/100) from firmas17 f17 left join transaction t on t.external_id = f17.id left join contact s on (t.seller_id = s.id) left join contact b on (b.id = t.buyer_id) left join property p on (p.id = t.property_id) where t.id is not null and (ref_vendedor <> s.reference or ref_comprador <> b.reference or coalesce(ref_prop, '') <> coalesce(p.reference, '') or round(precio::numeric) <> round(t.sale_price_euc/100) );
+
+-- firmas importadas vs. firmas para importar, comprobación por vendedor y comprador
+select f17.id, t.id as tx_id, t.external_id, f17.fecha_firma::date, t.option_signed_at, f17.ref_vendedor, s.reference, f17.ref_comprador, b.reference, f17.ref_prop, f17.precio, round(t.sale_price_euc/100) from firmas17 f17 left join contact s on s.reference = ref_vendedor left join contact b on b.reference = ref_comprador left join transaction t on t.buyer_id = b.id and t.seller_id = s.id where t.external_id <> f17.id;

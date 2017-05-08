@@ -161,9 +161,9 @@ class ChartController extends Controller
     {
         list($period1, $period2) = $this->getSumByCountDefaultPeriods($from1, $to1, $label1, $from2, $to2, $label2);
         $aux1 = ArrayHelper::index(
-            Office::getAttributionSum($period1['from'], $period1['to'], 'sum1_eu', 'count1'), 'name');
+            Office::getAttributionSum($period1['from'], $period1['to'], 'sum1_eu', 'count1'), 'joined_name');
         $aux2 = ArrayHelper::index(
-            Office::getAttributionSum($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'name');
+            Office::getAttributionSum($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'joined_name');
         $offices = ArrayHelper::merge($aux1, $aux2);
         ksort($offices);
         $title= Yii::t('app', 'Attributed by office');
@@ -285,7 +285,7 @@ class ChartController extends Controller
         $periods = [[
             'label' => $label1,
             'default_from' => date('Y-m-d', mktime(0, 0, 0, $current_quarter * 3 - 2, 1, date('Y'))),
-            'default_to' => date('Y-m-d', mktime(0, 0, 0, $current_quarter * 3, date('t'), date('Y')))
+            'default_to' => date('Y-m-d', mktime(0, 0, 0, $current_quarter * 3, date('t', mktime(0, 0, 0, $current_quarter * 3)), date('Y')))
         ], [
             'label' => $label2,
             'default_from' => date('Y-m-d', mktime(0, 0, 0, 1, 1, date('Y'))),

@@ -24,12 +24,26 @@ from effective_attribution a
      join transaction t on a.transaction_id = t.id
 where option_signed_at between '2016-01-01' and '2016-12-31';
 
-\! echo total attributions 2016 by office
-select office, ad.name as advisor, round(sum(amount_euc)/100., 2) as atribucion_oficina_eu
+\! echo total attributions 2016 by adviser
+select office, ad.name as advisor, round(sum(amount_euc)/100., 2) as atribucion_asesor_eu
 from effective_attribution a
      join advisor ad on a.advisor_id = ad.id
      join transaction t on a.transaction_id = t.id
 where option_signed_at between '2016-01-01' and '2016-12-31'
+group by office, ad.name
+having sum(amount_euc) <> 0 order by office, ad.name;
+
+\! echo total attributions 2016 by advisor acording to Pilar
+select office, ad.name as advisor, round(sum(amount_euc)/100., 2) as atribucion_asesor_pilar_eu
+from effective_attribution a
+     join advisor ad on a.advisor_id = ad.id
+     join transaction t on a.transaction_id = t.id
+     join (
+         select min(issued_at) as issued_at, transaction_id
+         from invoice
+         group by transaction_id
+     ) oldest_invoice on t.id = oldest_invoice.transaction_id
+where oldest_invoice.issued_at between '2016-01-01' and '2016-12-31'
 group by office, ad.name
 having sum(amount_euc) <> 0 order by office, ad.name;
 
@@ -45,6 +59,18 @@ select office, round(sum(amount_euc)/100., 2) as atribucion_oficina_eu
 from effective_attribution a
      join transaction t on a.transaction_id = t.id
 where option_signed_at between '2016-01-01' and '2016-12-31'
+group by office
+having sum(amount_euc) <> 0;
+
+select office, round(sum(amount_euc)/100., 2) as atribucion_oficina_pilar_eu
+from effective_attribution a
+     join transaction t on a.transaction_id = t.id
+     join (
+         select min(issued_at) as issued_at, transaction_id
+         from invoice
+         group by transaction_id
+     ) oldest_invoice on t.id = oldest_invoice.transaction_id
+where oldest_invoice.issued_at between '2016-01-01' and '2016-12-31'
 group by office
 having sum(amount_euc) <> 0;
 

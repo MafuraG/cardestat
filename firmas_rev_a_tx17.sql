@@ -54,13 +54,13 @@ $f$ language sql immutable;
 --
 
 drop table if exists firmas17;
-select load_csv_file('firmas17', '/home/claudio/projects/cardestat/Copia de FIRMAS 2017 (2).csv', 12);
-update firmas17 set ref_prop = null where ref_prop = 'Sin referencia';
+select load_csv_file('firmas17', '/home/claudio/projects/cardestat/Transacciones 2017.csv', 18);
+update firmas17 set ref_prop = null where ref_prop = 'Sin referencia' or ref_prop = 'Sin ref.' or ref_prop = 'Colaborador';
 
-insert into property (reference, entry_date, active_date, inactive_date, property_type, location, building_complex, geo_coordinates, plot_area_dm2, built_area_dm2, n_bedrooms) values 
-    ('23447-RS', '2016-08-01', '2016-08-01', '2016-09-01', 'Villa', 'Maspalomas_Meloneras', null, '27.744695, -15.610053', 66800, 39100, 5),
-    ('0B-V11574', '2013-05-01', '2013-05-01', '2013-05-08', 'Apartment', 'Playa del Inglés', 'Ecuador', '27.754808, -15.572702', null, 3464, 1),
-    ('0B-V32483', '2016-05-13', '2016-05-13', '2017-04-03', 'Duplex', 'Meloneras', null, '27.754808, -15.572702', null, 8990, 2);
+--insert into property (reference, entry_date, active_date, inactive_date, property_type, location, building_complex, geo_coordinates, plot_area_dm2, built_area_dm2, n_bedrooms) values 
+--    ('23447-RS', '2016-08-01', '2016-08-01', '2016-09-01', 'Villa', 'Maspalomas_Meloneras', null, '27.744695, -15.610053', 66800, 39100, 5),
+--    ('OB-V11574', '2013-05-01', '2013-05-01', '2013-05-08', 'Apartment', 'Playa del Inglés', 'Ecuador', '27.754808, -15.572702', null, 3464, 1),
+--    ('OB-V32483', '2016-05-13', '2016-05-13', '2017-04-03', 'Duplex', 'Meloneras', null, '27.754808, -15.572702', null, 8990, 2);
 
 --insert into contact (reference, first_name, last_name, nationality, type_of_data, contact_source, country_of_residence) values 
     --('24332', 'Victor', 'Basistyi', 'Russia', 'Buyer Gestoría_client,Fiscalidad_client,+500', 'Internet', 'Rusia'),
@@ -71,19 +71,19 @@ insert into property (reference, entry_date, active_date, inactive_date, propert
     --('24537', null, 'MACARONESIA REAL ESTATE', null, 'Client', 'Collaboration', 'España'),
     --('24550', 'Alejandro', 'Rodriguez Hernandez', 'Spain', 'Seller', 'Collaborator - ACEGI', 'España');
 
---insert into partner (name)
---    select distinct upper(colab_comprador)
---    from firmas17 f
---         left join partner p on (p.name = upper(colab_comprador))
---    where colab_comprador is not null and
---          p.name is null;
---
---insert into partner (name)
---    select distinct upper(colab_vendedor)
---    from firmas17 f
---         left join partner p on (p.name = upper(colab_vendedor))
---    where colab_vendedor is not null and
---          p.name is null;
+insert into partner (name)
+    select distinct upper(colab_comprador)
+    from firmas17 f
+         left join partner p on (p.name = upper(colab_comprador))
+    where colab_comprador is not null and
+          p.name is null;
+
+insert into partner (name)
+    select distinct upper(colab_vendedor)
+    from firmas17 f
+         left join partner p on (p.name = upper(colab_vendedor))
+    where colab_vendedor is not null and
+          p.name is null;
 
 insert into transaction (
     external_id,
@@ -92,9 +92,9 @@ insert into transaction (
     buyer_id,
     seller_id,
     property_id,
-    transaction_type)
-    --buyer_provider,
-    --seller_provider)
+    transaction_type,
+    buyer_provider,
+    seller_provider)
 select distinct on (f.id)
     f.id,
     f.fecha_firma::date,
@@ -102,16 +102,16 @@ select distinct on (f.id)
     b.id,
     s.id,
     p.id,
-    --coalesce(upper(asesoramiento), 'COMPRAVENTA')--,
-    'COMPRAVENTA'--,
-    --upper(colab_comprador),
-    --upper(colab_vendedor)
+    coalesce(upper(asesoramiento), 'COMPRAVENTA'),
+    upper(colab_comprador),
+    upper(colab_vendedor)
 from firmas17 f
     join contact s on (f.ref_vendedor = s.reference)
     join contact b on (f.ref_comprador = b.reference)
     join property p on (f.ref_prop = p.reference)
-where f.ref_prop is not null--; -- redundant, but kept for clarity
-    and fecha_firma is not null; -- QUITARRRRRRRRRR!!!!!!!!!!!!!!!!!!!!!!!
+    left join transaction t on (f.id = t.external_id)
+where f.ref_prop is not null and -- redundant, but kept for clarity
+      t.id is null;
 
 insert into transaction (
     external_id,
@@ -120,9 +120,9 @@ insert into transaction (
     buyer_id,
     seller_id,
     property_id,
-    transaction_type)
-    --buyer_provider,
-    --seller_provider)
+    transaction_type,
+    buyer_provider,
+    seller_provider)
 select distinct on (f.id)
     f.id,
     f.fecha_firma::date,
@@ -130,16 +130,16 @@ select distinct on (f.id)
     b.id,
     s.id,
     p.id,
-    --coalesce(upper(asesoramiento), 'COMPRAVENTA')--,
-    'COMPRAVENTA'--,
-    --upper(colab_comprador),
-    --upper(colab_vendedor)
+    coalesce(upper(asesoramiento), 'COMPRAVENTA'),
+    upper(colab_comprador),
+    upper(colab_vendedor)
 from firmas17 f
     join contact s on (f.ref_vendedor = s.reference)
     join contact b on (f.ref_comprador = b.reference)
     left join property p on (f.ref_prop = p.reference)
-where f.ref_prop is null--;
-    and fecha_firma is not null; -- QUITARRRRRRRRRR!!!!!!!!!!!!!!!!!!!!!!!
+    left join transaction t on (f.id = t.external_id)
+where f.ref_prop is null and
+      t.id is null;
 
 --insert into transaction(
 --    external_id,
@@ -234,5 +234,5 @@ insert into attribution (advisor_id, attribution_type_id, amount_euc, transactio
           'YW' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'YVONNE WEERTS' or
           'TB' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'THERESA BONA' or
           'TE' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'THOMAS EKBLOM' or
-          'CC' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'CRISTINA CARUSO'
+          'CC' = any (regexp_split_to_array(comercial, '/')) and ad.name = 'CRISTINA CARUSO';
 

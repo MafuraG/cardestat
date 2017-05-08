@@ -58,8 +58,8 @@ AppAsset::register($this);
                 ['label' => \Yii::t('app', 'Avg. Volume vs. Avg. Revenue'), 'url' => ['/chart/avg-volume']],
                 ['label' => Yii::t('app', 'Attributions'), 'options' => ['class' => 'dropdown-header']],
                 ['label' => \Yii::t('app', 'Attributed by advisor'), 'url' => ['/chart/attribution-by-advisor']],
-                /*
                 ['label' => \Yii::t('app', 'Attributed by office'), 'url' => ['/chart/attribution-by-office']],
+                /*
                 ['label' => Yii::t('app', 'Transactions'), 'options' => ['class' => 'dropdown-header']],
                 ['label' => \Yii::t('app', 'No. transactions'), 'url' => ['/chart/transactions']],
                 ['label' => \Yii::t('app', 'Prorated Operations by advisor'), 'url' => ['/chart/pr-operation-by-advisor']],
