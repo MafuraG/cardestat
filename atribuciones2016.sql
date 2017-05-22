@@ -37,18 +37,18 @@ begin
         attributions := array[
              -- [amount, adviser, office, attribution_type, attribution_type_category]
             array[a16.prod_rk_ar, 'ROBERT KORTLANG', 'ARGUINEGUÍN', 'CAPTACIÓN', '0'],
-            array[a16.prod_pb_ar, 'PAOLA BUSCEMI', 'ARGUINEGUÍN', 'VENTA', '0'],
+            array[a16.prod_pb_ar, 'PAOLA BUSCEMI', 'ARGUINEGUÍN', 'CAPTACIÓN', '0'],
             array[a16.prod_dt_ar, 'DEBORAH TESCH', 'ARGUINEGUÍN', 'VENTA', '0'],
             array[a16.prod_sb_ar, 'STEPHAN BERGONJE', 'ARGUINEGUÍN', 'VENTA', '0'],
             array[a16.prod_te_ar, 'THOMAS EKBLOM', 'ARGUINEGUÍN', 'VENTA', '0'],
             array[a16.prod_yw_ar, 'YVONNE WEERTS', 'ARGUINEGUÍN', 'VENTA', '0'],
-            array[a16.te_ar, 'TINA FREDTOFT', 'ARGUINEGUÍN', 'GESTIÓN DE LEADS', null],
-            array[a16.cg_ar, 'CARLOS GÓMEZ', 'ARGUINEGUÍN', 'GESTIÓN DE FIRMAS', null],
+            array[a16.te_ar, 'TINA FREDTOFT', null, 'GESTIÓN DE LEADS', null],
+            array[a16.cg_ar, 'CARLOS GALÁN', null, 'GESTIÓN DE FIRMAS', null],
             array[a16.prod_rk_pm, 'ROBERT KORTLANG', 'PUERTO DE MOGÁN', 'CAPTACIÓN', '0'],
-            array[a16.prod_pb_pm, 'PAOLA BUSCEMI', 'PUERTO DE MOGÁN', 'VENTA', '0'],
+            array[a16.prod_pb_pm, 'PAOLA BUSCEMI', 'PUERTO DE MOGÁN', 'CAPTACIÓN', '0'],
             array[a16.prod_ih_pm, 'INGE HILDEBRANDT', 'PUERTO DE MOGÁN', 'VENTA', '0'],
             array[a16.prod_rk_pr, 'ROBERT KORTLANG', 'PUERTO RICO', 'CAPTACIÓN', '0'],
-            array[a16.prod_pb_pr, 'PAOLA BUSCEMI', 'PUERTO RICO', 'VENTA', '0'],
+            array[a16.prod_pb_pr, 'PAOLA BUSCEMI', 'PUERTO RICO', 'CAPTACIÓN', '0'],
             array[a16.prod_lm_pr, 'LEONOR MARTÍN', 'PUERTO RICO', 'VENTA', '0'],
             array[a16.prod_ra_pr, 'RAFAEL ALZOLA', 'PUERTO RICO', 'VENTA', '0'],
             array[a16.prod_cm_pr, 'CARINA MAEHLE', 'PUERTO RICO', 'VENTA', '0']
@@ -67,6 +67,7 @@ begin
         for j in 1 .. array_upper(attributions, 1) loop
             continue when attributions[j][1] is null;
             attr_amount_euc := round(regexp_replace(attributions[j][1], '[, €]', '', 'g')::float*100);
+            continue when attr_amount_euc = 0;
             bp := round((attr_amount_euc::float / transaction_net_invoiced_euc * 10000)::numeric, 2);
             at_id := getAttributionTypeId(attributions[j][4], bp, attributions[j][5]::smallint);
             select * into adv from advisor where name = attributions[j][2];
@@ -78,3 +79,5 @@ end;
 $$ language plpgsql;
 
 select import2016Attributions();
+drop function getAttributionTypeId(_name varchar, _attribution_bp integer, _attribution_type_category smallint);
+drop function import2016Attributions();

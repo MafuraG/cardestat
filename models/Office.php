@@ -74,7 +74,7 @@ class Office extends \yii\db\ActiveRecord
     }
     /**
      */
-    public static function getAttributionSum($from, $to, $sum_alias = 'sum', $count_alias = 'count')
+    public static function getArchivedAttributionSum($from, $to, $sum_alias = 'sum', $count_alias = 'count')
     {
         $min_issued_at = static::find()
             ->innerJoinWith('effectiveAttributions.transaction.invoices')->min('issued_at');
@@ -113,6 +113,22 @@ class Office extends \yii\db\ActiveRecord
             ->groupBy('joined_name')
             ->createCommand()->queryAll();
     }
+    /**
+     */
+    public static function getAttributionSum($from, $to, $sum_alias = 'sum', $count_alias = 'count')
+    {
+        return static::find()
+            ->joinWith(['effectiveAttributions.transaction' => function($q) use ($from, $to) {
+                $q->where('option_signed_at between :from and :to', [
+                    ':from' => $from,
+                    ':to' => $to
+                ]);
+            }])->select(['name', "round(sum(amount_euc / 100.), 2) as {$sum_alias}", "count(*) as {$count_alias}"])
+            ->orderBy('name')
+            ->groupBy('name')
+            ->createCommand()->queryAll();
+    }
+
     /**
      */
     public static function getProratedOperationCount($from, $to, $sum_alias = 'sum', $count_alias = 'count')

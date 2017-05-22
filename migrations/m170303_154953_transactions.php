@@ -74,6 +74,8 @@ class m170303_154953_transactions extends Migration
         ], [
             'GILBERTO GIL', 'ARGUINEGUÍN', $unknown0_id, false, false
         ], [
+            'CARLOS GALÁN', null, $unknown0_id, true, false
+        ], [
             'CARLOS GÓMEZ', 'ARGUINEGUÍN', $unknown0_id, true, false
         ], [
             'LONNIE LINDQUIST', 'ARGUINEGUÍN', $unknown0_id, true, false
@@ -268,7 +270,7 @@ class m170303_154953_transactions extends Migration
             'subject' => $this->string(32)->notNull() . ' references archive_subject (name)',
             'n_operations_c' => $this->integer()->notNull(),
         ]);
-        $this->createIndex('archived_invoice-year-office-subject-uidx', 'archived_invoice', ['year', 'office', 'subject'], true);
+        $this->createIndex('archived_invoice-year-office-subject-uidx', 'archived_invoice', ['month', 'office', 'subject'], true);
         $this->createTable('archived_attribution', [
             'id' => $this->primaryKey(),
             'archived_invoice_id' => $this->integer() . ' references archived_invoice(id)',

@@ -1,11 +1,11 @@
-drop table if exists historico_produccion;
-select load_csv_file('historico_produccion', '/home/claudio/projects/cardestat/historico_produccion.csv', 6);
-drop table if exists historico_atribucion;
-select load_csv_file('historico_atribucion', '/home/claudio/projects/cardestat/historico_atribucion.csv', 7);
+drop table if exists resumen_historico_produccion;
+select load_csv_file('resumen_historico_produccion', '/home/claudio/projects/cardestat/resumen_historico_produccion.csv', 6);
+drop table if exists resumen_historico_atribucion;
+select load_csv_file('resumen_historico_atribucion', '/home/claudio/projects/cardestat/resumen_historico_atribucion.csv', 7);
 
 insert into archived_invoice (month, amount_euc, office, transaction_type, subject, n_operations_c)
     select make_date(year::int, mw.month, 1), round(amount_euc::int*weight), office, transaction_type, subject, round(n_operations_c::int*weight)
-    from historico_produccion 
+    from resumen_historico_produccion 
          cross join (
              select 1 as month, 0.1 as weight union
              select 2, 0.1 union
@@ -31,7 +31,7 @@ insert into archived_attribution (archived_invoice_id, attributed_euc, advisor_i
            else
                cast(n_rentals_c::float/ai_op.sum*n_operations_c*weight as int)
            end
-    from historico_atribucion ha 
+    from resumen_historico_atribucion ha 
          cross join (
              select 1 as month, 0.1 as weight union
              select 2, 0.1 union

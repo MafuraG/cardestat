@@ -54,7 +54,9 @@ class ChartController extends Controller
             'transaction_type' => $transaction_type,
             'label1' => Yii::t('app', 'All transactions'),
             'label2' => Yii::t('app', 'Shared transactions'),
-            'title' => $title
+            'title' => $title,
+            'subtitle' => null,
+            'comments' => null
         ];
         if (Yii::$app->request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;
@@ -161,17 +163,45 @@ class ChartController extends Controller
     {
         list($period1, $period2) = $this->getSumByCountDefaultPeriods($from1, $to1, $label1, $from2, $to2, $label2);
         $aux1 = ArrayHelper::index(
-            Office::getAttributionSum($period1['from'], $period1['to'], 'sum1_eu', 'count1'), 'joined_name');
+            Office::getAttributionSum($period1['from'], $period1['to'], 'sum1_eu', 'count1'), 'name');
         $aux2 = ArrayHelper::index(
-            Office::getAttributionSum($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'joined_name');
+            Office::getAttributionSum($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'name');
         $offices = ArrayHelper::merge($aux1, $aux2);
         ksort($offices);
         $title= Yii::t('app', 'Attributed by office');
+        $subtitle = Yii::t('app', 'From detail using option date');
         $data = [
             'groupings' => $offices,
             'period1' => $period1,
             'period2' => $period2,
             'title' => $title,
+            'subtitle' => $subtitle,
+            'label' => Yii::t('app', 'Attributed') . ' €'
+        ];
+        if (Yii::$app->request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return $data;
+        } else return $this->render('sum_by_count', $data);
+    }
+    /**
+     */
+    public function actionArchivedAttributionByOffice($from1 = null, $to1 = null, $label1 = null, $from2 = null, $to2 = null, $label2 = null)
+    {
+        list($period1, $period2) = $this->getSumByCountDefaultPeriods($from1, $to1, $label1, $from2, $to2, $label2);
+        $aux1 = ArrayHelper::index(
+            Office::getArchivedAttributionSum($period1['from'], $period1['to'], 'sum1_eu', 'count1'), 'joined_name');
+        $aux2 = ArrayHelper::index(
+            Office::getArchivedAttributionSum($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'joined_name');
+        $offices = ArrayHelper::merge($aux1, $aux2);
+        ksort($offices);
+        $title= Yii::t('app', 'Attributed by office <em>union archive</em>');
+        $subtitle = Yii::t('app', 'Union of detail and archive using invoice date');
+        $data = [
+            'groupings' => $offices,
+            'period1' => $period1,
+            'period2' => $period2,
+            'title' => $title,
+            'subtitle' => $subtitle,
             'label' => Yii::t('app', 'Attributed') . ' €'
         ];
         if (Yii::$app->request->isAjax) {
@@ -233,17 +263,45 @@ class ChartController extends Controller
     {
         list($period1, $period2) = $this->getSumByCountDefaultPeriods($from1, $to1, $label1, $from2, $to2, $label2);
         $aux1 = ArrayHelper::index(
-            Advisor::getAttributionSum($period1['from'], $period1['to'], 'sum1_eu', 'count1'), 'joined_name');
+            Advisor::getAttributionSum($period1['from'], $period1['to'], 'sum1_eu', 'count1'), 'name');
         $aux2 = ArrayHelper::index(
-            Advisor::getAttributionSum($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'joined_name');
+            Advisor::getAttributionSum($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'name');
         $advisors = ArrayHelper::merge($aux1, $aux2);
         $title= Yii::t('app', 'Attributed by advisor');
+        $subtitle = Yii::t('app', 'From detail using option date');
         ksort($advisors);
         $data = [
             'groupings' => $advisors,
             'period1' => $period1,
             'period2' => $period2,
             'title' => $title,
+            'label' => Yii::t('app', 'Attributed') . ' €',
+            'subtitle' => $subtitle,
+        ];
+        if (Yii::$app->request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return $data;
+        } else return $this->render('sum_by_count', $data);
+    }
+    /**
+     */
+    public function actionArchivedAttributionByAdvisor($from1 = null, $to1 = null, $label1 = null, $from2 = null, $to2 = null, $label2 = null)
+    {
+        list($period1, $period2) = $this->getSumByCountDefaultPeriods($from1, $to1, $label1, $from2, $to2, $label2);
+        $aux1 = ArrayHelper::index(
+            Advisor::getArchivedAttributionSum($period1['from'], $period1['to'], 'sum1_eu', 'count1'), 'joined_name');
+        $aux2 = ArrayHelper::index(
+            Advisor::getArchivedAttributionSum($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'joined_name');
+        $advisors = ArrayHelper::merge($aux1, $aux2);
+        $title= Yii::t('app', 'Attributed by advisor <em>union archive</em>');
+        $subtitle = Yii::t('app', 'Union of detail and archive using invoice date');
+        ksort($advisors);
+        $data = [
+            'groupings' => $advisors,
+            'period1' => $period1,
+            'period2' => $period2,
+            'title' => $title,
+            'subtitle' => $subtitle,
             'label' => Yii::t('app', 'Attributed') . ' €'
         ];
         if (Yii::$app->request->isAjax) {

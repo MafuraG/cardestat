@@ -11,7 +11,7 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Charts');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="groupings-comparison">
-  <h1 class="page-header"><?= Html::encode($this->title) ?></h1>
+  <h1 class="page-header"><?= $this->title ?></h1>
   <div class="well well-sm">
     <?= Html::beginForm('', 'get', ['class' => 'form form-inline']) ?>
       <?= Html::hiddenInput('label1', $period1['label']) ?>
@@ -101,6 +101,7 @@ $this->params['breadcrumbs'][] = $this->title;
       </div>
     <?= Html::endForm() ?>
   </div>
+  <p class="lead text-center"><?= $subtitle ?></p>
   <canvas height="100%"></canvas>
 </div>
 <?php
