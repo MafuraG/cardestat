@@ -45,12 +45,6 @@ use kartik\date\DatePicker;
       </div>
 
       <div class="col-md-12">
-        <small class="pull-right">
-          <dl class="text-info dl-horizontal">
-            <dt><?= Yii::t('app', 'Created At') ?></dt> <dd><?= Yii::$app->formatter->asDatetime($model->created_at, 'long') ?></dd>
-            <dt><?= Yii::t('app', 'Last Updated At') ?></dt> <dd><?= Yii::$app->formatter->asDatetime($model->updated_at, 'long') ?></dd>
-          </dl>
-        </small>
         <div class="form-group">
             <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
         </div>

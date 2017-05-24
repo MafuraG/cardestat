@@ -74,7 +74,7 @@ class Office extends \yii\db\ActiveRecord
     }
     /**
      */
-    public static function getArchivedAttributionSum($from, $to, $sum_alias = 'sum', $count_alias = 'count')
+    public static function getAccountingAttributionSum($from, $to, $sum_alias = 'sum', $count_alias = 'count')
     {
         $min_issued_at = static::find()
             ->innerJoinWith('effectiveAttributions.transaction.invoices')->min('issued_at');
@@ -115,7 +115,7 @@ class Office extends \yii\db\ActiveRecord
     }
     /**
      */
-    public static function getAttributionSum($from, $to, $sum_alias = 'sum', $count_alias = 'count')
+    public static function getActivityAttributionSum($from, $to, $sum_alias = 'sum', $count_alias = 'count')
     {
         return static::find()
             ->joinWith(['effectiveAttributions.transaction' => function($q) use ($from, $to) {

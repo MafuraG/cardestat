@@ -153,7 +153,7 @@ class Advisor extends \yii\db\ActiveRecord
     }
     /**
      */
-    public static function getAttributionSum($from, $to, $sum_alias = 'sum', $count_alias = 'count')
+    public static function getActivityAttributionSum($from, $to, $sum_alias = 'sum', $count_alias = 'count')
     {
         return static::find()
             ->joinWith(['effectiveAttributions.transaction' => function($q) use ($from, $to) {
@@ -168,7 +168,7 @@ class Advisor extends \yii\db\ActiveRecord
     }
     /**
      */
-    public static function getArchivedAttributionSum($from, $to, $sum_alias = 'sum', $count_alias = 'count')
+    public static function getAccountingAttributionSum($from, $to, $sum_alias = 'sum', $count_alias = 'count')
     {
         $min_issued_at = static::find()
             ->innerJoinWith('effectiveAttributions.transaction.invoices')->min('issued_at');
@@ -179,30 +179,39 @@ class Advisor extends \yii\db\ActiveRecord
         $query = static::find()
             ->innerJoinWith(['effectiveAttributions.transaction' => function($q) use ($min_issued_at, $to) {
                 $q->innerJoin('(
-                    select min(issued_at) issued_at, transaction_id
+                    select sum(amount_euc), transaction_id
                     from invoice
-                    where issued_at between :from and :to
+                    where issued_at between :from1 and :to1
                     group by transaction_id
-                ) oldest_invoice', 'transaction.id = oldest_invoice.transaction_id', [
-                    ':from' => $min_issued_at,
-                    ':to' => $to
+                ) period_invoice', 'transaction.id = period_invoice.transaction_id', [
+                    ':from1' => $min_issued_at,
+                    ':to1' => $to
+                ])->leftJoin('(
+                    select sum(amount_euc), transaction_id
+                    from invoice
+                    where issued_at not between :from2 and :to2
+                    group by transaction_id
+                ) rest_invoice', 'transaction.id = rest_invoice.transaction_id', [
+                    ':from2' => $min_issued_at,
+                    ':to2' => $to
                 ]);
             }])->join('full join', '(
                 select sum(attributed_euc), name
                 from archived_attribution
                      join advisor on advisor.id = archived_attribution.advisor_id
                      join archived_invoice on archived_attribution.archived_invoice_id = archived_invoice.id 
-                where month between :from2 and :to2
+                where month between :from3 and :to3
                 group by name
             ) archived', 'false', [
-                ':from2' => $from,
-                ':to2' => $archive_to
+                ':from3' => $from,
+                ':to3' => $archive_to
             ])->select([
                 '(case when advisor.name is null
                     then archived.name 
                  else advisor.name
                  end) as joined_name',
-                "round(sum((coalesce(effective_attribution.amount_euc, 0) + coalesce(archived.sum, 0))/ 100.), 2) as {$sum_alias}",
+                "round(sum((coalesce(effective_attribution.amount_euc, 0) * period_invoice.sum / (period_invoice.sum +
+                    coalesce(rest_invoice.sum, 0)) + coalesce(archived.sum, 0))/ 100.), 2) as {$sum_alias}",
                 "count(*) as {$count_alias}"
             ])->orderBy('joined_name')
             ->groupBy('joined_name');

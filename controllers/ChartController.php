@@ -159,16 +159,16 @@ class ChartController extends Controller
     }
     /**
      */
-    public function actionAttributionByOffice($from1 = null, $to1 = null, $label1 = null, $from2 = null, $to2 = null, $label2 = null)
+    public function actionActivityAttributionByOffice($from1 = null, $to1 = null, $label1 = null, $from2 = null, $to2 = null, $label2 = null)
     {
         list($period1, $period2) = $this->getSumByCountDefaultPeriods($from1, $to1, $label1, $from2, $to2, $label2);
         $aux1 = ArrayHelper::index(
-            Office::getAttributionSum($period1['from'], $period1['to'], 'sum1_eu', 'count1'), 'name');
+            Office::getActivityAttributionSum($period1['from'], $period1['to'], 'sum1_eu', 'count1'), 'name');
         $aux2 = ArrayHelper::index(
-            Office::getAttributionSum($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'name');
+            Office::getActivityAttributionSum($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'name');
         $offices = ArrayHelper::merge($aux1, $aux2);
         ksort($offices);
-        $title= Yii::t('app', 'Attributed by office');
+        $title= Yii::t('app', 'Activity attribution by office');
         $subtitle = Yii::t('app', 'From detail using option date');
         $data = [
             'groupings' => $offices,
@@ -185,16 +185,16 @@ class ChartController extends Controller
     }
     /**
      */
-    public function actionArchivedAttributionByOffice($from1 = null, $to1 = null, $label1 = null, $from2 = null, $to2 = null, $label2 = null)
+    public function actionAccountingAttributionByOffice($from1 = null, $to1 = null, $label1 = null, $from2 = null, $to2 = null, $label2 = null)
     {
         list($period1, $period2) = $this->getSumByCountDefaultPeriods($from1, $to1, $label1, $from2, $to2, $label2);
         $aux1 = ArrayHelper::index(
-            Office::getArchivedAttributionSum($period1['from'], $period1['to'], 'sum1_eu', 'count1'), 'joined_name');
+            Office::getAccountingAttributionSum($period1['from'], $period1['to'], 'sum1_eu', 'count1'), 'joined_name');
         $aux2 = ArrayHelper::index(
-            Office::getArchivedAttributionSum($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'joined_name');
+            Office::getAccountingAttributionSum($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'joined_name');
         $offices = ArrayHelper::merge($aux1, $aux2);
         ksort($offices);
-        $title= Yii::t('app', 'Attributed by office <em>union archive</em>');
+        $title= Yii::t('app', 'Accounting attribution by office');
         $subtitle = Yii::t('app', 'Union of detail and archive using invoice date');
         $data = [
             'groupings' => $offices,
@@ -259,15 +259,15 @@ class ChartController extends Controller
     }
     /**
      */
-    public function actionAttributionByAdvisor($from1 = null, $to1 = null, $label1 = null, $from2 = null, $to2 = null, $label2 = null)
+    public function actionActivityAttributionByAdvisor($from1 = null, $to1 = null, $label1 = null, $from2 = null, $to2 = null, $label2 = null)
     {
         list($period1, $period2) = $this->getSumByCountDefaultPeriods($from1, $to1, $label1, $from2, $to2, $label2);
         $aux1 = ArrayHelper::index(
-            Advisor::getAttributionSum($period1['from'], $period1['to'], 'sum1_eu', 'count1'), 'name');
+            Advisor::getActivityAttributionSum($period1['from'], $period1['to'], 'sum1_eu', 'count1'), 'name');
         $aux2 = ArrayHelper::index(
-            Advisor::getAttributionSum($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'name');
+            Advisor::getActivityAttributionSum($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'name');
         $advisors = ArrayHelper::merge($aux1, $aux2);
-        $title= Yii::t('app', 'Attributed by advisor');
+        $title= Yii::t('app', 'Activity attribution by advisor');
         $subtitle = Yii::t('app', 'From detail using option date');
         ksort($advisors);
         $data = [
@@ -285,15 +285,15 @@ class ChartController extends Controller
     }
     /**
      */
-    public function actionArchivedAttributionByAdvisor($from1 = null, $to1 = null, $label1 = null, $from2 = null, $to2 = null, $label2 = null)
+    public function actionAccountingAttributionByAdvisor($from1 = null, $to1 = null, $label1 = null, $from2 = null, $to2 = null, $label2 = null)
     {
         list($period1, $period2) = $this->getSumByCountDefaultPeriods($from1, $to1, $label1, $from2, $to2, $label2);
         $aux1 = ArrayHelper::index(
-            Advisor::getArchivedAttributionSum($period1['from'], $period1['to'], 'sum1_eu', 'count1'), 'joined_name');
+            Advisor::getAccountingAttributionSum($period1['from'], $period1['to'], 'sum1_eu', 'count1'), 'joined_name');
         $aux2 = ArrayHelper::index(
-            Advisor::getArchivedAttributionSum($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'joined_name');
+            Advisor::getAccountingAttributionSum($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'joined_name');
         $advisors = ArrayHelper::merge($aux1, $aux2);
-        $title= Yii::t('app', 'Attributed by advisor <em>union archive</em>');
+        $title= Yii::t('app', 'Accounting attribution by advisor');
         $subtitle = Yii::t('app', 'Union of detail and archive using invoice date');
         ksort($advisors);
         $data = [

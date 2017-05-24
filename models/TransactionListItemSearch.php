@@ -67,7 +67,7 @@ class TransactionListItemSearch extends TransactionListItem
         ]);
 
         $dataProvider->setSort([
-            'defaultOrder' => ['option_signed_at' => SORT_DESC]
+            'defaultOrder' => ['updated_at' => SORT_DESC]
         ]);
 
         $this->load($params);
@@ -105,10 +105,10 @@ class TransactionListItemSearch extends TransactionListItem
         ]);
 
         $search_id = null;
-        if (intval($this->search_any)) $search_id = intval($this->search_any);
+        if (substr($this->search_any, 0, 1) == '#' && intval(substr($this->search_any, 1))) $search_id = intval(substr($this->search_any, 1));
         $query->andFilterWhere(['or', 
             ['id' => $search_id],
-            ['ilike', 'external_id', $this->search_any],
+            ['external_id' => $this->search_any],
             ['ilike', 'custom_type', $this->search_any],
             ['ilike', 'transfer_type', $this->search_any],
             ['ilike', 'development_type', $this->search_any],
@@ -118,10 +118,10 @@ class TransactionListItemSearch extends TransactionListItem
             ['ilike', 'comments', $this->search_any],
             ['ilike', 'property_location', $this->search_any],
             ['ilike', 'property_building_complex', $this->search_any],
-            ['ilike', 'property_reference', $this->search_any],
-            ['ilike', 'seller_reference', $this->search_any],
+            ['property_reference' => $this->search_any],
+            ['seller_reference' => $this->search_any],
             ['ilike', 'seller_name', $this->search_any],
-            ['ilike', 'buyer_reference', $this->search_any],
+            ['buyer_reference' => $this->search_any],
             ['ilike', 'buyer_name', $this->search_any],
             ['ilike', 'advisors', $this->search_any]]);
 

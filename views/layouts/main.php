@@ -51,16 +51,17 @@ AppAsset::register($this);
                 ['label' => \Yii::t('app', 'Advisors'), 'url' => ['/advisor/index']],
                 ['label' => \Yii::t('app', 'Offices'), 'url' => ['/office/index']],
                 ['label' => \Yii::t('app', 'Partners'), 'url' => ['/partner/index']],
+                ['label' => \Yii::t('app', 'Attribution types'), 'url' => ['/attribution-type/index']],
             ]],
             ['label' => \Yii::t('app', 'Charts'), 'active' => Yii::$app->controller->id == 'chart', 'items' => [
                 ['label' => Yii::t('app', 'Trading volume'), 'options' => ['class' => 'dropdown-header']],
                 ['label' => \Yii::t('app', 'Volume vs. Revenues'), 'url' => ['/chart/volume']],
                 ['label' => \Yii::t('app', 'Avg. Volume vs. Avg. Revenue'), 'url' => ['/chart/avg-volume']],
                 ['label' => Yii::t('app', 'Attributions'), 'options' => ['class' => 'dropdown-header']],
-                ['label' => \Yii::t('app', 'Attributed by advisor'), 'url' => ['/chart/attribution-by-advisor']],
-                ['label' => \Yii::t('app', 'Attributed by advisor <em>union archive</em>'), 'url' => ['/chart/archived-attribution-by-advisor']],
-                ['label' => \Yii::t('app', 'Attributed by office'), 'url' => ['/chart/attribution-by-office']],
-                ['label' => \Yii::t('app', 'Attributed by office <em>union archive</em>'), 'url' => ['/chart/archived-attribution-by-office']],
+                ['label' => \Yii::t('app', 'Activity attribution by advisor'), 'url' => ['/chart/activity-attribution-by-advisor']],
+                ['label' => \Yii::t('app', 'Accounting attribution by advisor'), 'url' => ['/chart/accounting-attribution-by-advisor']],
+                ['label' => \Yii::t('app', 'Activity attribution by office'), 'url' => ['/chart/activity-attribution-by-office']],
+                ['label' => \Yii::t('app', 'Accounting attribution by office'), 'url' => ['/chart/accounting-attribution-by-office']],
                 /*
                 ['label' => Yii::t('app', 'Transactions'), 'options' => ['class' => 'dropdown-header']],
                 ['label' => \Yii::t('app', 'No. transactions'), 'url' => ['/chart/transactions']],
@@ -103,6 +104,7 @@ AppAsset::register($this);
 
     <div class="container-fluid" style="padding-top: 72px">
         <?= Breadcrumbs::widget([
+            'encodeLabels' => false,
             'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
         ]) ?>
         <?= $content ?>

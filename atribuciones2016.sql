@@ -72,7 +72,7 @@ begin
             at_id := getAttributionTypeId(attributions[j][4], bp, attributions[j][5]::smallint);
             select * into adv from advisor where name = attributions[j][2];
             insert into attribution (advisor_id, office, attribution_type_id, amount_euc, transaction_id)
-                values (adv.id, attributions[j][3], at_id, null, i.transaction_id);
+                values (adv.id, attributions[j][3], at_id, attr_amount_euc, i.transaction_id);
         end loop;
     end loop;
 end;

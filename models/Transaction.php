@@ -305,7 +305,6 @@ class Transaction extends \yii\db\ActiveRecord
 
     public function afterFind() {
         parent::afterFind();
-        $formatter = Yii::$app->formatter;
         $this->sale_price_eu = round($this->sale_price_euc / 100., 2);
         $this->first_published_price_eu = round($this->first_published_price_euc / 100., 2);
         $this->last_published_price_eu = round($this->last_published_price_euc / 100., 2);

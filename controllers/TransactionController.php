@@ -86,10 +86,10 @@ class TransactionController extends Controller
         $years = Payroll::find()->select(['to_char(month, \'yyyy\')'])
             ->distinct()->asArray()->createCommand()->queryColumn();
         $years = array_combine($years, $years);
-        $positive_invoiced_euc = Invoice::find()->with(['transaction' => function($q) use ($year) {
+        $positive_invoiced_euc = Invoice::find()->joinWith(['transaction' => function($q) use ($year) {
             $q->where(['to_char(payroll_month, \'yyyy\')' => $year]);
         }])->where('amount_euc > 0')->sum('amount_euc');
-        $negative_invoiced_euc = Invoice::find()->with(['transaction' => function($q) use ($year) {
+        $negative_invoiced_euc = Invoice::find()->joinWith(['transaction' => function($q) use ($year) {
             $q->where(['to_char(payroll_month, \'yyyy\')' => $year]);
         }])->where('amount_euc < 0')->sum('amount_euc');
         $our_fees_euc = Transaction::find()
@@ -114,6 +114,7 @@ class TransactionController extends Controller
         $this->layout = 'print';
         if (!$year) $year = date('Y');
         $data = $this->mkCommissionsViewData($year, $advisor_id, true);
+        if (!$data) return null;
         $content = $this->render('_commission_tables', [
             'data' => $data,
             'year' => $year,

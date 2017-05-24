@@ -106,9 +106,16 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <?php
 $groupings_json = Json::encode($groupings);
+$presetRanges_json = Json::encode($presetRanges);
+$period1_json = Json::encode($period1);
+$period2_json = Json::encode($period2);
 $script = <<<JS
-  $('#w0-container').find('.range-value').html('{$period1['label']}');
-  $('#w1-container').find('.range-value').html('{$period2['label']}');
+  var presetRanges = $presetRanges_json;
+  var period1 = $period1_json;
+  var period2 = $period2_json;
+  console.log(presetRanges);
+  $('#w0-container').find('.range-value').html(period1['label']);
+  $('#w1-container').find('.range-value').html(period2['label']);
   var horizonalLinePlugin = {
       beforeDraw: function(chartInstance) {
           var yValue;
@@ -171,19 +178,24 @@ $script = <<<JS
           else return 0;
       }
   }
+  function mkRangeLabel(period) {
+     var label = period.label;
+     if (presetRanges[label] == undefined) label = moment(period.from).format('DD MMM \'YY') + ' - ' + moment(period.to).format('DD MMM \'YY');
+     return label;
+  }
   var period1avg = grouping_labels.reduce(avg_reduce(1, groupings), 0);
   var period2avg = grouping_labels.reduce(avg_reduce(2, groupings), 0);
   var data = {
       labels: grouping_labels,
       datasets: [{
-          label: '{$period1['label']}',
+          label: mkRangeLabel(period1),
           fill: false,
           backgroundColor: 'rgba(255, 99, 132, 0.4)',
           borderColor: 'rgba(255,99,132,1)',
           borderWidth: 1,
           data: grouping_labels.map(data_map(1, groupings))
       }, {
-          label: '{$period2['label']}',
+          label: mkRangeLabel(period2),
           fill: false,
           backgroundColor: 'rgba(54, 162, 235, 0.4)',
           borderColor: 'rgba(54, 162, 235, 1)',
@@ -194,9 +206,9 @@ $script = <<<JS
   function updateChart(data) {
      var grouping_labels = Object.keys(data.groupings);
      chart.config.data.labels = grouping_labels;
-     chart.config.data.datasets[0].label = data.period1.label;
+     chart.config.data.datasets[0].label = mkRangeLabel(data.period1);
+     chart.config.data.datasets[1].label = mkRangeLabel(data.period2);
      chart.config.data.datasets[0].data = grouping_labels.map(data_map(1, data.groupings));
-     chart.config.data.datasets[1].label = data.period2.label;
      chart.config.data.datasets[1].data = grouping_labels.map(data_map(2, data.groupings));
      var period1avg = grouping_labels.reduce(avg_reduce(1, data.groupings), 0);
      chart.config.options.horizontalLines[0].y = period1avg;

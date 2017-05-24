@@ -18,6 +18,7 @@ use yii\helpers\ArrayHelper;
  */
 class AttributionType extends \yii\db\ActiveRecord
 {
+    public $attribution_pct;
     /**
      * @inheritdoc
      */
@@ -32,11 +33,11 @@ class AttributionType extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'attribution_bp'], 'required'],
+            [['name', 'attribution_pct'], 'required'],
             [['active'], 'boolean'],
-            [['attribution_bp'], 'integer'],
+            [['attribution_pct'], 'number'],
             [['name'], 'string', 'max' => 32],
-            [['name', 'attribution_bp'], 'unique', 'targetAttribute' => ['name', 'attribution_bp'], 'message' => 'The combination of Name and Attribution bips has already been taken.'],
+            [['name', 'attribution_pct'], 'unique', 'targetAttribute' => ['name', 'attribution_bp'], 'message' => 'The combination of Name and Attribution bips has already been taken.'],
         ];
     }
 
@@ -49,7 +50,7 @@ class AttributionType extends \yii\db\ActiveRecord
             'id' => Yii::t('app', 'ID'),
             'name' => Yii::t('app', 'Name'),
             'active' => Yii::t('app', 'Active'),
-            'attribution_bp' => Yii::t('app', 'Attribution Rate'),
+            'attribution_pct' => Yii::t('app', 'Attribution Rate'),
         ];
     }
 
@@ -83,5 +84,13 @@ class AttributionType extends \yii\db\ActiveRecord
             $attrPct = $el->attribution_bp / 100;
             return "$el->name $attrPct%";
         });
+    }
+    public function afterFind() {
+        parent::afterFind();
+        $this->attribution_pct = round($this->attribution_bp / 100., 2);
+    }
+    public function beforeSave($insert) {
+        $this->attribution_bp = round($this->attribution_pct * 100.);
+        return parent::beforeSave($insert);
     }
 }

@@ -111,7 +111,8 @@ $yesno = [true => Yii::t('app', 'Yes'), false => Yii::t('app', 'No')]
                   <label><?= Yii::t('app', 'Order by') ?></label>
                   <div class="input-group">
                     <select name="sort" class="input-sm form-control" style="float: left; width: initial">
-                      <option data-value="option_signed_at" selected value="-option_signed_at"><?= $model->getAttributeLabel('option_signed_at') ?></option>
+                      <option data-value="updated_at" selected value="-updated_at"><?= $model->getAttributeLabel('updated_at') ?></option>
+                      <option data-value="option_signed_at" value="-option_signed_at"><?= $model->getAttributeLabel('option_signed_at') ?></option>
                       <option data-value="first_invoiced_at" value="-first_invoiced_at"><?= $model->getAttributeLabel('first_invoiced_at') ?></option>
                       <option data-value="sale_price_euc" value="-sale_price_euc"><?= $model->getAttributeLabel('sale_price_euc') ?></option>
                     </select>
