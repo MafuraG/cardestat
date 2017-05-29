@@ -190,7 +190,6 @@ $script = <<< JS
       var cur_com_pct = \$currentComPct.maskMoney('unmasked')[0];
       var cur_from_eu = \$currentFromEu.maskMoney('unmasked')[0];
       var cur_to_eu = \$currentToEu.maskMoney('unmasked')[0];
-      console.log(\$current, \$currentToEu, \$trancheTpl);
       if (cur_to_eu < 0.02 || cur_from_eu + 0.02 >= cur_to_eu) return false;
       \$currentFromEu.maskMoney('mask', cur_from_eu + 0.02);
       $(this).closest('tr').before(\$trancheTpl.clone());

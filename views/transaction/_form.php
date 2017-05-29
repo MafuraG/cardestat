@@ -316,7 +316,7 @@ $user = Yii::$app->user;
         </div>
       </div>
     </div>
-    <?php if ($user->can('accounting')): ?>
+    <?php if (!$model->isNewRecord and $user->can('accounting')): ?>
       <div class="col-md-12">
         <div class="panel panel-default">
           <div class="panel-heading">
@@ -362,28 +362,30 @@ $user = Yii::$app->user;
             ]
         ]); ?>
       </div>
-      <div class="col-md-12">
-        <hr style="border-top: 1px solid #ddd">
-        <?= $form->field($model, 'comments')
-            ->textarea(['rows' => 6, 'form' => $form->id, 'disabled' => $readonly]) ?>
-        <?= $form->field($model, 'approved_by_accounting')
-            ->checkbox(['form' => $form->id, 'disabled' => $readonly]) ?>
-        <?= $form->field($model, 'approved_by_direction')
-            ->checkbox(['form' => $form->id, 'disabled' => $readonly or !$user->can('admin')]) ?>
-      </div>
     <?php endif; ?>
+    <div class="col-md-12">
+      <hr style="border-top: 1px solid #ddd">
+      <?= $form->field($model, 'comments')
+          ->textarea(['rows' => 6, 'form' => $form->id, 'disabled' => $readonly]) ?>
+      <?= $form->field($model, 'approved_by_accounting')
+          ->checkbox(['form' => $form->id, 'disabled' => $readonly or !$user->can('accounting')]) ?>
+      <?= $form->field($model, 'approved_by_direction')
+          ->checkbox(['form' => $form->id, 'disabled' => $readonly or !$user->can('admin')]) ?>
+    </div>
   </div>
 
+  <?php if (!$model->isNewRecord): ?>
   <small>
     <dl class="text-info pull-right dl-horizontal">
       <dt><?= Yii::t('app', 'Created At') ?></dt> <dd><?= Yii::$app->formatter->asDatetime($model->created_at, 'long') ?></dd>
       <dt><?= Yii::t('app', 'Last Updated At') ?></dt> <dd><?= Yii::$app->formatter->asDatetime($model->updated_at, 'long') ?></dd>
     </dl>
   </small>
+  <?php endif; ?>
 
   <?php if (!$readonly): ?>
     <div class="form-group">
-      <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['form' => $form->id, 'class' => $model->isNewRecord ? 'btn btn-lg btn-success' : 'btn btn-lg btn-primary']) ?>
+      <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['form' => $form->id, 'class' => $model->isNewRecord ? 'btn btn-lg btn-success' : 'btn btn-lg btn-primary', 'data-loading-text' => Yii::t('app', 'Saving...')]) ?>
     </div>
   <?php endif; ?>
 

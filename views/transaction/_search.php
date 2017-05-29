@@ -61,7 +61,7 @@ $yesno = [true => Yii::t('app', 'Yes'), false => Yii::t('app', 'No')]
                 ]); ?>
               </div>
               <div class="col-md-6">
-                <?= $form->field($model, 'first_invoiced_from')->widget(DatePicker::classname(), [
+                <?= $form->field($model, 'invoiced_from')->widget(DatePicker::classname(), [
                     'size' => 'sm',
                     'pluginOptions' => [
                         'autoclose' => true,
@@ -70,7 +70,7 @@ $yesno = [true => Yii::t('app', 'Yes'), false => Yii::t('app', 'No')]
                 ]); ?>
               </div>
               <div class="col-md-6">
-                <?= $form->field($model, 'first_invoiced_to')->widget(DatePicker::classname(), [
+                <?= $form->field($model, 'invoiced_to')->widget(DatePicker::classname(), [
                     'size' => 'sm',
                     'pluginOptions' => [
                         'autoclose' => true,

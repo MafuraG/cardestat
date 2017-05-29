@@ -67,7 +67,7 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
   
       <div class="col-md-12">
         <div class="form-group">
-          <?= Html::submitButton(Yii::t('app', 'Add'), ['class' => 'btn btn-sm btn-primary', 'form' => $form->id]) ?>
+          <?= Html::submitButton(Yii::t('app', 'Add'), ['class' => 'btn btn-sm btn-primary', 'form' => $form->id, 'data-loading-text' => Yii::t('app', 'Adding...')]) ?>
         </div>
       </div>
     </div>
@@ -79,9 +79,16 @@ $json_attribution_types = Json::encode($attribution_types);
 $script = <<< JS
   var advisor_defaults = $json_advisor_defaults;
   var attribution_types = $json_attribution_types;
+  var \$submitBtn;
   $('.attribution-form form').on('beforeSubmit.yii', function(e) {
+      \$submitBtn = $('.attribution-form').find('button[type="submit"]');
+      \$submitBtn.button('loading');
       $.pjax.submit(e, '#attribution-index-p0', {push: false, scrollTo: false});
       return false;
+  });
+  $('#attribution-index-p0').on('pjax:error', function(e, xhr) {
+      alert(xhr.statusText);
+      \$submitBtn.button('reset');
   });
   var \$advisorId = $('select[name="Attribution[advisor_id]"]');
   var \$office = $('select[name="Attribution[office]"]');

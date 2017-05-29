@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
       <div class="col-xs-5 col-md-3"> 
         <div class="input-group">
           <span class="input-group-addon"><?= Yii::t('app', 'Year') ?></span>
-          <?= Html::dropDownList('year', $year, $years, ['class' => 'form-control input-sm', 'prompt' => '-- ' . Yii::t('app', 'All') . ' --']) ?>
+          <?= Html::dropDownList('year', $year, $years, ['class' => 'form-control input-sm']) ?>
         </div>
       </div>
       <div class="col-xs-5 col-md-3"> 
@@ -63,14 +63,24 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
   </div>
 </div>
+<div class="loading-indicator hidden"><?= Yii::t('app', 'Reloading...') ?></div>
 <div class="transaction-commissions">
   <?= $this->render('_commission_tables', ['data' => $data, 'year' => $year]) ?>
 </div>
 <?php
 $script = <<< JS
+  var \$loadingIndicator = $('.loading-indicator');
+  $.pjax.defaults.timeout = 12000;
   \$form = $('form.form');
   \$form.find('select').on('change', function() {
+      $('.transaction-commissions').css('opacity', 0.3);
+      \$loadingIndicator.toggleClass('hidden', false);
       $.pjax({container: '.transaction-commissions', fragment: '.transaction-commissions', data: \$form.serialize(), scrollTo: false});
+  });
+  $('.transaction-commissions').on('pjax:success', function() {
+      $('.transaction-commissions').css('opacity', 1);
+      \$loadingIndicator.toggleClass('hidden', true);
+      activatePopovers();
   });
   $('.btn-print').on('click', function() {
       var href = $(this).attr('href');
@@ -78,6 +88,5 @@ $script = <<< JS
       var year = $('select[name="year"]').val();
       $(this).attr('href', href.replace('_advisor_id_', advisor_id).replace('_year_', year));
   });
-  $.pjax.defaults.timeout = 6000;
 JS;
 $this->registerJs($script);

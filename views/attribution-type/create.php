@@ -18,5 +18,4 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
     ]) ?>
 
-    <?php echo \yii\helpers\VarDumper::dump($model->errors, 6, true) ?>
 </div>

@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
   <h1><?= Html::encode($this->title) ?></h1>
 
   <?php Pjax::begin(['id' => 'p1']) ?>
-    <?= $this->render('_simple_form', [
+    <?= $this->render('_form', [
         'model' => $model,
     ]) ?>
   <?php Pjax::end() ?>

@@ -85,6 +85,7 @@ class TransactionController extends Controller
         $data = $this->mkCommissionsViewData($year, $advisor_id);
         $years = Payroll::find()->select(['to_char(month, \'yyyy\')'])
             ->distinct()->asArray()->createCommand()->queryColumn();
+        $years = ArrayHelper::merge($years, [$year]);
         $years = array_combine($years, $years);
         $positive_invoiced_euc = Invoice::find()->joinWith(['transaction' => function($q) use ($year) {
             $q->where(['to_char(payroll_month, \'yyyy\')' => $year]);

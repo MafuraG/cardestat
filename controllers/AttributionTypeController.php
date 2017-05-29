@@ -8,6 +8,7 @@ use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 /**
  * AttributionTypeController implements the CRUD actions for AttributionType model.
@@ -20,6 +21,13 @@ class AttributionTypeController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [[
+                    'allow' => true,
+                    'roles' => ['admin']
+                ]]
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [

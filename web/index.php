@@ -12,4 +12,6 @@ require(__DIR__ . '/../vendor/yiisoft/yii2/Yii.php');
 
 $config = require(__DIR__ . '/../config/web.php');
 
+\Yii::$container->set('yii\widgets\Pjax', ['timeout' => 12000]);
+
 (new yii\web\Application($config))->run();

@@ -15,8 +15,8 @@ class TransactionListItemSearch extends TransactionListItem
 {
     public $option_signed_from;
     public $option_signed_to;
-    public $first_invoiced_from;
-    public $first_invoiced_to;
+    public $invoiced_from;
+    public $invoiced_to;
     public $search_any;
     /**
      * @inheritdoc
@@ -24,7 +24,7 @@ class TransactionListItemSearch extends TransactionListItem
     public function rules()
     {
         return [
-            [['transaction_type', 'advisors', 'option_signed_from', 'option_signed_to', 'search_any', 'first_invoiced_from', 'first_invoiced_to'], 'safe'],
+            [['transaction_type', 'advisors', 'option_signed_from', 'option_signed_to', 'search_any', 'invoiced_from', 'invoiced_to'], 'safe'],
             [['approved_by_direction', 'approved_by_accounting', 'payrolled', 'invoiced', 'with_collaborator'], 'boolean'],
         ];
     }
@@ -40,8 +40,8 @@ class TransactionListItemSearch extends TransactionListItem
         return ArrayHelper::merge(parent::attributeLabels(), [
             'option_signed_from' => Yii::t('app', 'Option Signed From'),
             'option_signed_to' => Yii::t('app', 'Option Signed To'),
-            'first_invoiced_from' => Yii::t('app', 'First Invoiced From'),
-            'first_invoiced_to' => Yii::t('app', 'First Invoiced To'),
+            'invoiced_from' => Yii::t('app', 'Invoiced From'),
+            'invoiced_to' => Yii::t('app', 'Invoiced To'),
             'search_any' => Yii::t('app', 'Search Any'),
             'payrolled' => Yii::t('app', 'Payrolled'),
             'with_collaborator' => Yii::t('app', 'Collaborator'),
@@ -83,15 +83,16 @@ class TransactionListItemSearch extends TransactionListItem
         if (!$this->option_signed_from and $this->option_signed_to)
             $this->option_signed_from = '1970-01-01';
 
-        if ($this->first_invoiced_from and !$this->first_invoiced_to)
-            $this->first_invoiced_to = date('Y-m-d');
-        if (!$this->first_invoiced_from and $this->first_invoiced_to)
-            $this->first_invoiced_from = '1970-01-01';
+        if ($this->invoiced_from and !$this->invoiced_to)
+            $this->invoiced_to = date('Y-m-d');
+        if (!$this->invoiced_from and $this->invoiced_to)
+            $this->invoiced_from = '1970-01-01';
 
         $query->andFilterWhere(
             ['between', 'option_signed_at', $this->option_signed_from, $this->option_signed_to]);
-        $query->andFilterWhere(
-            ['between', 'first_invoiced_at', $this->first_invoiced_from, $this->first_invoiced_to]);
+        if ($this->invoiced_from) $query->innerJoinWith(['invoices' => function($q) {
+            $q->where(['between', 'issued_at', $this->invoiced_from, $this->invoiced_to]);
+        }]);
 
         //\yii\helpers\VarDumper::dump($this->transaction_type, 9, true); die;
         $query->andFilterWhere(['like', 'advisors', $this->advisors]);
@@ -107,7 +108,7 @@ class TransactionListItemSearch extends TransactionListItem
         $search_id = null;
         if (substr($this->search_any, 0, 1) == '#' && intval(substr($this->search_any, 1))) $search_id = intval(substr($this->search_any, 1));
         $query->andFilterWhere(['or', 
-            ['id' => $search_id],
+            ['transaction_list_item.id' => $search_id],
             ['external_id' => $this->search_any],
             ['ilike', 'custom_type', $this->search_any],
             ['ilike', 'transfer_type', $this->search_any],

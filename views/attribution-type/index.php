@@ -6,7 +6,7 @@ use yii\grid\GridView;
 /* @var $this yii\web\View */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('app', 'Attribution Types');
+$this->title = Yii::t('app', 'Attribution types');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="attribution-type-index">

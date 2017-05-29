@@ -61,7 +61,7 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
   
       <div class="col-md-12">
         <div class="form-group">
-          <?= Html::submitButton(Yii::t('app', 'Add'), ['class' => 'btn btn-sm btn-primary', 'form' => $form->id]) ?>
+          <?= Html::submitButton(Yii::t('app', 'Add'), ['class' => 'btn btn-sm btn-primary', 'form' => $form->id, 'data-loading-text' => Yii::t('app', 'Adding...')]) ?>
         </div>
       </div>
     </div>
@@ -69,9 +69,16 @@ $euTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-a
 </div>
 <?php
 $script = <<< JS
+  var \$submitBtn;
   $('.invoice-form form').on('beforeSubmit.yii', function(e) {
+      \$submitBtn = $('.invoice-form').find('button[type="submit"]');
+      \$submitBtn.button('loading');
       $.pjax.submit(e, '#invoice-index-p0', {push: false, scrollTo: false});
       return false;
+  });
+  $('#invoice-index-p0').on('pjax:error', function(e, xhr) {
+      alert(xhr.statusText);
+      \$submitBtn.button('reset');
   });
 JS;
 $this->registerJs($script);

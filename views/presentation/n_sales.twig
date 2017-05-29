@@ -93,8 +93,6 @@
                   var chartInstance = this.chart,
                       ctx = chartInstance.ctx;
                   ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
-                  console.log(ctx);
-                  console.log(Chart.defaults);
                   ctx.fillStyle = Chart.defaults.global.defaultFontColor;//'#333';
                   ctx.textAlign = 'center';
                   ctx.textBaseline = 'bottom';
@@ -147,7 +145,6 @@
     last = n;
     for (var i = new Date().getMonth(); i < 12; i++)
       actuals[i].value = parseInt(last);
-    console.log(last, first, actuals);
   });
   $('.btn-success').on('click', function() {
     for (var i = new Date().getMonth(); i < 12; i++) actuals[i].value++;

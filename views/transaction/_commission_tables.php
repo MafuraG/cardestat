@@ -54,6 +54,7 @@ $diff_cause_title = [
 if (!isset($expanded)) $expanded = false;
 
 foreach ($data as $advisor => $advisor_data): ?>
+  <?php $tt_titles = []; ?>
   <div class="row">
     <div class="col-sm-2 col-xs-3">
       <h4><span class="label label-default col-md-12">
@@ -129,13 +130,13 @@ foreach ($data as $advisor => $advisor_data): ?>
               <?php $first = true; $rowspan = count($month_data['transactions']); $fmonth = $formatter->asDate($month, 'MMM') ?>
               <tr>
                 <td rowspan="<?= $rowspan ?>">
-                  <h4><span role="button" class="label label-danger monospace toggle-payroll"
-                    data-payroll_id="<?= $month_data['payroll']['id'] ?>"><?= $fmonth ?> 
+                  <h4><button role="button" class="btn btn-danger monospace toggle-payroll" <?php if (($month_data['commission_euc'] + $month_data['compensated_euc']) <= 0) echo 'disabled' ?> data-loading-text="<?= Yii::t('app', 'Saving...') ?>"
+                    data-payroll_id="<?= $month_data['payroll']['id'] ?>"><?= $fmonth ?>
                   <?php if (isset($month_data['payroll']['commission_bp'])): ?>
                     <span class="glyphicon glyphicon-folder-close"></span> 
                   <?php else: ?>
                     <span class="glyphicon glyphicon-folder-open"></span> 
-                  <?php endif; ?></span></h4>
+                  <?php endif; ?></button></h4>
                 </td>
                 <?php foreach ($month_data['transactions'] as $tc): ?>
                   <?php if (!$first): ?>
@@ -195,6 +196,7 @@ foreach ($data as $advisor => $advisor_data): ?>
                                   $formatter->asDecimal($compensation['compensation_euc'] / 100., 2) . ' €';
                               $br = '<br>';
                           }
+                          if ($tt_title) $tt_titles[$month] = $tt_title;
                           $compensation_tooltip = 'data-toggle="tooltip" title="' . $tt_title . '" data-html="true"';
                       } else $compensation_tooltip= ''; ?>">
                       <strong <?= $compensation_tooltip ?>>
@@ -242,6 +244,9 @@ foreach ($data as $advisor => $advisor_data): ?>
             <?php endforeach; ?>
           </tbody>
         </table>
+        <?php if ($expanded) foreach ($tt_titles as $month => $ttit): ?>
+            <p><small><?= "$fmonth: $ttit" ?></small></p>
+        <?php endforeach; ?>
       </div>
     </div>
   </div>
@@ -301,21 +306,24 @@ $script = <<< JS
   var togglePayrollUrl = '$toggle_payroll_url';
   $('[data-toggle="tooltip"]').tooltip();
   $('[data-toggle="popover"]').popover();
-  $('.correction-popover').on('hide.bs.popover', function() {
+  $(document).on('hide.bs.popover', '.correction-popover', function() {
       var \$correctionForm = $(this).next('.popover').find('.correction-form').detach();
       \$correctionFormWrapper.append(\$correctionForm);
       \$correctionForm.find('form')[0].reset();
   });
-  $('.correction-popover').on('shown.bs.popover', function() {
+  $(document).on('shown.bs.popover', '.correction-popover', function() {
       $(this).next('.popover').find('.correction-form').replaceWith(\$correctionFormWrapper.find('.correction-form'));
       $(this).next('.popover').find('.correction-form').find('input[name="Correction[payroll_id]"]').val($(this).data('payroll_id'));
   });
-  $('.correction-popover').popover({
-      content: function() {
-          return $('#correction-table-wrapper').find('tbody')
-              .html($(this).siblings('.popover-table').find('tbody').html()).end().html() + \$correctionFormWrapper.html();
-      }
-  });
+  function activatePopovers() {
+      $('.correction-popover').popover({
+          content: function() {
+              return $('#correction-table-wrapper').find('tbody')
+                  .html($(this).siblings('.popover-table').find('tbody').html()).end().html() + \$correctionFormWrapper.html();
+          }
+      });
+  };
+  activatePopovers();
   $(document).on('submit', '.correction-form form', function() {
       $.ajax({
           url: '$correction_create_url',
@@ -333,20 +341,21 @@ $script = <<< JS
   $(document).on('click', '.popover .close', function() {
       $(this).closest('.popover').siblings('.correction-popover').trigger('click');
   });
-  $('.toggle-payroll').on('click', function() {
+  $(document).on('click', '.toggle-payroll', function() {
       var \$glyph = $(this).find('.glyphicon');
+      \$glyph.removeClass('glyphicon-folder-open glyphicon-folder-close').addClass('glyphicon-refresh gly-spin');
       var payroll_id = $(this).data('payroll_id');
       $.ajax({
          url: togglePayrollUrl,
          data: 'id=' + payroll_id,
          success: function(payroll) {
-             if (payroll.commission_bp) // closed payroll
-                 \$glyph.removeClass('glyphicon-folder-open').addClass('glyphicon-folder-close');
+             if (payroll.commission_bp != null) // closed payroll
+                 \$glyph.removeClass('glyphicon-refresh gly-spin').addClass('glyphicon-folder-close');
              else // open payroll
-                 \$glyph.removeClass('glyphicon-folder-close').addClass('glyphicon-folder-open');
+                 \$glyph.removeClass('glyphicon-refresh gly-spin').addClass('glyphicon-folder-open');
          },
          error: function(jqXHR, textStatus, errorThrown) {
-             console.log(textStatus);
+             alert(textStatus);
          }
       });
   });

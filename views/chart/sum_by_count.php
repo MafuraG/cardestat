@@ -113,7 +113,6 @@ $script = <<<JS
   var presetRanges = $presetRanges_json;
   var period1 = $period1_json;
   var period2 = $period2_json;
-  console.log(presetRanges);
   $('#w0-container').find('.range-value').html(period1['label']);
   $('#w1-container').find('.range-value').html(period2['label']);
   var horizonalLinePlugin = {

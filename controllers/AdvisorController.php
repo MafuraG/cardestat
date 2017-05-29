@@ -8,6 +8,7 @@ use app\models\AdvisorTranche;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 /**
  * AdvisorController implements the CRUD actions for Advisor model.
@@ -20,6 +21,13 @@ class AdvisorController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [[
+                    'allow' => true,
+                    'roles' => ['admin']
+                ]]
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [

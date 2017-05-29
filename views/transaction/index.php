@@ -28,6 +28,7 @@ $user = Yii::$app->user;
   <?= $this->render('_search', [
       'model' => $searchModel
   ]) ?>
+  <div class="loading-indicator hidden"><?= Yii::t('app', 'Reloading...') ?></div>
   <?php Pjax::begin() ?>
   <?= ListView::widget([
       'id' => 'transactions-list-view',
@@ -51,6 +52,7 @@ $user = Yii::$app->user;
   <?php Modal::end() ?>
 </div>
 <?php
+$loadingLbl = Yii::t('app', 'Loading...');
 $newTransactionLbl = Yii::t('app', 'Create Transaction');
 $transactionLbl = Yii::t('app', 'Transaction');
 $txUpdateUrl = Url::to(['transaction/update', 'id' => '_id_']);
@@ -63,7 +65,8 @@ $script = <<< JS
   var txRemoveUrl = '$txRemoveUrl';
   var areYouSure = '$areYouSure';
   var \$transactionModal = $('#transaction-modal');
-  $.pjax.defaults.timeout = 6000;
+  var \$newTxBtn = $('.transaction-index .btn-create');
+  $.pjax.defaults.timeout = 12000;
   $('.transaction-index').on('submit', '.transaction-list-item-search form', function(e) {
       $.pjax.submit(e, '#p0', {scrollTo: false})
       closeAdvancedSearch();
@@ -76,7 +79,8 @@ $script = <<< JS
       });
   });
   \$transactionModal.on('submit', '.transaction-form form', function(e) {
-      var \$form = $(this);
+      var \$txSubmitBtn = $('.transaction-form button[type="submit"]');
+      \$txSubmitBtn.button('loading');
       $.pjax.submit(e, '#p1', {push: false});
       return false;
   });
@@ -101,7 +105,6 @@ $script = <<< JS
       if (last_id)
           \$transactionModal.find('.modal-header h3').html('{$transactionLbl} #' + last_id);
       else \$transactionModal.find('.modal-header h3').html('{$newTransactionLbl}');
-      \$transactionModal.modal('show');
   }
   $('[data-toggle="tooltip"]').tooltip()
   $('#advanced-search-caret').on('click', function() {
@@ -137,6 +140,9 @@ $script = <<< JS
   });
   $('#p0').on('click', 'a.transaction-edit', function() {
     var id = $(this).closest('.transaction').data('key');
+    \$transactionModal.find('.modal-header h3').html('{$loadingLbl}');
+    \$transactionModal.find('.modal-body #p1').html('');
+    \$transactionModal.modal('show');
     $.pjax({container: '#p1', url: txUpdateUrl.replace('_id_', id), scrollTo: false, push: false});
     last_id = id;
   });
@@ -145,8 +151,26 @@ $script = <<< JS
     $.pjax({container: '#p1', url: txViewUrl.replace('_id_', id), scrollTo: false, push: false});
     last_id = id;
   });
+  var \$loadingIndicator = $('.loading-indicator');
+  $('#p0').on('pjax:start', function(xhr, options) {
+      \$loadingIndicator.toggleClass('hidden', false);
+      $('#transactions-list-view').css('opacity', 0.3);
+  });
+  $('#p0').on('pjax:success', function(xhr, options) {
+      \$loadingIndicator.toggleClass('hidden', true);
+      $('#transactions-list-view').css('opacity', 1);
+  });
+  $('#p0').on('pjax:error', function(e, xhr) {
+      alert(xhr.statusText);
+  });
+  $('#p1').on('pjax:success', function() {
+      \$newTxBtn.button('reset');
+  });
   $('.transaction-index .btn-create').on('click', function() {
       last_id = null;
+      \$transactionModal.find('.modal-header h3').html('{$loadingLbl}');
+      \$transactionModal.find('.modal-body #p1').html('');
+      \$transactionModal.modal('show');
       $.pjax({container: '#p1', url: $(this).attr('href'), scrollTo: false, push: false});
       return false;
   });
