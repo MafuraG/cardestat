@@ -41,7 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="thumbnail text-center">
       <h5><?= Yii::t('app', 'Invoiced') ?></h5>
       <h4><small><span class="text-info"><?= $formatter->asDecimal($positive_invoiced_euc / 100. , 2) ?></span>
-          <span class="text-danger"> <?= $formatter->asDecimal($negative_invoiced_euc / 100. , 2) ?></span></small> = <?= $formatter->asDecimal(($positive_invoiced_euc + $negative_invoiced_euc) / 100. , 2) ?> €</h4>
+          <span class="text-danger"> - <?= $formatter->asDecimal(abs($negative_invoiced_euc) / 100. , 2) ?></span></small> = <?= $formatter->asDecimal(($positive_invoiced_euc + $negative_invoiced_euc) / 100. , 2) ?> €</h4>
     </div>
   </div>
   <div class="col-xs-6 col-sm-3">

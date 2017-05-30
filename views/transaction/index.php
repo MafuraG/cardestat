@@ -183,6 +183,7 @@ $script = <<< JS
     reload_list = false;
     return true;
   });
+  $.fn.modal.Constructor.prototype.enforceFocus = function() {};
 JS;
 $this->registerJs($script);
 ?>
