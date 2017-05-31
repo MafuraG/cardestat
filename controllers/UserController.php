@@ -103,9 +103,9 @@ class UserController extends Controller {
                 throw new HttpException(500, \Yii::t('app', 'Could not save the user'));
 
             $auth = \Yii::$app->authManager;
+            $auth->revokeAll($user->id);
             $role = $auth->getRole($model->role);
             if ($role) $auth->assign($role, $user->id);
-            else $auth->revokeAll($user->id);
 
             $this->layout = false;
             return $this->actionIndex();

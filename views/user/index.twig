@@ -65,7 +65,7 @@
                    autocomplete: 'off'
                }
         }) %}
-          {{ html.activeHiddenInput(model, 'id') | raw }}
+          {{ form.field(model, 'id', {enableAjaxValidation: true}).hiddenInput() | raw }}
           {{ form.field(model, 'username', {enableAjaxValidation: true}) | raw }}
           {{ form.field(model, 'password', {validateOnChange: true}).passwordInput() | raw }}
           {{ form.field(model, 'password_repeat', {validateOnChange: true}).passwordInput() | raw }}

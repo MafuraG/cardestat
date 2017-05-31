@@ -409,7 +409,12 @@ $script = <<< JS
       $.pjax.reload('#attribution-index-p0', {url: attrIndexUrl, push: false, replace: false, timeout: 6000});
   });
   \$salePriceEuMM = $('input[name="Transaction[sale_price_eu]"]').siblings('.mask-money');
-  salePriceEu = \$salePriceEuMM.maskMoney('unmasked')[0];
+  var salePriceEu = \$salePriceEuMM.maskMoney('unmasked')[0];
+  \$salePriceEuMM.on('change', function() {
+      salePriceEu = \$salePriceEuMM.maskMoney('unmasked')[0];
+      \$ourFeeEuMM.trigger('blur');
+      \$theirFeeEuMM.trigger('blur');
+  });
   \$ourFeeEuMM = $('input[name="Transaction[our_fee_eu]"]').siblings('.mask-money');
   \$ourFeePctMM = $('input[name="our_fee_pct"]').siblings('.mask-money');
   \$ourFeePctMM.on('blur', function() {

@@ -148,6 +148,9 @@ $script = <<< JS
   });
   $('#p0').on('click', 'a.transaction-details', function() {
     var id = $(this).closest('.transaction').data('key');
+    \$transactionModal.find('.modal-header h3').html('{$loadingLbl}');
+    \$transactionModal.find('.modal-body #p1').html('');
+    \$transactionModal.modal('show');
     $.pjax({container: '#p1', url: txViewUrl.replace('_id_', id), scrollTo: false, push: false});
     last_id = id;
   });
