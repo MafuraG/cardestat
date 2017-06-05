@@ -170,7 +170,7 @@ class m170303_154953_transactions extends Migration
         $this->createTable('recipient_category', [
             'name' => $this->string(32) . ' primary key',
         ]);
-        $this->batchInsert('recipient_category', ['name'], [['COMPRADOR/ARRENDATARIO'], ['VENDEDOR/ARRENDADOR'], ['COLABORADOR'], ['BANCO']]);
+        $this->batchInsert('recipient_category', ['name'], [['COMPRADOR'], ['ARRENDATARIO'], ['VENDEDOR'], ['ARRENDADOR'], ['COLABORADOR'], ['BANCO']]);
         $this->createTable('transaction', [
             'id' => $this->primaryKey(),
             'external_id' => $this->string(12)->unique(),

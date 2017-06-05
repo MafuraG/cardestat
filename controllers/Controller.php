@@ -20,8 +20,10 @@ class Controller extends YiiController {
         ];
     }
     public function beforeAction($event) {
-        if (\Yii::$app->session->get('lang') === 'es') {
-            \Yii::$app->language = 'es';
+        if (\Yii::$app->session->get('lang')) {
+            \Yii::$app->language = \Yii::$app->session->get('lang');
+        }
+        if (\Yii::$app->language === 'es') {
             \Yii::$app->formatter->thousandSeparator = '.';
             \Yii::$app->formatter->decimalSeparator = ',';
         } else {

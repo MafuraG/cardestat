@@ -176,6 +176,7 @@ class Advisor extends \yii\db\ActiveRecord
         else $min_issued_at = date('Y-m-01', strtotime($min_issued_at));
         if ($min_issued_at < $from) $min_issued_at = $from;
         $archive_to = date('Y-m-d', strtotime($min_issued_at) - 1);
+        if ($archive_to > $to) $archive_to = $to;
         $query = static::find()
             ->innerJoinWith(['effectiveAttributions.transaction' => function($q) use ($min_issued_at, $to) {
                 $q->innerJoin('(
@@ -186,14 +187,6 @@ class Advisor extends \yii\db\ActiveRecord
                 ) period_invoice', 'transaction.id = period_invoice.transaction_id', [
                     ':from1' => $min_issued_at,
                     ':to1' => $to
-                ])->leftJoin('(
-                    select sum(amount_euc), transaction_id
-                    from invoice
-                    where issued_at not between :from2 and :to2
-                    group by transaction_id
-                ) rest_invoice', 'transaction.id = rest_invoice.transaction_id', [
-                    ':from2' => $min_issued_at,
-                    ':to2' => $to
                 ]);
             }])->join('full join', '(
                 select sum(attributed_euc), name
@@ -209,12 +202,12 @@ class Advisor extends \yii\db\ActiveRecord
                 '(case when advisor.name is null
                     then archived.name 
                  else advisor.name
-                 end) as joined_name',
-                "round(sum((coalesce(effective_attribution.amount_euc, 0) * period_invoice.sum / (period_invoice.sum +
-                    coalesce(rest_invoice.sum, 0)) + coalesce(archived.sum, 0))/ 100.), 2) as {$sum_alias}",
+                 end) as joint_name',
+                "round(sum(coalesce(effective_attribution.amount_euc, 0) + coalesce(archived.sum, 0))/ 100., 2) as {$sum_alias}",
                 "count(*) as {$count_alias}"
-            ])->orderBy('joined_name')
-            ->groupBy('joined_name');
+            ])->having("round(sum(coalesce(effective_attribution.amount_euc, 0) + coalesce(archived.sum, 0))/ 100., 2) > 0")
+            ->orderBy('joint_name')
+            ->groupBy('joint_name');
         return $query->createCommand()->queryAll();
     }
     /**

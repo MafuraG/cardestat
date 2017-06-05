@@ -82,6 +82,7 @@ class Office extends \yii\db\ActiveRecord
         else $min_issued_at = date('Y-m-01', strtotime($min_issued_at));
         if ($min_issued_at < $from) $min_issued_at = $from;
         $archive_to = date('Y-m-d', strtotime($min_issued_at) - 1);
+        if ($archive_to > $to) $archive_to = $to;
         return static::find()
             ->innerJoinWith(['effectiveAttributions.transaction' => function($q) use ($min_issued_at, $to) {
                 $q->innerJoin('(
@@ -103,14 +104,14 @@ class Office extends \yii\db\ActiveRecord
                 ':from2' => $from,
                 ':to2' => $archive_to
             ])->select([
-                '(case when office.name is null
+                '(case when effective_attribution.id is null
                     then archived.name 
                  else office.name
-                 end) as joined_name',
+                 end) as joint_name',
                 "round(sum((coalesce(effective_attribution.amount_euc, 0) + coalesce(archived.sum, 0))/ 100.), 2) as {$sum_alias}",
                 "count(*) as {$count_alias}"
-            ])->orderBy('joined_name')
-            ->groupBy('joined_name')
+            ])->orderBy('joint_name')
+            ->groupBy('joint_name')
             ->createCommand()->queryAll();
     }
     /**
