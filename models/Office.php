@@ -95,7 +95,7 @@ class Office extends \yii\db\ActiveRecord
                     ':to' => $to
                 ]);
             }])->join('full join', '(
-                select sum(attributed_euc), office as name
+                select sum(attributed_euc), coalesce(office, \'null\') as name
                 from archived_attribution
                      join archived_invoice on archived_attribution.archived_invoice_id = archived_invoice.id 
                 where month between :from2 and :to2

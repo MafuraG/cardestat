@@ -23,13 +23,19 @@ insert into archived_invoice (month, amount_euc, office, transaction_type, subje
 
 insert into archived_attribution (archived_invoice_id, attributed_euc, advisor_id, commission_euc, n_operations_c)
     select ai.id,
-           cast(attributed_euc::float/ai_s.sum*amount_euc*weight as int),
-           ad.id,
-           cast(commission_euc::float/ai_s.sum*amount_euc*weight as int),
-           case when ai.transaction_type = 'COMPRAVENTA' then 
-               cast(n_sales_c::float/ai_op.sum*n_operations_c*weight as int)
+           case when ha_s.sum <> 0 then
+               cast(attributed_euc::float/ha_s.sum*amount_euc as int)
            else
-               cast(n_rentals_c::float/ai_op.sum*n_operations_c*weight as int)
+               0
+           end,
+           ad.id,
+           cast(commission_euc::float*mw.weight as int),
+           case when ha_sop.sum <> 0 and ai.transaction_type = 'COMPRAVENTA' then 
+               cast(n_sales_c::float/ha_sop.sum*n_operations_c as int)
+           when ha_rop.sum <> 0 and ai.transaction_type = 'ALQUILER' then 
+               cast(n_rentals_c::float/ha_rop.sum*n_operations_c as int)
+           else
+               0
            end
     from resumen_historico_atribucion ha 
          cross join (
@@ -46,17 +52,21 @@ insert into archived_attribution (archived_invoice_id, attributed_euc, advisor_i
              select 11, 0.1 union
              select 12, 0.1
          ) mw
+         join advisor ad on (ad.name = ha.advisor)
          join archived_invoice ai on (make_date(ha.year::int, mw.month, 1) = ai.month and coalesce(ha.office, '') = coalesce(ai.office, ''))
          join (
-             select month, office, sum(amount_euc::int)
-             from archived_invoice
-             where transaction_type in ('COMPRAVENTA', 'ALQUILER')
-             group by month, office
-         ) ai_s on (ai.month = ai_s.month and coalesce(ai.office, '') = coalesce(ai_s.office, ''))
+             select year, office, sum(attributed_euc::int)
+             from resumen_historico_atribucion ha
+             group by year, office
+         ) ha_s on (make_date(ha_s.year::int, mw.month, 1) = ai.month and coalesce(ha_s.office, '') = coalesce(ai.office, ''))
          join (
-             select month, office, transaction_type, sum(n_operations_c::int)
-             from archived_invoice
-             where transaction_type in ('COMPRAVENTA', 'ALQUILER')
-             group by month, office, transaction_type
-         ) ai_op on (ai.month = ai_op.month and coalesce(ai.office, '') = coalesce(ai_op.office, '') and ai.transaction_type = ai_op.transaction_type)
-         join advisor ad on (ad.name = ha.advisor);
+             select year, office, sum(n_rentals_c::int)
+             from resumen_historico_atribucion ha
+             group by year, office
+         ) ha_rop on (make_date(ha_rop.year::int, mw.month, 1) = ai.month and coalesce(ha_rop.office, '') = coalesce(ai.office, ''))
+         join (
+             select year, office, sum(n_sales_c::int)
+             from resumen_historico_atribucion ha
+             group by year, office
+         ) ha_sop on (make_date(ha_sop.year::int, mw.month, 1) = ai.month and coalesce(ha_sop.office, '') = coalesce(ai.office, ''))
+     where (ha_s.sum <> 0 or ha_rop.sum <> 0 or ha_sop.sum <> 0) and (attributed_euc::int <> 0 or commission_euc::int <> 0);

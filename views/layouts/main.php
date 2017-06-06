@@ -42,7 +42,7 @@ AppAsset::register($this);
         'options' => ['class' => 'navbar-nav'],
         'encodeLabels' => false, 
         'items' => [
-            ['label' => \Yii::t('app', 'Home'), 'url' => ['/table/index']],
+            ['label' => \Yii::t('app', 'Home'), 'url' => ['/'], 'active' => false],
             ['label' => \Yii::t('app', 'Transactions'), 'url' => ['/transaction/index']],
             ['label' => \Yii::t('app', 'Commissions'), 'url' => ['/transaction/commissions']],
             ['label' => \Yii::t('app', 'Misc'), 'items' => [
