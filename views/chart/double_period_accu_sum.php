@@ -49,9 +49,13 @@ $script = <<<JS
   });
   function data_map(period, sums) {
       var sum_index = 'sum' + period + '_eu';
+      var accu = 0.;
       return function(key, index) {
-          if (sums[key][sum_index]) return parseFloat(sums[key][sum_index]).toFixed(2);
-          else return 0;
+          if (sums[key][sum_index]) {
+              accu += parseFloat(sums[key][sum_index]);
+              return accu.toFixed(2);
+          }
+          else return accu;
       }
   }
   function updateChart(data) {
@@ -120,3 +124,4 @@ $script = <<<JS
   });
 JS;
 $this->registerJs($script);
+

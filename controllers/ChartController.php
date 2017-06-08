@@ -100,6 +100,41 @@ class ChartController extends Controller
     }
     /**
      */
+    public function actionAccuVolume($from = null, $to = null, $interval_months = 1, $transaction_type = null)
+    {
+        extract($this->getDoubleSumDefaultPeriods($from, $to));
+        $aux1 = ArrayHelper::index(Transaction::getVolume($from, $to, $interval_months, $transaction_type, 'sum1_eu'), 'period');
+        $aux2 = ArrayHelper::index(Invoice::getRevenue($from, $to, $interval_months, $transaction_type, 'sum2_eu'), 'period');
+        $turnover = ArrayHelper::merge($aux1, $aux2);
+        $intervals = [
+            1 => Yii::t('app', 'Monthly'),
+            3 => Yii::t('app', 'Quarterly'),
+            12 => Yii::t('app', 'Yearly'),
+        ];
+        $title= Yii::t('app', 'Accumulated Volume vs. Revenues (<em>signature date</em>)');
+        $subtitle = Yii::t('app', 'Price of the traded property vs. fees invoiced');
+        $comments = Yii::t('app', 'A spread between the curves is normally caused by transactions made in colaboration.');
+        $data = [
+            'sums' => $turnover,
+            'from' => $from,
+            'to' => $to,
+            'period' => $label,
+            'interval_months' => $interval_months,
+            'intervals' => $intervals,
+            'transaction_type' => $transaction_type,
+            'label1' => Yii::t('app', 'Accumulated price of properties traded') . ' €',
+            'label2' => Yii::t('app', 'Accumulated fees invoiced') . ' €',
+            'title' => $title,
+            'subtitle' => $subtitle,
+            'comments' => $comments
+        ];
+        if (Yii::$app->request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return $data;
+        } else return $this->render('double_period_accu_sum', $data);
+    }
+    /**
+     */
     public function actionAvgVolume($from = null, $to = null, $interval_months = 1, $transaction_type = null)
     {
         extract($this->getDoubleSumDefaultPeriods($from, $to));

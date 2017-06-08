@@ -56,6 +56,7 @@ AppAsset::register($this);
             ['label' => \Yii::t('app', 'Charts'), 'active' => Yii::$app->controller->id == 'chart', 'items' => [
                 ['label' => Yii::t('app', 'Trading volume'), 'options' => ['class' => 'dropdown-header']],
                 ['label' => \Yii::t('app', 'Volume vs. Revenues'), 'url' => ['/chart/volume']],
+                ['label' => \Yii::t('app', 'Accumulated Volume vs. Revenues'), 'url' => ['/chart/accu-volume']],
                 ['label' => \Yii::t('app', 'Avg. Volume vs. Avg. Revenue'), 'url' => ['/chart/avg-volume']],
                 ['label' => Yii::t('app', 'Attributions'), 'options' => ['class' => 'dropdown-header']],
                 ['label' => \Yii::t('app', 'Attribution by advisor (<em>option date</em>)'), 'url' => ['/chart/attribution-by-advisor-on-option-date']],
