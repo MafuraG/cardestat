@@ -244,7 +244,7 @@ $script = <<<JS
                   datasets.forEach(function (dataset, i) {
                       chart.getDatasetMeta(i).data.forEach(function (p, j) {
                           var y = p._model.y;
-                          if (p._model.y < 50) y = p._model.y - 45;
+                          if (p._model.y < 50) y = p._model.y + 15;
                           ctx.fillText(Math.round(datasets[i].data[j]), p._model.x, y, Math.ceil(p._model.width));
                       });
                   });

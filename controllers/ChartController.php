@@ -162,10 +162,12 @@ class ChartController extends Controller
     public function actionAttributionByOfficeOnOptionDate($from1 = null, $to1 = null, $label1 = null, $from2 = null, $to2 = null, $label2 = null)
     {
         list($period1, $period2) = $this->getSumByCountDefaultPeriods($from1, $to1, $label1, $from2, $to2, $label2);
+        $no = mb_strtoupper(Yii::t('app', 'Employees w/o office'));
+        $na = mb_strtoupper(Yii::t('app', 'Direction (no office)'));
         $aux1 = ArrayHelper::index(
-            Office::getAttributionSumOnOptionDate($period1['from'], $period1['to'], 'sum1_eu', 'count1'), 'name');
+            Office::getAttributionSumOnOptionDate($period1['from'], $period1['to'], 'sum1_eu', 'count1', $na, $no), 'name');
         $aux2 = ArrayHelper::index(
-            Office::getAttributionSumOnOptionDate($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'name');
+            Office::getAttributionSumOnOptionDate($period2['from'], $period2['to'], 'sum2_eu', 'count2', $na, $no), 'name');
         $offices = ArrayHelper::merge($aux1, $aux2);
         ksort($offices);
         $title= Yii::t('app', 'Attribution by office (<em>option date</em>)');
@@ -191,8 +193,8 @@ class ChartController extends Controller
     public function actionAttributionByOfficeOnInvoiceDate($from1 = null, $to1 = null, $label1 = null, $from2 = null, $to2 = null, $label2 = null)
     {
         list($period1, $period2) = $this->getSumByCountDefaultPeriods($from1, $to1, $label1, $from2, $to2, $label2);
-        $no = mb_strtoupper(Yii::t('app', 'No Office'));
-        $na = mb_strtoupper(Yii::t('app', 'Direction'));
+        $no = mb_strtoupper(Yii::t('app', 'Employees w/o office'));
+        $na = mb_strtoupper(Yii::t('app', 'Direction (no office)'));
         $aux1 = ArrayHelper::index(
             Office::getAttributionSumOnInvoiceDate($period1['from'], $period1['to'], 'sum1_eu', 'count1', $no, $na), 'joint_name');
         $aux2 = ArrayHelper::index(
@@ -267,10 +269,11 @@ class ChartController extends Controller
     public function actionAttributionByAdvisorOnOptionDate($from1 = null, $to1 = null, $label1 = null, $from2 = null, $to2 = null, $label2 = null)
     {
         list($period1, $period2) = $this->getSumByCountDefaultPeriods($from1, $to1, $label1, $from2, $to2, $label2);
+        $no = mb_strtoupper(Yii::t('app', 'Direction'));
         $aux1 = ArrayHelper::index(
-            Advisor::getAttributionSumOnOptionDate($period1['from'], $period1['to'], 'sum1_eu', 'count1'), 'name');
+            Advisor::getAttributionSumOnOptionDate($period1['from'], $period1['to'], 'sum1_eu', 'count1', $no), 'name');
         $aux2 = ArrayHelper::index(
-            Advisor::getAttributionSumOnOptionDate($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'name');
+            Advisor::getAttributionSumOnOptionDate($period2['from'], $period2['to'], 'sum2_eu', 'count2', $no), 'name');
         $advisors = ArrayHelper::merge($aux1, $aux2);
         $title= Yii::t('app', 'Attribution by advisor (<em>by option date</em>)');
         $subtitle = Yii::t('app', 'From detail using option date');

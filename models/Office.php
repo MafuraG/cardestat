@@ -157,17 +157,43 @@ class Office extends \yii\db\ActiveRecord
     }
     /**
      */
-    public static function getAttributionSumOnOptionDate($from, $to, $sum_alias = 'sum', $count_alias = 'count')
+    public static function getAttributionSumOnOptionDate($from, $to, $sum_alias = 'sum', $count_alias = 'count', $not_attributed = 'NA', $no_office = 'NO')
     {
         return static::find()
             ->joinWith(['effectiveAttributions.transaction' => function($q) use ($from, $to) {
-                $q->where('option_signed_at between :from and :to', [
+                $q->where('transaction.id is null or option_signed_at between :from and :to', [
                     ':from' => $from,
                     ':to' => $to
                 ]);
-            }])->select(['name', "round(sum(amount_euc / 100.), 2) as {$sum_alias}", "count(*) as {$count_alias}"])
-            ->orderBy('name')
-            ->groupBy('name')
+            }])->join('full join', '(
+                select sum(amount_euc), :na_no::varchar as name
+                from effective_attribution ea join
+                     transaction t on (ea.transaction_id = t.id)
+                where our_fee_euc > 0 and
+                    option_signed_at between :from_no and :to_no and
+                    office is null) wo_office', 'false', [
+                ':from_no' => $from,
+                ':to_no' => $to,
+                ':na_no' => $no_office
+            ])->join('full join', '(
+                select greatest(0, sum(our_fee_euc) - sum(tx_attribution.sum)) as sum, :na1::varchar as name
+                from transaction left join (
+                    select sum(ea.amount_euc), transaction_id
+                    from effective_attribution ea join
+                        transaction t on t.id = ea.transaction_id
+                    where option_signed_at between :from_na1 and :to_na1
+                    group by transaction_id) tx_attribution on transaction.id = transaction_id
+                where our_fee_euc > 0 and option_signed_at between :from_na2 and :to_na2) not_attributed', 'false', [
+                ':from_na1' => $from,
+                ':to_na1' => $to,
+                ':from_na2' => $from,
+                ':to_na2' => $to,
+                ':na1' => $not_attributed
+            ])->select([
+                'coalesce(office.name, not_attributed.name, wo_office.name) as name',
+                "round(sum((coalesce(amount_euc, 0) + coalesce(wo_office.sum, 0) + coalesce(not_attributed.sum, 0)) / 100.), 2) as {$sum_alias}", "count(*) as {$count_alias}"
+            ])->orderBy('name')
+            ->groupBy(['coalesce(office.name, not_attributed.name, wo_office.name)'])
             ->createCommand()->queryAll();
     }
 
