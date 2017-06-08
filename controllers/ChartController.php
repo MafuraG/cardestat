@@ -275,7 +275,7 @@ class ChartController extends Controller
         $aux2 = ArrayHelper::index(
             Advisor::getAttributionSumOnOptionDate($period2['from'], $period2['to'], 'sum2_eu', 'count2', $no), 'name');
         $advisors = ArrayHelper::merge($aux1, $aux2);
-        $title= Yii::t('app', 'Attribution by advisor (<em>by option date</em>)');
+        $title= Yii::t('app', 'Attribution by advisor (<em>option date</em>)');
         $subtitle = Yii::t('app', 'From detail using option date');
         $formatter = Yii::$app->formatter;
         $comments = Yii::t('app', 'Available for transactions invoiced after {date}', ['date' => $formatter->asDate('2016-01-01')]);
