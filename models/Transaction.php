@@ -397,12 +397,20 @@ class Transaction extends \yii\db\ActiveRecord
             ':arg5' => $from,
             ':arg6' => $to,
         ];
-        $joinCondition = "series.period = date_trunc(:arg4, option_signed_at)::date and option_signed_at between :arg5 and :arg6";
+        $joinCondition = "series.period = date_trunc(:arg4, first_invoiced_at)::date and first_invoiced_at between :arg5 and :arg6";
         if ($transaction_type) {
             $joinCondition .=  ' and transaction_type = :arg7';
             $joinArgs[':arg7'] = $transaction_type;
         }
         $query = static::find();
+        $query->innerJoin('(
+            select transaction_id, min(issued_at) as first_invoiced_at
+            from invoice
+            where issued_at between :arg8 and :arg9
+            group by transaction_id) tx_invoice', 'tx_invoice.transaction_id = transaction.id', [
+            ':arg8' => $from,
+            ':arg9' => $to
+        ]);
         if ($avg) $query->select(['period', "round(sum(sale_price_euc)/count(*) / 100., 2) as {$sum_alias}"]);
         else $query->select(['period', "round(sum(sale_price_euc) / 100., 2) as {$sum_alias}"]);
         return $query->rightJoin("(

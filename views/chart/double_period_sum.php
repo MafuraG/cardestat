@@ -6,12 +6,12 @@ use yii\helpers\Html;
 use kartik\daterange\DateRangePicker;
 
 ChartjsAsset::register($this);
-$this->title = $title;
+$this->title = strip_tags($title);
 $this->params['breadcrumbs'][] = Yii::t('app', 'Charts');
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = $title;
 ?>
 <div class="sums-comparison">
-  <h1 class="page-header"><?= $this->title ?></h1>
+  <h1 class="page-header"><?= $title ?></h1>
   <div class="well well-sm">
     <?= Html::beginForm('', 'get', ['class' => 'form form-inline']) ?>
       <?php $presetRanges = [

@@ -153,7 +153,7 @@ class Advisor extends \yii\db\ActiveRecord
     }
     /**
      */
-    public static function getActivityAttributionSum($from, $to, $sum_alias = 'sum', $count_alias = 'count')
+    public static function getAttributionSumOnOptionDate($from, $to, $sum_alias = 'sum', $count_alias = 'count')
     {
         return static::find()
             ->joinWith(['effectiveAttributions.transaction' => function($q) use ($from, $to) {
@@ -168,7 +168,7 @@ class Advisor extends \yii\db\ActiveRecord
     }
     /**
      */
-    public static function getAccountingAttributionSum($from, $to, $sum_alias = 'sum', $count_alias = 'count')
+    public static function getAttributionSumOnInvoiceDate($from, $to, $sum_alias = 'sum', $count_alias = 'count', $not_attributed = 'NA')
     {
         $min_issued_at = static::find()
             ->innerJoinWith('effectiveAttributions.transaction.invoices')->min('issued_at');
@@ -177,7 +177,7 @@ class Advisor extends \yii\db\ActiveRecord
         if ($min_issued_at < $from) $min_issued_at = $from;
         $archive_to = date('Y-m-d', strtotime($min_issued_at) - 1);
         if ($archive_to > $to) $archive_to = $to;
-        $query = static::find()
+        $subquery = static::find()
             ->innerJoinWith(['effectiveAttributions.transaction' => function($q) use ($min_issued_at, $to) {
                 $q->innerJoin('(
                     select sum(amount_euc), transaction_id
@@ -188,8 +188,19 @@ class Advisor extends \yii\db\ActiveRecord
                     ':from1' => $min_issued_at,
                     ':to1' => $to
                 ]);
-            }])->join('full join', '(
-                select sum(attributed_euc), name
+            }])->join('cross join', '(
+                select sum(amount_euc)
+                from invoice
+                where issued_at between :from2 and :to2
+            ) invoiced', null, [
+                ':from2' => $min_issued_at,
+                ':to2' => $to
+            ])->join('cross join', '(
+                select true as attributed
+                union
+                select null
+            ) u')->join('full join', '(
+                select sum(attributed_euc), coalesce(name, :na3) as name
                 from archived_attribution
                      join advisor on advisor.id = archived_attribution.advisor_id
                      join archived_invoice on archived_attribution.archived_invoice_id = archived_invoice.id 
@@ -197,17 +208,40 @@ class Advisor extends \yii\db\ActiveRecord
                 group by name
             ) archived', 'false', [
                 ':from3' => $from,
-                ':to3' => $archive_to
+                ':to3' => $archive_to,
+                ':na3' => $not_attributed
+            ])->join('full join', '(
+                select sum(amount_euc) - sum(invoice_attribution.sum) as sum, :na::varchar as name
+                from archived_invoice ai join (
+                    select archived_invoice_id, sum(attributed_euc)
+                    from archived_attribution join
+                        archived_invoice on archived_invoice_id = archived_invoice.id
+                    where month between :from_na1 and :to_na1 and
+                        attributed_euc <> 0
+                    group by archived_invoice_id) invoice_attribution on (archived_invoice_id = ai.id)
+                where month between :from_na2 and :to_na2) archived_not_attributed', 'false', [
+                ':from_na1' => $from,
+                ':to_na1' => $archive_to,
+                ':from_na2' => $from,
+                ':to_na2' => $archive_to,
+                ':na' => $not_attributed
             ])->select([
-                '(case when advisor.name is null
-                    then archived.name 
-                 else advisor.name
-                 end) as joint_name',
-                "round(sum(coalesce(effective_attribution.amount_euc, 0) + coalesce(archived.sum, 0))/ 100., 2) as {$sum_alias}",
-                "count(*) as {$count_alias}"
-            ])->having("round(sum(coalesce(effective_attribution.amount_euc, 0) + coalesce(archived.sum, 0))/ 100., 2) > 0")
+                'case when attributed then
+                     coalesce(advisor.name, archived.name, :na4)
+                 else 
+                     coalesce(archived.name, archived_not_attributed.name, :na5)
+                 end as joint_name',
+                "case when attributed then
+                     round(sum(coalesce(effective_attribution.amount_euc, 0))/ 100., 2)
+                 else
+                     round((coalesce(invoiced.sum, 0) + sum(coalesce(-effective_attribution.amount_euc, 0) + coalesce(archived_not_attributed.sum, 0) + coalesce(archived.sum, 0))) / 100., 2)
+                 end as {$sum_alias}",
+            ])->having("round(sum(coalesce(effective_attribution.amount_euc, 0) + coalesce(archived_not_attributed.sum, 0) + coalesce(archived.sum, 0))/ 100., 2) > 0")
             ->orderBy('joint_name')
-            ->groupBy('joint_name');
+            ->groupBy(['joint_name', 'attributed', 'invoiced.sum']);
+        $subquery->addParams([':na4' => $not_attributed, ':na5' => $not_attributed]);
+        $query = (new \yii\db\Query)->from(['aux' => $subquery]);
+        $query->select(['joint_name', "sum($sum_alias) as $sum_alias"])->groupBy('joint_name');
         return $query->createCommand()->queryAll();
     }
     /**

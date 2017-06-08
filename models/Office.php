@@ -74,7 +74,7 @@ class Office extends \yii\db\ActiveRecord
     }
     /**
      */
-    public static function getAccountingAttributionSum($from, $to, $sum_alias = 'sum', $count_alias = 'count')
+    public static function getAttributionSumOnInvoiceDate($from, $to, $sum_alias = 'sum', $count_alias = 'count', $no_office = 'NA', $not_attributed = 'NA')
     {
         $min_issued_at = static::find()
             ->innerJoinWith('effectiveAttributions.transaction.invoices')->min('issued_at');
@@ -95,20 +95,61 @@ class Office extends \yii\db\ActiveRecord
                     ':to' => $to
                 ]);
             }])->join('full join', '(
-                select sum(attributed_euc), coalesce(office, \'null\') as name
+                select sum(amount_euc), :na_no::varchar as name
+                from effective_attribution ea join
+                     transaction t on (ea.transaction_id = t.id) join (
+                         select distinct transaction_id
+                         from invoice
+                         where issued_at between :from_no and :to_no
+                         group by transaction_id) invoice_no on t.id = invoice_no.transaction_id
+                where office is null) wo_office', 'false', [
+                ':from_no' => $min_issued_at,
+                ':to_no' => $to,
+                ':na_no' => $no_office
+            ])->join('full join', '(
+                select sum(amount_euc) - sum(invoice_attribution.sum) as sum, :na1::varchar as name
+                from invoice left join (
+                    select sum(ea.amount_euc), i.id as invoice_id
+                    from effective_attribution ea join
+                        transaction t on (ea.transaction_id = t.id) join (
+                            select distinct on (transaction_id) *
+                            from invoice
+                            where issued_at between :from_na3 and :to_na3) i on (i.transaction_id = t.id)
+                    group by i.id) invoice_attribution on invoice.id = invoice_id
+                where issued_at between :from_na4 and :to_na4) not_attributed', 'false', [
+                ':from_na3' => $min_issued_at,
+                ':to_na3' => $to,
+                ':from_na4' => $min_issued_at,
+                ':to_na4' => $to,
+                ':na1' => $not_attributed
+            ])->join('full join', '(
+                select sum(amount_euc) - sum(invoice_attribution.sum) as sum, :na::varchar as name
+                from archived_invoice ai join (
+                    select archived_invoice_id, sum(attributed_euc)
+                    from archived_attribution join
+                        archived_invoice on archived_invoice_id = archived_invoice.id
+                    where month between :from_na1 and :to_na1 and
+                        attributed_euc <> 0
+                    group by archived_invoice_id) invoice_attribution on (archived_invoice_id = ai.id)
+                where month between :from_na2 and :to_na2) archived_not_attributed', 'false', [
+                ':from_na1' => $from,
+                ':to_na1' => $archive_to,
+                ':from_na2' => $from,
+                ':to_na2' => $archive_to,
+                ':na' => $not_attributed
+            ])->join('full join', '(
+                select sum(attributed_euc), coalesce(office, :no) as name
                 from archived_attribution
                      join archived_invoice on archived_attribution.archived_invoice_id = archived_invoice.id 
                 where month between :from2 and :to2
                 group by name
             ) archived', 'false', [
                 ':from2' => $from,
-                ':to2' => $archive_to
+                ':to2' => $archive_to,
+                ':no' => $no_office
             ])->select([
-                '(case when effective_attribution.id is null
-                    then archived.name 
-                 else office.name
-                 end) as joint_name',
-                "round(sum((coalesce(effective_attribution.amount_euc, 0) + coalesce(archived.sum, 0))/ 100.), 2) as {$sum_alias}",
+                'coalesce(office.name, wo_office.name, archived.name, archived_not_attributed.name, not_attributed.name) as joint_name',
+                "round(sum((coalesce(effective_attribution.amount_euc, 0) + coalesce(wo_office.sum, 0) + coalesce(archived.sum, 0) + coalesce(not_attributed.sum, 0) + coalesce(archived_not_attributed.sum, 0))/ 100.), 2) as {$sum_alias}",
                 "count(*) as {$count_alias}"
             ])->orderBy('joint_name')
             ->groupBy('joint_name')
@@ -116,7 +157,7 @@ class Office extends \yii\db\ActiveRecord
     }
     /**
      */
-    public static function getActivityAttributionSum($from, $to, $sum_alias = 'sum', $count_alias = 'count')
+    public static function getAttributionSumOnOptionDate($from, $to, $sum_alias = 'sum', $count_alias = 'count')
     {
         return static::find()
             ->joinWith(['effectiveAttributions.transaction' => function($q) use ($from, $to) {

@@ -28,3 +28,6 @@ phpunit.phar
 
 # vim backup files
 *.swp
+
+# private data
+/private

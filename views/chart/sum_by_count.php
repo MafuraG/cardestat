@@ -6,17 +6,20 @@ use kartik\daterange\DateRangePicker;
 
 ChartjsAsset::register($this);
 
-$this->title = $title;
+$this->title = strip_tags($title);
 $this->params['breadcrumbs'][] = Yii::t('app', 'Charts');
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = $title;
+$color1 = ['bg' => 'rgba(255, 99, 132, 0.4)', 'border' => 'rgba(255,99,132,1)'];
+$color2 = ['bg' => 'rgba(54, 162, 235, 0.4)', 'border' => 'rgba(54, 162, 235, 1)'];
+if (!isset($comments)) $comments = '';
 ?>
 <div class="groupings-comparison">
-  <h1 class="page-header"><?= $this->title ?></h1>
+  <h1 class="page-header"><?= $title ?></h1>
   <div class="well well-sm">
     <?= Html::beginForm('', 'get', ['class' => 'form form-inline']) ?>
       <?= Html::hiddenInput('label1', $period1['label']) ?>
       <?= Html::hiddenInput('label2', $period2['label']) ?>
-      <div class="form-group">
+      <div class="form-group color1">
         <label><?= Yii::t('app', 'Period') ?> 1</label>
         <?php $presetRanges = [
             Yii::t('app', 'Current quarter') => ["moment().startOf('quarter')", "moment().endOf('quarter')"],
@@ -63,7 +66,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ]
         ]) ?>
       </div>
-      <div class="form-group">
+      <div class="form-group color2">
         <label><?= Yii::t('app', 'Period') ?> 2</label>
         <?= DateRangePicker::widget([
             'name' => 'daterange2',
@@ -103,6 +106,7 @@ $this->params['breadcrumbs'][] = $this->title;
   </div>
   <p class="lead text-center"><?= $subtitle ?></p>
   <canvas height="100%"></canvas>
+  <p class="text-center"><?= $comments ?></p>
 </div>
 <?php
 $groupings_json = Json::encode($groupings);
@@ -189,15 +193,15 @@ $script = <<<JS
       datasets: [{
           label: mkRangeLabel(period1),
           fill: false,
-          backgroundColor: 'rgba(255, 99, 132, 0.4)',
-          borderColor: 'rgba(255,99,132,1)',
+          backgroundColor: '{$color1['bg']}',
+          borderColor: '{$color1['border']}',
           borderWidth: 1,
           data: grouping_labels.map(data_map(1, groupings))
       }, {
           label: mkRangeLabel(period2),
           fill: false,
-          backgroundColor: 'rgba(54, 162, 235, 0.4)',
-          borderColor: 'rgba(54, 162, 235, 1)',
+          backgroundColor: '{$color2['bg']}',
+          borderColor: '{$color2['border']}',
           borderWidth: 1,
           data: grouping_labels.map(data_map(2, groupings))
       }]
@@ -213,6 +217,7 @@ $script = <<<JS
      chart.config.options.horizontalLines[0].y = period1avg;
      var period2avg = grouping_labels.reduce(avg_reduce(2, data.groupings), 0);
      chart.config.options.horizontalLines[1].y = period2avg;
+     //chart.config.options.scales.yAxes.ticks.max = Math.max.apply(null, chart.config.data.datasets[0].data.concat(chart.config.data.datasets[1].data))*1.04;
      chart.update();
   }
   function ticksCallback(value, index, values) {
@@ -225,6 +230,26 @@ $script = <<<JS
       data: data,
       options: {
           responsive: true,
+          animation: {
+              onComplete: function(animation) {
+                  ctx = this.chart.ctx;
+                  chart = this;
+
+                  ctx.fillStyle = 'rgb(70, 90, 119)'; 
+                  ctx.textAlign = 'center';
+                  ctx.textBaseline = 'bottom';
+                  ctx.font = '11px Helvetica';
+
+                  datasets = this.config.data.datasets;
+                  datasets.forEach(function (dataset, i) {
+                      chart.getDatasetMeta(i).data.forEach(function (p, j) {
+                          var y = p._model.y;
+                          if (p._model.y < 50) y = p._model.y - 45;
+                          ctx.fillText(Math.round(datasets[i].data[j]), p._model.x, y, Math.ceil(p._model.width));
+                      });
+                  });
+              }
+          },
           horizontalLines: [{
               y: period1avg,
               style: 'rgba(255,99,132,1)',
@@ -243,12 +268,12 @@ $script = <<<JS
                   },
                   ticks: {
                       userCallback: ticksCallback,
-                      min: 0,
-                      //max: 100,
                   },
               }]
           }
       }
   });
+  $('.color1 span.form-control').css('background-color', '{$color1['bg']}');
+  $('.color2 span.form-control').css('background-color', '{$color2['bg']}');
 JS;
 $this->registerJs($script);

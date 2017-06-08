@@ -24,16 +24,16 @@ insert into archived_invoice (month, amount_euc, office, transaction_type, subje
 insert into archived_attribution (archived_invoice_id, attributed_euc, advisor_id, commission_euc, n_operations_c)
     select ai.id,
            case when ha_s.sum <> 0 then
-               cast(attributed_euc::float/ha_s.sum*amount_euc as int)
+               cast(attributed_euc::float/ha_s.sum*(ha_s.sum*mw.weight/ai_s.sum)*amount_euc as int)
            else
                0
            end,
            ad.id,
            cast(commission_euc::float*mw.weight as int),
            case when ha_sop.sum <> 0 and ai.transaction_type = 'COMPRAVENTA' then 
-               cast(n_sales_c::float/ha_sop.sum*n_operations_c as int)
+               cast(n_sales_c::float/ha_sop.sum*((ha_rop.sum + ha_sop.sum)*mw.weight/ai_op.sum)*n_operations_c as int)
            when ha_rop.sum <> 0 and ai.transaction_type = 'ALQUILER' then 
-               cast(n_rentals_c::float/ha_rop.sum*n_operations_c as int)
+               cast(n_rentals_c::float/ha_rop.sum*((ha_rop.sum + ha_sop.sum)*mw.weight/ai_op.sum)*n_operations_c as int)
            else
                0
            end
@@ -54,6 +54,16 @@ insert into archived_attribution (archived_invoice_id, attributed_euc, advisor_i
          ) mw
          join advisor ad on (ad.name = ha.advisor)
          join archived_invoice ai on (make_date(ha.year::int, mw.month, 1) = ai.month and coalesce(ha.office, '') = coalesce(ai.office, ''))
+         join (
+             select month, office, sum(amount_euc::int)
+             from archived_invoice
+             group by month, office
+         ) ai_s on (ai_s.month = ai.month and coalesce(ai_s.office, '') = coalesce(ai.office, ''))
+         join (
+             select month, office, sum(n_operations_c::int)
+             from archived_invoice
+             group by month, office
+         ) ai_op on (ai_op.month = ai.month and coalesce(ai_op.office, '') = coalesce(ai.office, ''))
          join (
              select year, office, sum(attributed_euc::int)
              from resumen_historico_atribucion ha
