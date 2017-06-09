@@ -279,17 +279,32 @@ class Advisor extends \yii\db\ActiveRecord
     }
     /**
      */
-    public static function getAttributionOverOperationCount($from, $to, $sum_alias = 'sum', $count_alias = 'count')
+    public static function getAttributionOverOperationCount($from, $to, $sum_alias = 'sum', $count_alias = 'count', $not_attributed = 'na')
     {
-        return static::find()
-            ->joinWith(['effectiveAttributions.attributionType', 'effectiveAttributions.transaction' => function($q) use ($from, $to) {
-                $q->where('option_signed_at between :from and :to', [
-                    ':from' => $from,
-                    ':to' => $to
-                ])->andWhere(['<>', 'attribution_bp', 0]);
-            }])->select(['advisor.name', "round(sum(amount_euc)/count(*) / 100, 2) as {$sum_alias}", "count(*) as {$count_alias}"])
+        $query1 = static::find()
+            ->joinWith(['effectiveAttributions.transaction' => function($q) use ($from, $to) {
+                $q->where('option_signed_at between :from1 and :to1', [
+                    ':from1' => $from,
+                    ':to1' => $to
+                ])->andWhere(['>', 'effective_attribution.amount_euc', 0]);
+            }])->innerJoin('(
+                select advisor_id, count(*)
+                from (
+                    select distinct on (transaction_id) transaction_id, advisor_id
+                    from effective_attribution) ea join 
+                    transaction t on (t.id = ea.transaction_id) join
+                    advisor ad on ea.advisor_id = ad.id 
+                where option_signed_at between :from2 and :to2 group by advisor_id) ea_tx', 'ea_tx.advisor_id = advisor.id', [ 
+                ':from2' => $from,
+                ':to2' => $to
+            ])->select(['advisor.name', "round(sum(amount_euc)/ea_tx.count / 100, 2) as {$sum_alias}", "count(*) as {$count_alias}"])
             ->orderBy('advisor.name')
-            ->groupBy('advisor.name')
-            ->createCommand()->queryAll();
+            ->groupBy('advisor.name, ea_tx.count');
+        $query2 = (new \yii\db\Query())
+            ->select(['(:na::varchar) as name', "round(sum(our_fee_euc)/100./count(*), 2) as {$sum_alias}", "count(*) as {$count_alias}"])
+            ->from('transaction')
+            ->where('our_fee_euc > 0 and option_signed_at between :from3 and :to3')
+            ->addParams([':na' => $not_attributed, ':from3' => $from, ':to3' => $to]);
+        return $query1->union($query2, false)->createCommand()->queryAll();
     }
 }

@@ -12,6 +12,7 @@ $this->params['breadcrumbs'][] = $title;
 $color1 = ['bg' => 'rgba(255, 99, 132, 0.4)', 'border' => 'rgba(255,99,132,1)'];
 $color2 = ['bg' => 'rgba(54, 162, 235, 0.4)', 'border' => 'rgba(54, 162, 235, 1)'];
 if (!isset($comments)) $comments = '';
+if (!isset($subtitle)) $subtitle = '';
 ?>
 <div class="groupings-comparison">
   <h1 class="page-header"><?= $title ?></h1>

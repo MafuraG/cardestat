@@ -181,7 +181,8 @@ class Office extends \yii\db\ActiveRecord
                     select sum(ea.amount_euc), transaction_id
                     from effective_attribution ea join
                         transaction t on t.id = ea.transaction_id
-                    where option_signed_at between :from_na1 and :to_na1
+                    where option_signed_at between :from_na1 and :to_na1 and
+                        our_fee_euc > 0
                     group by transaction_id) tx_attribution on transaction.id = transaction_id
                 where our_fee_euc > 0 and option_signed_at between :from_na2 and :to_na2) not_attributed', 'false', [
                 ':from_na1' => $from,
@@ -199,24 +200,51 @@ class Office extends \yii\db\ActiveRecord
 
     /**
      */
-    public static function getProratedOperationCount($from, $to, $sum_alias = 'sum', $count_alias = 'count')
+    public static function getProratedOperationCount($from, $to, $sum_alias = 'sum', $count_alias = 'count', $no_office = 'NO', $not_attributed = 'NA')
     {
         return static::find()
-            ->joinWith(['effectiveAttributions.attributionType', 'attributions.transaction' => function($q) use ($from, $to) {
-                $q->where('option_signed_at between :from and :to', [
+            ->joinWith(['effectiveAttributions.attributionType', 'effectiveAttributions.transaction' => function($q) use ($from, $to) {
+                $q->where('transaction.id is null or option_signed_at between :from and :to', [
                     ':from' => $from,
                     ':to' => $to
                 ]);
-            }])->select(['office.name', "round(sum(attribution_type.attribution_bp / 10000.), 4) as {$sum_alias}", "count(*) as {$count_alias}"])
-            ->orderBy('office.name')
-            ->groupBy('office.name')
+            }])->join('full join', '(
+                select sum(attribution_bp), :na_no::varchar as name
+                from effective_attribution ea join
+                     attribution_type at on (at.id = ea.attribution_type_id) join
+                     transaction t on (ea.transaction_id = t.id)
+                where option_signed_at between :from_no and :to_no and
+                    office is null) wo_office', 'false', [
+                ':from_no' => $from,
+                ':to_no' => $to,
+                ':na_no' => $no_office
+            ])->join('full join', '(
+                select count(*)*10000 - sum(tx_attribution_bp.sum) as sum, :na1::varchar as name
+                from transaction left join (
+                    select sum(attribution_bp), transaction_id
+                    from effective_attribution ea join
+                        attribution_type at on (at.id = ea.attribution_type_id) join
+                        transaction t on t.id = ea.transaction_id
+                    where option_signed_at between :from_na1 and :to_na1
+                    group by transaction_id) tx_attribution_bp on transaction.id = transaction_id
+                where option_signed_at between :from_na2 and :to_na2) not_attributed', 'false', [
+                ':from_na1' => $from,
+                ':to_na1' => $to,
+                ':from_na2' => $from,
+                ':to_na2' => $to,
+                ':na1' => $not_attributed
+            ])->select([
+                'coalesce(office.name, wo_office.name, not_attributed.name) as name',
+                "round(sum(coalesce(attribution_type.attribution_bp, 0) + coalesce(wo_office.sum, 0) + coalesce(not_attributed.sum, 0)) / 10000., 4) as {$sum_alias}", "count(*) as {$count_alias}"
+            ])
+            ->groupBy(['coalesce(office.name, wo_office.name, not_attributed.name)'])
             ->createCommand()->queryAll();
     }
     /**
      */
-    public static function getAttributionOverOperationCount($from, $to, $sum_alias = 'sum', $count_alias = 'count')
+    public static function getAttributionOverOperationCount($from, $to, $sum_alias = 'sum', $count_alias = 'count', $wo_office = 'NO', $not_attributed = 'NA')
     {
-        return static::find()
+        $query1 = static::find()
             ->joinWith(['effectiveAttributions.attributionType', 'effectiveAttributions.transaction' => function($q) use ($from, $to) {
                 $q->where('option_signed_at between :from and :to', [
                     ':from' => $from,
@@ -224,7 +252,29 @@ class Office extends \yii\db\ActiveRecord
                 ]);
             }])->select(['office.name', "round(sum(amount_euc)/count(*) / 100, 2) as {$sum_alias}", "count(*) as {$count_alias}"])
             ->orderBy('office.name')
-            ->groupBy('office.name')
-            ->createCommand()->queryAll();
+            ->groupBy('office.name');
+        $query2 = (new \yii\db\Query())
+            ->select(['(:na::varchar) as name', "round(greatest(0, sum(our_fee_euc - tx_attributed.net))/100./count(*), 0) as {$sum_alias}", "count(*) as {$count_alias}"])
+            ->from('transaction')
+            ->innerJoin('(
+                select sum(amount_euc) as net, transaction_id  
+                from effective_attribution ea join 
+                    transaction t on ea.transaction_id = t.id
+                where our_fee_euc > 0 and option_signed_at between :from3 and :to3
+                group by transaction_id) tx_attributed', 'tx_attributed.transaction_id = transaction.id')
+            ->where('our_fee_euc > 0 and option_signed_at between :from4 and :to4')
+            ->addParams([':na' => $not_attributed, ':from3' => $from, ':to3' => $to, ':from4' => $from, ':to4' => $to]);
+        $query3 = (new \yii\db\Query())
+            ->select(['(:wo::varchar) as name', "round(sum(tx_attributed.net)/100./count(*), 0) as {$sum_alias}", "count(*) as {$count_alias}"])
+            ->from('transaction')
+            ->innerJoin('(
+                select sum(amount_euc) as net, transaction_id  
+                from effective_attribution ea join 
+                    transaction t on ea.transaction_id = t.id
+                where office is null and our_fee_euc > 0 and option_signed_at between :from5 and :to5
+                group by transaction_id) tx_attributed', 'tx_attributed.transaction_id = transaction.id')
+            ->where('our_fee_euc > 0 and option_signed_at between :from6 and :to6')
+            ->addParams([':wo' => $wo_office, ':from5' => $from, ':to5' => $to, ':from6' => $from, ':to6' => $to]);
+        return $query1->union($query2, false)->union($query3, false)->createCommand()->queryAll();
     }
 }

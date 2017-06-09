@@ -9,6 +9,7 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
+use yii\web\ServerErrorHttpException;
 
 class ContactController extends Controller
 {
@@ -29,6 +30,7 @@ class ContactController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                    'on-office' => ['POST']
                 ],
             ],
         ];
@@ -42,10 +44,23 @@ class ContactController extends Controller
     {
         $dataProvider = new ActiveDataProvider([
             'query' => Contact::find(),
+            'sort' => [
+                'defaultOrder' => ['updated_at' => SORT_DESC]
+            ]
         ]);
         return $this->render('index', [
             'dataProvider' => $dataProvider,
         ]);
+    }
+
+    public function actionSyncOnoffice() {
+        $consoleController = new \app\commands\CsvImportController('csv-import', Yii::$app); 
+        ini_set('memory_limit', '1G');
+        try {
+            $consoleController->runAction('contacts');
+        } catch (\Exception $e) {
+            throw new ServerErrorHttpException(Yii::t('app', 'Field mapping broken. Please check the mapping for onOffice CSV'));
+        }
     }
 
     public function actionList($q = null, $id = null, $page = 1)

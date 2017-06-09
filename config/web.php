@@ -8,6 +8,9 @@ $config = [
     'sourceLanguage' => 'en',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
+    'aliases' => [
+        '@commands' =>  dirname(dirname(__DIR__)) . '/commands'
+    ],
     'defaultRoute' => 'transaction',
     'modules' => [
         'gridview' => [

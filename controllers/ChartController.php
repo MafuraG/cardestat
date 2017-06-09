@@ -44,6 +44,7 @@ class ChartController extends Controller
             12 => Yii::t('app', 'Yearly'),
         ];
         $title= Yii::t('app', 'No. transactions');
+        $subtitle = Yii::t('app', 'Number of all our transactions vs. transactions shared with partners');
         $data = [
             'sums' => $turnover,
             'from' => $from,
@@ -55,7 +56,7 @@ class ChartController extends Controller
             'label1' => Yii::t('app', 'All transactions'),
             'label2' => Yii::t('app', 'Shared transactions'),
             'title' => $title,
-            'subtitle' => null,
+            'subtitle' => $subtitle,
             'comments' => null
         ];
         if (Yii::$app->request->isAjax) {
@@ -173,18 +174,24 @@ class ChartController extends Controller
     public function actionPrOperationByOffice($from1 = null, $to1 = null, $label1 = null, $from2 = null, $to2 = null, $label2 = null)
     {
         list($period1, $period2) = $this->getSumByCountDefaultPeriods($from1, $to1, $label1, $from2, $to2, $label2);
+        $no = mb_strtoupper(Yii::t('app', 'Employees w/o office'));
+        $na = mb_strtoupper(Yii::t('app', 'Direction (no office)'));
         $aux1 = ArrayHelper::index(
-            Office::getProratedOperationCount($period1['from'], $period1['to'], 'sum1_eu', 'count1'), 'name');
+            Office::getProratedOperationCount($period1['from'], $period1['to'], 'sum1_eu', 'count1', $no, $na), 'name');
         $aux2 = ArrayHelper::index(
-            Office::getProratedOperationCount($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'name');
+            Office::getProratedOperationCount($period2['from'], $period2['to'], 'sum2_eu', 'count2', $no, $na), 'name');
         $offices = ArrayHelper::merge($aux1, $aux2);
         ksort($offices);
         $title= Yii::t('app', 'Prorated Operations by office');
+        $subtitle = Yii::t('app', 'Total number of pro-rated operations per office');
+        $comments = Yii::t('app', 'A pro-rated number for an operation is the proportion attributed to the office in that operation.');
         $data = [
             'groupings' => $offices,
             'period1' => $period1,
             'period2' => $period2,
             'title' => $title,
+            'subtitle' => $subtitle,
+            'comments' => $comments,
             'label' => Yii::t('app', 'No. operations')
         ];
         if (Yii::$app->request->isAjax) {
@@ -256,18 +263,23 @@ class ChartController extends Controller
     public function actionAttributionOverOperationByOffice($from1 = null, $to1 = null, $label1 = null, $from2 = null, $to2 = null, $label2 = null)
     {
         list($period1, $period2) = $this->getSumByCountDefaultPeriods($from1, $to1, $label1, $from2, $to2, $label2);
+        $no = mb_strtoupper(Yii::t('app', 'Employees w/o office'));
+        $na = mb_strtoupper(Yii::t('app', 'Direction (no office)'));
         $aux1 = ArrayHelper::index(
-            Office::getAttributionOverOperationCount($period1['from'], $period1['to'], 'sum1_eu', 'count1'), 'name');
+            Office::getAttributionOverOperationCount($period1['from'], $period1['to'], 'sum1_eu', 'count1', $no, $na), 'name');
         $aux2 = ArrayHelper::index(
-            Office::getAttributionOverOperationCount($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'name');
+            Office::getAttributionOverOperationCount($period2['from'], $period2['to'], 'sum2_eu', 'count2', $no, $na), 'name');
         $offices = ArrayHelper::merge($aux1, $aux2);
         ksort($offices);
         $title= Yii::t('app', 'Attributed/Operation by office');
+        $subtitle = Yii::t('app', '');
+        $subtitle = Yii::t('app', 'Average attribution per operation by office');
         $data = [
             'groupings' => $offices,
             'period1' => $period1,
             'period2' => $period2,
             'title' => $title,
+            'subtitle' => $subtitle,
             'label' => Yii::t('app', 'Attributed') . ' €'
         ];
         if (Yii::$app->request->isAjax) {
@@ -287,11 +299,16 @@ class ChartController extends Controller
         $advisors = ArrayHelper::merge($aux1, $aux2);
         ksort($advisors);
         $title= Yii::t('app', 'Prorated Operations by advisor');
+        $subtitle = Yii::t('app', 'Total number of pro-rated operations per advisor');//Numero de operaciones prorrateadas por asesor');
+        $comments = Yii::t('app', 'A pro-rated number for an operation is the proportion attributed to the advisor in that operation.');
         $data = [
             'groupings' => $advisors,
             'period1' => $period1,
             'period2' => $period2,
             'title' => $title,
+            'title' => $title,
+            'subtitle' => $subtitle,
+            'comments' => $comments,
             'label' => Yii::t('app', 'No. operations')
         ];
         if (Yii::$app->request->isAjax) {
@@ -361,18 +378,21 @@ class ChartController extends Controller
     public function actionAttributionOverOperationByAdvisor($from1 = null, $to1 = null, $label1 = null, $from2 = null, $to2 = null, $label2 = null)
     {
         list($period1, $period2) = $this->getSumByCountDefaultPeriods($from1, $to1, $label1, $from2, $to2, $label2);
+        $na = mb_strtoupper(Yii::t('app', 'Direction'));
         $aux1 = ArrayHelper::index(
-            Advisor::getAttributionOverOperationCount($period1['from'], $period1['to'], 'sum1_eu', 'count1'), 'name');
+            Advisor::getAttributionOverOperationCount($period1['from'], $period1['to'], 'sum1_eu', 'count1', $na), 'name');
         $aux2 = ArrayHelper::index(
-            Advisor::getAttributionOverOperationCount($period2['from'], $period2['to'], 'sum2_eu', 'count2'), 'name');
+            Advisor::getAttributionOverOperationCount($period2['from'], $period2['to'], 'sum2_eu', 'count2', $na), 'name');
         $advisors = ArrayHelper::merge($aux1, $aux2);
         ksort($advisors);
         $title= Yii::t('app', 'Attributed/Operation by advisor');
+        $subtitle = Yii::t('app', 'Average attribution per operation by advisor');
         $data = [
             'groupings' => $advisors,
             'period1' => $period1,
             'period2' => $period2,
             'title' => $title,
+            'subtitle' => $subtitle,
             'label' => Yii::t('app', 'Attributed') . ' €'
         ];
         if (Yii::$app->request->isAjax) {

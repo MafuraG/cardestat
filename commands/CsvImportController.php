@@ -34,7 +34,6 @@ class CsvImportController extends Controller {
         $attributes = ArrayHelper::map(Configuration::find()->where([
             'category' => 'ONOFFICE_CSV2PROPERTY'
         ])->asArray()->all(), 'value', 'name');
-        $configs = $this->mkConfig($property_dump, $attributes);
 
         $url = Configuration::find()->where([
             'category' => 'FTP_ONOFFICE',
@@ -42,11 +41,26 @@ class CsvImportController extends Controller {
         ])->one()->value;
         $importer = new CSVImporter;
         $importer->setData(new CSVReader([
+            'startFromLine' => 0,
             'filename' => $url,
                 'fgetcsvOptions' => [
                     'delimiter' => ';'
                 ]
         ]));
+        $data = $importer->getData();
+        $header = $data[0];
+        unset($data[0]);
+        $reader = new CSVArrayReader(['data' => $data]);
+        $importer->setData($reader);
+        $attr_mapping = [];
+        $n_cols = count($attributes);
+        foreach ($attributes as $csv_col => $field) {
+            $i = array_search($csv_col, $header);
+            if ($i !== false) $attr_mapping[$i] = $field;
+        }
+        if ($n_cols != count($attr_mapping))
+            throw new \Exception(Yii::t('app', 'Field mapping broken. Please check the mapping for onOffice CSV'));
+        $configs = $this->mkConfig($property_dump, $attr_mapping);
         $connection = Yii::$app->getDb();
         $connection->createCommand()->truncateTable(PropertyDump::tableName())->execute();
         $nrows = $importer->import(new MultipleImportStrategy([
@@ -120,7 +134,6 @@ class CsvImportController extends Controller {
         $attributes = ArrayHelper::map(Configuration::find()->where([
             'category' => 'ONOFFICE_CSV2CONTACT'
         ])->asArray()->all(), 'value', 'name');
-        $configs = $this->mkConfig($contact_dump, $attributes);
 
         $url = Configuration::find()->where([
             'category' => 'FTP_ONOFFICE',
@@ -128,11 +141,26 @@ class CsvImportController extends Controller {
         ])->one()->value;
         $importer = new CSVImporter;
         $importer->setData(new CSVReader([
+            'startFromLine' => 0,
             'filename' => $url,
                 'fgetcsvOptions' => [
                     'delimiter' => ';'
                 ]
         ]));
+        $data = $importer->getData();
+        $header = $data[0];
+        unset($data[0]);
+        $reader = new CSVArrayReader(['data' => $data]);
+        $importer->setData($reader);
+        $attr_mapping = [];
+        $n_cols = count($attributes);
+        foreach ($attributes as $csv_col => $field) {
+            $i = array_search($csv_col, $header);
+            $attr_mapping[$i] = $field;
+        }
+        if ($n_cols != count($attr_mapping))
+            throw new \Exception(Yii::t('app', 'Field mapping broken. Please check the mapping for onOffice CSV'));
+        $configs = $this->mkConfig($contact_dump, $attr_mapping);
         $connection = Yii::$app->getDb();
         $connection->createCommand()->truncateTable(ContactDump::tableName())->execute();
         $nrows = $importer->import(new MultipleImportStrategy([

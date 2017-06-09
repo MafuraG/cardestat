@@ -44,7 +44,7 @@ AppAsset::register($this);
         'items' => [
             ['label' => \Yii::t('app', 'Home'), 'url' => ['/'], 'active' => false],
             ['label' => \Yii::t('app', 'Transactions'), 'url' => ['/transaction/index']],
-            ['label' => \Yii::t('app', 'Commissions'), 'url' => ['/transaction/commissions']],
+            ['label' => \Yii::t('app', 'Commissions'), 'url' => ['/transaction/commissions', 'visible' => Yii::$app->user->can('accounting')]],
             ['label' => \Yii::t('app', 'Misc'), 'items' => [
                 ['label' => \Yii::t('app', 'Contacts'), 'url' => ['/contact/index']],
                 ['label' => \Yii::t('app', 'Properties'), 'url' => ['/property/index']],
@@ -53,7 +53,7 @@ AppAsset::register($this);
                 ['label' => \Yii::t('app', 'Partners'), 'url' => ['/partner/index']],
                 ['label' => \Yii::t('app', 'Attribution types'), 'url' => ['/attribution-type/index']],
             ]],
-            ['label' => \Yii::t('app', 'Charts'), 'active' => Yii::$app->controller->id == 'chart', 'items' => [
+            ['label' => \Yii::t('app', 'Charts'), 'active' => Yii::$app->controller->id == 'chart', 'visible' => Yii::$app->user->can('accounting'), 'items' => [
                 ['label' => Yii::t('app', 'Trading volume'), 'options' => ['class' => 'dropdown-header']],
                 ['label' => \Yii::t('app', 'Volume vs. Revenues'), 'url' => ['/chart/volume']],
                 ['label' => \Yii::t('app', 'Accumulated Volume vs. Revenues'), 'url' => ['/chart/accu-volume']],
@@ -63,7 +63,6 @@ AppAsset::register($this);
                 ['label' => \Yii::t('app', 'Attribution by advisor (<em>invoice date</em>)'), 'url' => ['/chart/attribution-by-advisor-on-invoice-date']],
                 ['label' => \Yii::t('app', 'Attribution by office (<em>option date</em>)'), 'url' => ['/chart/attribution-by-office-on-option-date']],
                 ['label' => \Yii::t('app', 'Attribution by office (<em>invoice date</em>)'), 'url' => ['/chart/attribution-by-office-on-invoice-date']],
-                /*
                 ['label' => Yii::t('app', 'Transactions'), 'options' => ['class' => 'dropdown-header']],
                 ['label' => \Yii::t('app', 'No. transactions'), 'url' => ['/chart/transactions']],
                 ['label' => \Yii::t('app', 'Prorated Operations by advisor'), 'url' => ['/chart/pr-operation-by-advisor']],
@@ -71,9 +70,8 @@ AppAsset::register($this);
                 ['label' => Yii::t('app', 'Ratios'), 'options' => ['class' => 'dropdown-header']],
                 ['label' => \Yii::t('app', 'Attributed/Operation by advisor'), 'url' => ['/chart/attribution-over-operation-by-advisor']],
                 ['label' => \Yii::t('app', 'Attributed/Operation by office'), 'url' => ['/chart/attribution-over-operation-by-office']],
-                */
             ]],
-            ['label' => \Yii::t('app', 'Presentations'), 'items' => [
+            ['label' => \Yii::t('app', 'Presentations'), 'visible' => \Yii::$app->user->can('admin'), 'items' => [
                 ['label' => \Yii::t('app', 'Salesmeter'), 'url' => ['/presentation/n-sales']],
             ]],
             ['label' => \Yii::t('app', 'Users'), 'url' => ['/user/index'], 'visible' => \Yii::$app->user->can('admin')],
