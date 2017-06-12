@@ -54,6 +54,7 @@ AppAsset::register($this);
                 ['label' => \Yii::t('app', 'Attribution types'), 'url' => ['/attribution-type/index'], 'visible' => \Yii::$app->user->can('accounting')],
             ]],
             ['label' => \Yii::t('app', 'Charts'), 'active' => Yii::$app->controller->id == 'chart', 'visible' => Yii::$app->user->can('accounting'), 'items' => [
+                ['label' => Yii::t('app', '<em><strong>All charts on option date by default</strong></em>'), 'options' => ['class' => 'text-center dropdown-header']],
                 ['label' => Yii::t('app', 'Trading volume'), 'options' => ['class' => 'dropdown-header']],
                 ['label' => \Yii::t('app', 'Volume vs. Revenues'), 'url' => ['/chart/volume']],
                 ['label' => \Yii::t('app', 'Accumulated Volume vs. Revenues'), 'url' => ['/chart/accu-volume']],

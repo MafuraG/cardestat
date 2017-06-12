@@ -45,6 +45,7 @@ class ChartController extends Controller
         ];
         $title= Yii::t('app', 'No. transactions');
         $subtitle = Yii::t('app', 'Number of all our transactions vs. transactions shared with partners');
+        $comments = Yii::t('app', 'All transactions: no. those participated by {company} / Shared transactions: those where a partner brings either the seller or the buyer.', ['company' => Yii::$app->params['company']]);
         $data = [
             'sums' => $turnover,
             'from' => $from,
@@ -57,7 +58,7 @@ class ChartController extends Controller
             'label2' => Yii::t('app', 'Shared transactions'),
             'title' => $title,
             'subtitle' => $subtitle,
-            'comments' => null
+            'comments' => $comments
         ];
         if (Yii::$app->request->isAjax) {
             Yii::$app->response->format = Response::FORMAT_JSON;

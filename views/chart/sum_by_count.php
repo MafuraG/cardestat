@@ -154,7 +154,7 @@ $script = <<<JS
                   }
                   if (line.text) {
                       ctx.fillStyle = style;
-                      ctx.fillText(line.text, 0, yValue - 16);
+                      ctx.fillText(line.text, 16, yValue - 16);
                   }
               }
           }
@@ -216,8 +216,10 @@ $script = <<<JS
      chart.config.data.datasets[1].data = grouping_labels.map(data_map(2, data.groupings));
      var period1avg = grouping_labels.reduce(avg_reduce(1, data.groupings), 0);
      chart.config.options.horizontalLines[0].y = period1avg;
+     chart.config.options.horizontalLines[0].text = ticksCallback(period1avg);
      var period2avg = grouping_labels.reduce(avg_reduce(2, data.groupings), 0);
      chart.config.options.horizontalLines[1].y = period2avg;
+     chart.config.options.horizontalLines[1].text = ticksCallback(period2avg);
      //chart.config.options.scales.yAxes.ticks.max = Math.max.apply(null, chart.config.data.datasets[0].data.concat(chart.config.data.datasets[1].data))*1.04;
      chart.update();
   }
@@ -254,9 +256,11 @@ $script = <<<JS
           horizontalLines: [{
               y: period1avg,
               style: 'rgba(255,99,132,1)',
+              text: ticksCallback(period1avg)
           }, {
               y: period2avg,
               style: 'rgba(54, 162, 235, 1)',
+              text: ticksCallback(period2avg)
           }], scales: {
               xAxes: [{
                   type: 'category',

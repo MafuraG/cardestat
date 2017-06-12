@@ -36,6 +36,8 @@ return [
     'Adding row' => 'Añadiendo fila',
     'Adding user...' => 'Añadiendo usuario...',
     'Adding...' => 'Añadiendo...',
+    '<em><strong>All charts on option date by default</strong></em>' => '<em><strong>Todas las gráficas a fecha de opción por defecto</strong></em>',
+    'All transactions: no. those participated by {company} / Shared transactions: those where a partner brings either the seller or the buyer.' => 'Todas las transacciones: aquellas en que ha participado {company} / Transacciones compartidas: aquellas en que un colaborador aporta el vendedor o el comprador.',
     'April' => 'Abril',
     'Are you sure you want to delete this table and all its readings?' => '¿Seguro que desea eliminar esta tabla y todas sus lecturas?',
     'Are you sure you want to delete this user?' => '¿Seguro que desea eliminar este usuario?',
