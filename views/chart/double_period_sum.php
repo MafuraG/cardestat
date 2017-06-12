@@ -86,6 +86,26 @@ $script = <<<JS
           }]
       },
       options: {
+          animation: {
+              onComplete: function(animation) {
+                  ctx = this.chart.ctx;
+                  chart = this;
+
+                  ctx.fillStyle = 'rgb(70, 90, 119)'; 
+                  ctx.textAlign = 'center';
+                  ctx.textBaseline = 'bottom';
+                  ctx.font = '11px Helvetica';
+
+                  datasets = this.config.data.datasets;
+                  datasets.forEach(function (dataset, i) {
+                      chart.getDatasetMeta(i).data.forEach(function (p, j) {
+                          var y = p._model.y -10;
+                          if (y < 50) y = p._model.y - 15;
+                          ctx.fillText(Math.round(datasets[i].data[j]), p._model.x + (i*2 -1)*30, y);
+                      });
+                  });
+              }
+          },
           scaleStartValue: 0,
           scales: {
               yAxes: [{
