@@ -19,6 +19,7 @@ use yii\helpers\ArrayHelper;
 class AttributionType extends \yii\db\ActiveRecord
 {
     public $attribution_pct;
+    const SCENARIO_UPDATE = 'update';
     /**
      * @inheritdoc
      */
@@ -39,6 +40,14 @@ class AttributionType extends \yii\db\ActiveRecord
             [['name'], 'string', 'max' => 32],
             [['name', 'attribution_pct'], 'unique', 'targetAttribute' => ['name', 'attribution_bp'], 'message' => 'The combination of Name and Attribution bips has already been taken.'],
         ];
+    }
+
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios[self::SCENARIO_UPDATE] = ['active'];
+
+        return $scenarios;
     }
 
     /**

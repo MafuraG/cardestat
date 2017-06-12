@@ -15,10 +15,11 @@ $pctTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-
     <div class="col-md-6">
       <?php $form = ActiveForm::begin(); ?>
   
-      <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+      <?= $form->field($model, 'name')->textInput(['maxlength' => true, 'readonly' => !$model->isNewRecord]) ?>
   
       <?= $form->field($model, 'attribution_pct', ['template' => $pctTpl])->widget(MaskMoney::classname(), ['options' => [
           'class' => 'text-right input-sm mask-money',
+          'readonly' => !$model->isNewRecord
       ]]); ?>
   
       <?= $form->field($model, 'active')->checkbox() ?>
