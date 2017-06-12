@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ['attribute' => 'attribution_bp', 'value' => function ($model, $key, $index, $column) { return $model->attribution_pct . ' %'; }, 'contentOptions' => ['class' => 'text-right']],
             'category',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            ['class' => 'yii\grid\ActionColumn', 'template' => '{view} {delete}'],
         ],
     ]); ?>
 </div>

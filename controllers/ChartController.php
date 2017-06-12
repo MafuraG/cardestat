@@ -78,7 +78,7 @@ class ChartController extends Controller
             3 => Yii::t('app', 'Quarterly'),
             12 => Yii::t('app', 'Yearly'),
         ];
-        $title= Yii::t('app', 'Volume vs. Revenues (<em>signature date</em>)');
+        $title= Yii::t('app', 'Volume vs. Revenues (<em>1st invoice date</em>)');
         $subtitle = Yii::t('app', 'Price of the traded property vs. fees invoiced');
         $comments = Yii::t('app', 'A spread between the curves is normally caused by transactions made in colaboration.');
         $data = [
@@ -113,7 +113,7 @@ class ChartController extends Controller
             3 => Yii::t('app', 'Quarterly'),
             12 => Yii::t('app', 'Yearly'),
         ];
-        $title= Yii::t('app', 'Accumulated Volume vs. Revenues (<em>signature date</em>)');
+        $title= Yii::t('app', 'Accumulated Volume vs. Revenues (<em>1st invoice date</em>)');
         $subtitle = Yii::t('app', 'Price of the traded property vs. fees invoiced');
         $comments = Yii::t('app', 'A spread between the curves is normally caused by transactions made in colaboration.');
         $data = [
@@ -149,7 +149,7 @@ class ChartController extends Controller
             3 => Yii::t('app', 'Quarterly'),
             12 => Yii::t('app', 'Yearly'),
         ];
-        $title= Yii::t('app', 'Avg. Volume vs. Avg. Revenue (<em>signature date</em>)');
+        $title= Yii::t('app', 'Avg. Volume vs. Avg. Revenue (<em>1st invoice date</em>)');
         $subtitle = Yii::t('app', 'Property price per transaction vs. fees invoiced per transaction');
         $data = [
             'sums' => $turnover,
