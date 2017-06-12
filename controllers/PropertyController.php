@@ -44,7 +44,7 @@ class PropertyController extends Controller
         $dataProvider = new ActiveDataProvider([
             'query' => Property::find(),
             'sort' => [
-                'defaultOrder' => ['updated_at' => SORT_DESC]
+                'defaultOrder' => ['updated_at' => SORT_DESC, 'id' => SORT_DESC]
             ]
         ]);
         return $this->render('index', [

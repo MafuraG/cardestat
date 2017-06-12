@@ -35,14 +35,15 @@ class CsvImportController extends Controller {
             'category' => 'ONOFFICE_CSV2PROPERTY'
         ])->asArray()->all(), 'value', 'name');
 
-        $url = Configuration::find()->where([
+        $dir = $_SERVER['ONOFFICE_FTP_URL'];
+        $filename = Configuration::find()->where([
             'category' => 'FTP_ONOFFICE',
-            'name' => 'PROPERTIES_URL'
+            'name' => 'PROPERTIES_FILENAME'
         ])->one()->value;
         $importer = new CSVImporter;
         $importer->setData(new CSVReader([
             'startFromLine' => 0,
-            'filename' => $url,
+            'filename' => "$dir$filename",
                 'fgetcsvOptions' => [
                     'delimiter' => ';'
                 ]
@@ -135,14 +136,15 @@ class CsvImportController extends Controller {
             'category' => 'ONOFFICE_CSV2CONTACT'
         ])->asArray()->all(), 'value', 'name');
 
-        $url = Configuration::find()->where([
+        $dir = $_SERVER['ONOFFICE_FTP_URL'];
+        $filename = Configuration::find()->where([
             'category' => 'FTP_ONOFFICE',
-            'name' => 'CONTACTS_URL'
+            'name' => 'CONTACTS_FILENAME'
         ])->one()->value;
         $importer = new CSVImporter;
         $importer->setData(new CSVReader([
             'startFromLine' => 0,
-            'filename' => $url,
+            'filename' => "$dir$filename",
                 'fgetcsvOptions' => [
                     'delimiter' => ';'
                 ]

@@ -44,14 +44,14 @@ AppAsset::register($this);
         'items' => [
             ['label' => \Yii::t('app', 'Home'), 'url' => ['/'], 'active' => false],
             ['label' => \Yii::t('app', 'Transactions'), 'url' => ['/transaction/index']],
-            ['label' => \Yii::t('app', 'Commissions'), 'url' => ['/transaction/commissions', 'visible' => Yii::$app->user->can('accounting')]],
+            ['label' => \Yii::t('app', 'Commissions'), 'url' => ['/transaction/commissions'], 'visible' => \Yii::$app->user->can('accounting')],
             ['label' => \Yii::t('app', 'Misc'), 'items' => [
                 ['label' => \Yii::t('app', 'Contacts'), 'url' => ['/contact/index']],
                 ['label' => \Yii::t('app', 'Properties'), 'url' => ['/property/index']],
-                ['label' => \Yii::t('app', 'Advisors'), 'url' => ['/advisor/index']],
-                ['label' => \Yii::t('app', 'Offices'), 'url' => ['/office/index']],
-                ['label' => \Yii::t('app', 'Partners'), 'url' => ['/partner/index']],
-                ['label' => \Yii::t('app', 'Attribution types'), 'url' => ['/attribution-type/index']],
+                ['label' => \Yii::t('app', 'Advisors'), 'url' => ['/advisor/index'], 'visible' => \Yii::$app->user->can('accounting')],
+                ['label' => \Yii::t('app', 'Offices'), 'url' => ['/office/index'], 'visible' => \Yii::$app->user->can('accounting')],
+                ['label' => \Yii::t('app', 'Partners'), 'url' => ['/partner/index'], 'visible' => \Yii::$app->user->can('accounting')],
+                ['label' => \Yii::t('app', 'Attribution types'), 'url' => ['/attribution-type/index'], 'visible' => \Yii::$app->user->can('accounting')],
             ]],
             ['label' => \Yii::t('app', 'Charts'), 'active' => Yii::$app->controller->id == 'chart', 'visible' => Yii::$app->user->can('accounting'), 'items' => [
                 ['label' => Yii::t('app', 'Trading volume'), 'options' => ['class' => 'dropdown-header']],
