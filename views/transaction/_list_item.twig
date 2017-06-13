@@ -1,28 +1,35 @@
 {# <?php #}
 {{ set(this, 'params', {'breadcrumbs': [t('app', 'Transactions')]}) }}
 
-<div class="row">
-  <div class="col-md-2">
-    <span class="label label-primary uppercase" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>{{ model.custom_type }}</br>{{ model.transfer_type }}</br>{{ model.development_type }}</div>">{{ model.transaction_type }}</span> <small>{{ app.formatter.asDate(model.option_signed_at, 'dd MMM \'\'yy') }}</small>
-  </div>
-  <div class="col-md-3 uppercase">
-    <div class="ellipsis">
-      <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?modul_name=daten&datensatz=193&inhalt=grunddaten" class="onoffice-icon"></a> 
-      <a data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>{{ model.property_building_complex }}<br>{{ model.property_location }}<br>{{ t('app', 'Ref.') }} {{ model.property_reference }}</div>" href="{{ path({0: 'property/view', id: model.property_id}) }}">{{ model.property_building_complex }}, {{ model.property_location }}</a>
-    </div>
-  </div>
-  <div class="col-md-5 uppercase">
+<style>
+  @media(max-width:1200px) {
+    .transaction-list-item {
+        font-size: 12px;
+    }
+  }
+</style>
+<div class="row transaction-list-item">
+  <div class="col-md-10">
     <div class="row">
-      <div class="col-md-6 text-right">
+      <div class="col-sm-3">
+        <span class="label label-primary uppercase" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>{{ t('app', 'Ref.') }} {{ model.external_id}}<br>{{ model.custom_type }}<br>{{ model.transfer_type }}<br>{{ model.development_type }}</div>">{{ model.transaction_type }}</span> <small>{{ app.formatter.asDate(model.option_signed_at, 'dd MMM \'\'yy') }}</small>
+      </div>
+      <div class="col-sm-3 uppercase">
+        <div class="ellipsis">
+          <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?modul_name=daten&datensatz=193&inhalt=grunddaten" class="onoffice-icon"></a> 
+          <a data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>{{ model.property_building_complex }}<br>{{ model.property_location }}<br>{{ t('app', 'Ref.') }} {{ model.property_reference }}</div>" href="{{ path({0: 'property/view', id: model.property_id}) }}">{{ model.property_building_complex }}, {{ model.property_location }}</a>
+        </div>
+      </div>
+      <div class="col-sm-2 text-right">
         <div class="ellipsis">
           <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?datensatz=33297&seite=0&modul_name=adressen&inhalt=adresse-bearbeiten" class="onoffice-icon"></a> 
           <a data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>{{ model.seller_name }}<br>{{ t('app', 'Ref.') }} {{ model.seller_reference }}</div>" href="{{ path({0: 'contact/view', id: model.seller_id}) }}">{{ model.seller_name }}</a>
         </div>
       </div>
-      <div class="col-md-1 text-center">
+      <div class="col-sm-1 text-center">
         <span class="glyphicon glyphicon-transfer"></span>
       </div>
-      <div class="col-md-5">
+      <div class="col-sm-2">
         <div class="ellipsis">
           <a target="_blank" href="https://smart.onoffice.de/smart25/alle-daten.php?datensatz=33297&seite=0&modul_name=adressen&inhalt=adresse-bearbeiten" class="onoffice-icon"></a> 
           <a data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>{{ model.buyer_name }}<br>{{ t('app', 'Ref.') }} {{ model.buyer_reference }}</div>" href="{{ path({0: 'contact/view', id: model.buyer_id}) }}">{{ model.buyer_name }}</a>
@@ -49,7 +56,7 @@
       <span class="label label-default">100% Cárdenas</span>
     {% else %}
       <span class="label label-warning" data-toggle="tooltip" data-html="true" title="<div class=&quot;text-left&quot;>50% CANARINVEST</div>">50% Cárdenas</span>
-    {% endif %}<small>#{{ model.id}}, {{ t('app', 'Ref.') }} {{ model.external_id}}</small>
+    {% endif %}<small>#{{ model.id}}</small>
   </div>
   <small class="col-md-4 text-warning">
     <div class="ellipsis">
@@ -63,19 +70,23 @@
       {% endif %}
     </div>
   </small>
-  <div class="col-md-2">
-    {% if (model.payroll_month) %}
-      <span class="text-success">{{ t('app', 'Payrolled') }} {{ app.formatter.asDate(model.payroll_month, 'LLL \'\'yy') }}</span> 
-    {% else %}
-      <span class="text-danger">{{ t('app', 'Not payrolled') }}</span>
-    {% endif %}
-  </div>
-  <div class="col-md-2">
-    {% if (model.n_invoices) %}
-      <small class="label label-success">{{ t('app', 'Invoiced') }} &times;{{ model.n_invoices }}</small> <small>{{ t('app', '1st') }} {{ model.first_invoiced_at }}</small>
-    {% else %}
-      <small class="label label-danger">{{ t('app', 'Not invoiced') }}</small>
-    {% endif %}
+  <div class="col-md-4">
+    <div class="row">
+      <div class="col-md-4">
+        {% if (model.payroll_month) %}
+          <span class="text-success">{{ t('app', 'Payrolled') }} {{ app.formatter.asDate(model.payroll_month, 'LLL \'\'yy') }}</span> 
+        {% else %}
+          <span class="text-danger">{{ t('app', 'Not payrolled') }}</span>
+        {% endif %}
+      </div>
+      <div class="col-md-8">
+        {% if (model.n_invoices) %}
+          <small class="label label-success">{{ t('app', 'Invoiced') }} &times;{{ model.n_invoices }}</small> <small>{{ t('app', '1st') }} {{ model.first_invoiced_at }}</small>
+        {% else %}
+          <small class="label label-danger">{{ t('app', 'Not invoiced') }}</small>
+        {% endif %}
+      </div>
+    </div>
   </div>
   <div class="col-md-2 text-right">
     <small class="text-muted">({{ app.formatter.asDecimal(model.our_fee_bp, 2) }}%)</small> {{ app.formatter.asDecimal(model.our_fee_euc/100, 2) }} € &nbsp;

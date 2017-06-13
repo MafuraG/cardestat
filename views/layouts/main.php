@@ -52,6 +52,7 @@ AppAsset::register($this);
                 ['label' => \Yii::t('app', 'Offices'), 'url' => ['/office/index'], 'visible' => \Yii::$app->user->can('accounting')],
                 ['label' => \Yii::t('app', 'Partners'), 'url' => ['/partner/index'], 'visible' => \Yii::$app->user->can('accounting')],
                 ['label' => \Yii::t('app', 'Attribution types'), 'url' => ['/attribution-type/index'], 'visible' => \Yii::$app->user->can('accounting')],
+                ['label' => \Yii::t('app', 'Users'), 'url' => ['/user/index'], 'visible' => \Yii::$app->user->can('admin')]
             ]],
             ['label' => \Yii::t('app', 'Charts'), 'active' => Yii::$app->controller->id == 'chart', 'visible' => Yii::$app->user->can('accounting'), 'items' => [
                 ['label' => Yii::t('app', '<em><strong>All charts on option date by default</strong></em>'), 'options' => ['class' => 'text-center dropdown-header']],
@@ -74,8 +75,7 @@ AppAsset::register($this);
             ]],
             ['label' => \Yii::t('app', 'Presentations'), 'visible' => \Yii::$app->user->can('admin'), 'items' => [
                 ['label' => \Yii::t('app', 'Salesmeter'), 'url' => ['/presentation/n-sales']],
-            ]],
-            ['label' => \Yii::t('app', 'Users'), 'url' => ['/user/index'], 'visible' => \Yii::$app->user->can('admin')],
+            ]]
     ]]);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],

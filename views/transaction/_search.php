@@ -21,7 +21,7 @@ $yesno = [true => Yii::t('app', 'Yes'), false => Yii::t('app', 'No')]
     ]); ?>
     <div class="well well-sm">
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-7">
           <div class="input-group">
             <div style="position: relative">
               <?= Html::activeTextInput($model, 'search_any', ['placeholder' => $model->getAttributeLabel('search_any'), 'class' => 'form-control']); ?>
@@ -106,7 +106,7 @@ $yesno = [true => Yii::t('app', 'Yes'), false => Yii::t('app', 'No')]
                     ->dropDownList($yesno, ['prompt' => Yii::t('app', 'All'), 'class' => 'form-control input-sm']) ?>
               </div>
               <div class="clearfix"></div>
-              <div class="col-md-9">
+              <div class="col-md-12">
                 <div class="form-group">
                   <label><?= Yii::t('app', 'Order by') ?></label>
                   <div class="input-group">
