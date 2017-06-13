@@ -138,6 +138,7 @@ return [
     'Reason' => 'Motivo',
     'Reloading...' => 'Recargando...',
     'Fees invoiced' => 'Honorarios facturados',
+    'Role' => 'Rol',
     'Rows' => 'Filas',
     'Same month previous year' => 'Mismo mes año anterior',
     'Same quarter previous year' => 'Mismo trimestre año anterior',

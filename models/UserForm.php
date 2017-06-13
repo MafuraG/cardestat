@@ -48,6 +48,7 @@ class UserForm extends Model
             'password_repeat' => \Yii::t('app', 'Repeat password'),
             'username' => \Yii::t('app', 'Username'),
             'is_admin' => \Yii::t('app', 'Is admin?'),
+            'role' => \Yii::t('app', 'Role')
         ];
     }
 }

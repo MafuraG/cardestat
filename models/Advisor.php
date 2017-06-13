@@ -41,6 +41,7 @@ class Advisor extends \yii\db\ActiveRecord
             [['default_attribution_type_id'], 'integer'],
             [['name'], 'string', 'max' => 32],
             [['default_office'], 'string', 'max' => 18],
+            ['default_office', 'default', 'value' => null],
             [['name'], 'unique'],
             [['default_attribution_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => AttributionType::className(), 'targetAttribute' => ['default_attribution_type_id' => 'id']],
             [['default_office'], 'exist', 'skipOnError' => true, 'targetClass' => Office::className(), 'targetAttribute' => ['default_office' => 'name']],

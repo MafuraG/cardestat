@@ -45,7 +45,7 @@ class AttributionType extends \yii\db\ActiveRecord
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios[self::SCENARIO_UPDATE] = ['active'];
+        $scenarios[self::SCENARIO_UPDATE] = ['active', 'name'];
 
         return $scenarios;
     }

@@ -41,7 +41,7 @@ MaskmoneyAsset::register($this);
             'is_hub_agent:boolean',
             'default_office', [
                 'attribute' => 'default_attribution_type_id',
-                'value' => $model->defaultAttributionType->name . ' ' . round($model->defaultAttributionType->attribution_bp / 100., 2) . '%'
+                'value' => isset($model->defaultAttributionType) ? ($model->defaultAttributionType->name . ' ' . round($model->defaultAttributionType->attribution_bp / 100., 2) . '%') : ''
             ],
         ],
     ]) ?>
