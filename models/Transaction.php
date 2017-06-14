@@ -104,7 +104,7 @@ class Transaction extends \yii\db\ActiveRecord
             [['first_published_price_eu', 'last_published_price_eu', 'sale_price_eu', 'suggested_sale_price_eu', 'our_fee_eu', 'their_fee_eu'], 'number'],
             [['buyer_id', 'seller_id', 'passed_to_sales_by', 'property_id'], 'integer'],
             [['transaction_type', 'option_signed_at', 'buyer_id', 'seller_id', 'property_id', 'sale_price_eu'], 'required'],
-            [['approved_by_accounting'], 'boolean', 'on' => 'accounting'],
+            [['approved_by_accounting'], 'boolean', 'on' => ['accounting', 'admin']],
             [['approved_by_direction'], 'boolean', 'on' => 'admin'],
             [['is_new_buyer', 'is_new_seller', 'is_home_staged'], 'boolean'],
             [['comments'], 'string'],
