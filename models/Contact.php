@@ -55,6 +55,7 @@ class Contact extends \yii\db\ActiveRecord
             [['first_name', 'last_name', 'nationality', 'contact_source', 'internet', 'country_of_residence'], 'string', 'max' => 42],
             ['type_of_data', 'string', 'max' => 54],
             [['reference'], 'unique'],
+            ['reference', 'required'],
         ];
     }
 

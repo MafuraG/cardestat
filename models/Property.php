@@ -53,6 +53,8 @@ class Property extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            ['reference', 'required'],
+            ['reference', 'unique'],
             [['created_at', 'updated_at'], 'safe'],
             [['entry_date', 'active_date', 'inactive_date'], 'date', 'format' => 'yyyy-MM-dd'],
             ['reference', 'string', 'max' => 12],
