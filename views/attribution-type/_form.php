@@ -19,7 +19,9 @@ $pctTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-
   
       <?= $form->field($model, 'attribution_pct', ['template' => $pctTpl])->widget(MaskMoney::classname(), ['options' => [
           'class' => 'text-right input-sm mask-money',
-          'readonly' => !$model->isNewRecord
+          'readonly' => !$model->isNewRecord,
+      ], 'pluginOptions' => [
+               'allowNegative' => true
       ]]); ?>
   
       <?= $form->field($model, 'category')->textInput(['type' => 'number']) ?>
