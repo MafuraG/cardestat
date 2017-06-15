@@ -11,6 +11,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $id
  * @property string $name
  * @property integer $attribution_bp
+ * @property integer $category
  * @property boolean $active
  *
  * @property Advisor[] $advisors
@@ -36,6 +37,7 @@ class AttributionType extends \yii\db\ActiveRecord
         return [
             [['name', 'attribution_pct'], 'required'],
             [['active'], 'boolean'],
+            ['category', 'integer'],
             [['attribution_pct'], 'number'],
             [['name'], 'string', 'max' => 32],
             [['name', 'attribution_pct'], 'unique', 'targetAttribute' => ['name', 'attribution_bp'], 'message' => 'The combination of Name and Attribution bips has already been taken.'],
@@ -59,6 +61,7 @@ class AttributionType extends \yii\db\ActiveRecord
             'id' => Yii::t('app', 'ID'),
             'name' => Yii::t('app', 'Name'),
             'active' => Yii::t('app', 'Active'),
+            'category' => Yii::t('app', 'Category'),
             'attribution_pct' => Yii::t('app', 'Attribution Rate'),
         ];
     }

@@ -22,6 +22,8 @@ $pctTpl = "{label}\n<div class=\"input-group\">{input}<span class=\"input-group-
           'readonly' => !$model->isNewRecord
       ]]); ?>
   
+      <?= $form->field($model, 'category')->textInput(['type' => 'number']) ?>
+
       <?= $form->field($model, 'active')->checkbox() ?>
   
       <div class="form-group">

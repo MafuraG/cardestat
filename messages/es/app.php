@@ -58,6 +58,7 @@ return [
     'Avg. price of properties traded' => 'Promedio del precio de las propiedades',
     'Avg. fees invoiced' => 'Promedio de los honorarios facturados',
     'Cancel' => 'Cancelar',
+    'Category' => 'Categoría',
     'Charts' => 'Gráficas',
     'Commission sheets' => 'Hojas de comisiones',
     'Compensation' => 'Compensación',
