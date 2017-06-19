@@ -77,7 +77,7 @@ $config = [
                     'extensions' => YII_DEBUG ? [
                         '\Twig_Extension_Debug',
                     ] : [],
-                    'globals' => ['html' => '\yii\helpers\Html'],
+                    'globals' => ['html' => ['class' => '\yii\helpers\Html']],
                     'functions' => array(
                         't' => 'Yii::t',
                     ),
