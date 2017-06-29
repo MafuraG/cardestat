@@ -272,6 +272,9 @@ td.actions .btn .glyphicon-eye-open {
   margin-top: 0;
 }
 
+.ws-nowrap {
+  white-space: nowrap;
+}
 .ellipsis {
   overflow: hidden;
   white-space: nowrap;

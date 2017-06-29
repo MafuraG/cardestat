@@ -130,7 +130,7 @@ foreach ($data as $advisor => $advisor_data): ?>
               <?php $first = true; $rowspan = count($month_data['transactions']); $fmonth = $formatter->asDate($month, 'MMM') ?>
               <tr>
                 <td rowspan="<?= $rowspan ?>">
-                  <h4><button role="button" class="btn btn-danger monospace toggle-payroll" <?php if (($month_data['commission_euc'] + $month_data['compensated_euc']) <= 0) echo 'disabled' ?> data-loading-text="<?= Yii::t('app', 'Saving...') ?>"
+                  <h4><button role="button" class="btn btn-danger monospace toggle-payroll" <?php if (!Yii::$app->user->can('admin') or ($month_data['commission_euc'] + $month_data['compensated_euc']) <= 0) echo 'disabled' ?> data-loading-text="<?= Yii::t('app', 'Saving...') ?>"
                     data-payroll_id="<?= $month_data['payroll']['id'] ?>"><?= $fmonth ?>
                   <?php if (isset($month_data['payroll']['commission_bp'])): ?>
                     <span class="glyphicon glyphicon-folder-close"></span> 

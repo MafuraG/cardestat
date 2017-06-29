@@ -296,7 +296,7 @@ return [
     'Passed To Sales By' => 'Pasado a Ventas por',
     'Password' => 'Contraseña',
     'Passwords don\'t match' => 'Las contraseñas no concuerdan',
-    'Payrolled' => 'En nómina',
+    'Payrolled' => 'Nómina',
     'Not payrolled' => 'Sin nómina',
     'Payroll' => 'Nómina',
     'Please fill out the following fields to login' => 'Por favor, rellene los siguientes campos para ingresar',

@@ -25,7 +25,7 @@ class ChartController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [[
                     'allow' => true,
-                    'roles' => ['admin']
+                    'roles' => ['accounting']
                 ]]
             ],
         ];

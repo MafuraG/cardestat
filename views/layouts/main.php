@@ -48,10 +48,10 @@ AppAsset::register($this);
             ['label' => \Yii::t('app', 'Misc'), 'items' => [
                 ['label' => \Yii::t('app', 'Contacts'), 'url' => ['/contact/index']],
                 ['label' => \Yii::t('app', 'Properties'), 'url' => ['/property/index']],
-                ['label' => \Yii::t('app', 'Advisors'), 'url' => ['/advisor/index'], 'visible' => \Yii::$app->user->can('accounting')],
-                ['label' => \Yii::t('app', 'Offices'), 'url' => ['/office/index'], 'visible' => \Yii::$app->user->can('accounting')],
-                ['label' => \Yii::t('app', 'Partners'), 'url' => ['/partner/index'], 'visible' => \Yii::$app->user->can('accounting')],
-                ['label' => \Yii::t('app', 'Attribution types'), 'url' => ['/attribution-type/index'], 'visible' => \Yii::$app->user->can('accounting')],
+                ['label' => \Yii::t('app', 'Advisors'), 'url' => ['/advisor/index'], 'visible' => \Yii::$app->user->can('admin')],
+                ['label' => \Yii::t('app', 'Offices'), 'url' => ['/office/index'], 'visible' => \Yii::$app->user->can('admin')],
+                ['label' => \Yii::t('app', 'Partners'), 'url' => ['/partner/index'], 'visible' => \Yii::$app->user->can('admin')],
+                ['label' => \Yii::t('app', 'Attribution types'), 'url' => ['/attribution-type/index'], 'visible' => \Yii::$app->user->can('admin')],
                 ['label' => \Yii::t('app', 'Users'), 'url' => ['/user/index'], 'visible' => \Yii::$app->user->can('admin')]
             ]],
             ['label' => \Yii::t('app', 'Charts'), 'active' => Yii::$app->controller->id == 'chart', 'visible' => Yii::$app->user->can('accounting'), 'items' => [

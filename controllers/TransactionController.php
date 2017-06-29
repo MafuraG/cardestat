@@ -44,6 +44,9 @@ class TransactionController extends Controller
                     'allow' => true,
                     'roles' => ['admin']
                 ], [
+                    'actions' => ['toggle-payroll'],
+                    'allow' => false,
+                ], [
                     'allow' => true,
                     'roles' => ['@']
                 ]]

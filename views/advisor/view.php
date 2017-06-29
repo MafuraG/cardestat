@@ -222,6 +222,9 @@ $script = <<< JS
       $(this).closest('tr').remove();
       return false;
   });
+  $('form').on('keydown', function(e) {
+      if (e.keyCode == 13) return false;
+  });
 JS;
 $this->registerJs($script);
 ?>

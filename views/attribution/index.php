@@ -27,7 +27,7 @@ if (!isset($readonly)) $readonly = false;
           'office',
           //['attribute' => 'attribution_type', 'value' => '$model->attribution_type->name'],
           ['attribute' => 'attribution_type_id', 'value' => 'attributionType.name'],
-          ['attribute' => 'attributionType.attribution_bp', 'value' => function($model) {
+          ['attribute' => 'attributionType.attribution_pct', 'value' => function($model) {
               $attrPct = Yii::$app->formatter->asDecimal($model->attributionType->attribution_bp / 100., 2);
               return "$attrPct%";
           }], ['attribute' => 'amount_eu', 'format' => ['currency', 'EUR']],

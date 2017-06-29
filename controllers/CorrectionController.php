@@ -22,7 +22,7 @@ class CorrectionController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [[
                     'allow' => true,
-                    'roles' => ['admin']
+                    'roles' => ['accounting']
                 ]]
             ],
             'verbs' => [
