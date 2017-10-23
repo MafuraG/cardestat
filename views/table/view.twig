@@ -50,7 +50,7 @@
           <th rowspan="{{ n_levels }}" class="bottom-column">{{ t('app', 'Date range') }}</th>
         {% endif %}
         {% for parent_id, item in row %}
-          <th colspan="{{ item['no_leaves'] }}" rowspan="{{ item['span_levels'] }}" class="break-all bottom-column col-xs-1">
+          <th colspan="{{ item['no_leaves'] }}" rowspan="{{ item['span_levels'] }}" class="bottom-column col-xs-1">
             {{ item['name'] }}
           </th>
         {% endfor %}
@@ -116,7 +116,7 @@
             {% for level, row in table %}
               <tr>
                 {% for parent_id, item in row %}
-                  <th colspan="{{ item['no_leaves'] }}" rowspan="{{ item['span_levels'] }}" class="break-all bottom-column">
+                  <th colspan="{{ item['no_leaves'] }}" rowspan="{{ item['span_levels'] }}" class="bottom-column">
                     {{ item['name'] }}
                   </th>
                 {% endfor %}
